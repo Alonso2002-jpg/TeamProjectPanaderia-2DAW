@@ -21,8 +21,6 @@ public class Categoria {
     private Long id;
     @Column(name = "name", unique = true, nullable = false)
     private String nameCategory;
-    @Pattern(regexp = "^(CLIENTE|PRODUCTO|PERSONAL|PROVEEDORES|COMPRAS|OTROS)$", message = "Categorias permitidas: CLIENTE, PRODUCTO, PERSONAL, PROVEEDORES, COMPRAS, OTROS")
-    private String tipo;
     @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDate createdAt = LocalDate.now();
     @Builder.Default
