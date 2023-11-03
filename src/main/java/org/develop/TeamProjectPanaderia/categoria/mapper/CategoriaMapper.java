@@ -4,13 +4,14 @@ import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class CategoriaMapper {
-    public Categoria toCategoria(CategoriaCreateDto dto, Long id) {
+    public Categoria toCategoria(CategoriaCreateDto dto) {
         return Categoria.builder()
-                .id(id)
                 .nameCategory(dto.nameCategory())
                 .isActive(dto.isActive())
                 .build();
@@ -26,8 +27,8 @@ public class CategoriaMapper {
     public Categoria toCategoria(CategoriaUpdateDto update, Categoria categoria){
         return Categoria.builder()
                 .id(categoria.getId())
-                .nameCategory(update.nameCategory())
-                .isActive(update.isActive())
+                .nameCategory(update.nameCategory() == null ? categoria.getNameCategory() : update.nameCategory())
+                .isActive(update.isActive() == null ? categoria.isActive() : update.isActive())
                 .build();
     }
 

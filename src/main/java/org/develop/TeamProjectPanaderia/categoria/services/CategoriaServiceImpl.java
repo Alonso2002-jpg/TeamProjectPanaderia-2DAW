@@ -1,6 +1,10 @@
 package org.develop.TeamProjectPanaderia.categoria.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
+import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
+import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.repositories.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +16,12 @@ import java.util.List;
 @Slf4j
 public class CategoriaServiceImpl implements CategoriaService{
     private final CategoriaRepository categoriaRepository;
+    private final CategoriaMapper categoriaMapper;
 
     @Autowired
-    public CategoriaServiceImpl(CategoriaRepository categoriaRepository) {
+    public CategoriaServiceImpl(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper) {
         this.categoriaRepository = categoriaRepository;
+        this.categoriaMapper = categoriaMapper;
     }
 
     @Override
@@ -29,14 +35,14 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
-    public Categoria save(Categoria categoria) {
-        return categoriaRepository.save(categoria);
+    public Categoria save(CategoriaCreateDto categoria) {
+        return categoriaRepository.save(categoriaMapper.toCategoria(categoria));
     }
 
     @Override
-    public Categoria update(Categoria categoria) {
-        var categoriaUpd = findById(categoria.getId());
-        return categoriaRepository.save(categoriaUpd);
+    public Categoria update(Long id,CategoriaUpdateDto categoria) {
+        var categoriaUpd = findById(id);
+        return categoriaRepository.save(categoriaMapper.toCategoria(categoria,categoriaUpd));
     }
 
     @Override

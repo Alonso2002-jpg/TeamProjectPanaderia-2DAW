@@ -4,6 +4,6 @@ public record CategoriaResponseDto(
         String nameCategory,
         String createdAt,
         String updatedAt,
-        boolean isActive
+        Boolean isActive
 ) {
 }
