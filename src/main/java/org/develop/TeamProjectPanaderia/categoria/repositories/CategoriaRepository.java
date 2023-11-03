@@ -1,4 +1,7 @@
 package org.develop.TeamProjectPanaderia.categoria.repositories;
 
-public interface CategoriaRepository {
+import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
 }
