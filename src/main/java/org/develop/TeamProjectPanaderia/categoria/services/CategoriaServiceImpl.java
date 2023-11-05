@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotFoundException;
+import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotSaveException;
 import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.repositories.CategoriaRepository;
@@ -31,11 +33,14 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public Categoria findById(Long id) {
-        return categoriaRepository.findById(id).orElseThrow(() -> new RuntimeException("No existe la categoria con id: " + id));
+        return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException(id));
     }
 
     @Override
     public Categoria save(CategoriaCreateDto categoria) {
+        if (categoriaRepository.findByNameCategoryIgnoreCase(categoria.nameCategory()).isPresent()){
+            throw new CategoriaNotSaveException("Category already exists");
+        }
         return categoriaRepository.save(categoriaMapper.toCategoria(categoria));
     }
 
