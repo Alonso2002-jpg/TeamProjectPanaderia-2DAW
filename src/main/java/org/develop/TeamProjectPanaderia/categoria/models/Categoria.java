@@ -21,6 +21,7 @@ public class Categoria {
     private Long id;
     @Column(name = "name", unique = true, nullable = false)
     private String nameCategory;
+    @Builder.Default
     @Column(updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDate createdAt = LocalDate.now();
     @Builder.Default

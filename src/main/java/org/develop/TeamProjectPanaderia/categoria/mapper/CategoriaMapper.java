@@ -13,7 +13,7 @@ public class CategoriaMapper {
     public Categoria toCategoria(CategoriaCreateDto dto) {
         return Categoria.builder()
                 .nameCategory(dto.nameCategory())
-                .isActive(dto.isActive())
+                .isActive(dto.isActive()!= null ? dto.isActive() : true)
                 .build();
     }
 
