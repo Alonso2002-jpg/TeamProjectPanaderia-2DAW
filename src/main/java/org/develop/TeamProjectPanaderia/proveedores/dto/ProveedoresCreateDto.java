@@ -1,6 +1,5 @@
-package org.develop.TeamProjectPanaderia.Proveedores.dto;
+package org.develop.TeamProjectPanaderia.proveedores.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 

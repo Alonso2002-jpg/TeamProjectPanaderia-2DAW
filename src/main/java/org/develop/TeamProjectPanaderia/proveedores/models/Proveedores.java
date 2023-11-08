@@ -1,4 +1,4 @@
-package org.develop.TeamProjectPanaderia.Proveedores.models;
+package org.develop.TeamProjectPanaderia.proveedores.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

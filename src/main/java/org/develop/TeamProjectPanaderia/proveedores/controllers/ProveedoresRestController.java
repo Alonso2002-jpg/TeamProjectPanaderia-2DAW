@@ -1,9 +1,9 @@
-package org.develop.TeamProjectPanaderia.Proveedores.controllers;
+package org.develop.TeamProjectPanaderia.proveedores.controllers;
 
-import org.develop.TeamProjectPanaderia.Proveedores.exceptions.ProveedoresNotFoundException;
-import org.develop.TeamProjectPanaderia.Proveedores.exceptions.ProveedoresNotSaveException;
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.Proveedores.repositories.ProveedoresRepository;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedoresNotFoundException;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedoresNotSaveException;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedoresRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
