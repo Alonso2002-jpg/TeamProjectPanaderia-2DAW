@@ -13,6 +13,7 @@ public interface CategoriaService {
     Categoria save(CategoriaCreateDto categoria);
     Categoria update(Long id,CategoriaUpdateDto categoria);
     Categoria findByName(String name);
+    List<Categoria> findByActiveIs(boolean isActive);
     void deleteById(Long id);
     void deleteAll();
 }

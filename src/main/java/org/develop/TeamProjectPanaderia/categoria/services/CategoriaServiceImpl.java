@@ -56,6 +56,11 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    public List<Categoria> findByActiveIs(boolean isActive) {
+        return categoriaRepository.findByActiveIs(isActive);
+    }
+
+    @Override
     public void deleteById(Long id) {
         findById(id);
         categoriaRepository.deleteById(id);
