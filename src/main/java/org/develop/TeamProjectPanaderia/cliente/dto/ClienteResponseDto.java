@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
+@Builder
 public class ClienteResponseDto {
 
     private Long id;

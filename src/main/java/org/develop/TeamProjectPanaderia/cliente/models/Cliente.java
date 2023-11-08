@@ -11,7 +11,6 @@ import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.hibernate.validator.constraints.Length;
 
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -35,11 +34,9 @@ public class Cliente {
     private String producto;
     @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @Builder.Default
     private LocalDateTime fechaCreacion;
     @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
-    @Builder.Default
     private LocalDateTime fechaActualizacion;
 
 
