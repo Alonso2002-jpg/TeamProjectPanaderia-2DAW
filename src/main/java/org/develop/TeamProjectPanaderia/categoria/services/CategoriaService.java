@@ -12,6 +12,7 @@ public interface CategoriaService {
     Categoria findById(Long id);
     Categoria save(CategoriaCreateDto categoria);
     Categoria update(Long id,CategoriaUpdateDto categoria);
+    Categoria findByName(String name);
     void deleteById(Long id);
     void deleteAll();
 }

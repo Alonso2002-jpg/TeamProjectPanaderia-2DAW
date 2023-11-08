@@ -33,7 +33,7 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public Categoria findById(Long id) {
-        return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException(id));
+        return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException("id " + id));
     }
 
     @Override
@@ -48,6 +48,11 @@ public class CategoriaServiceImpl implements CategoriaService{
     public Categoria update(Long id,CategoriaUpdateDto categoria) {
         var categoriaUpd = findById(id);
         return categoriaRepository.save(categoriaMapper.toCategoria(categoria,categoriaUpd));
+    }
+
+    @Override
+    public Categoria findByName(String name) {
+        return categoriaRepository.findByNameCategoryIgnoreCase(name).orElseThrow(() -> new CategoriaNotFoundException("name " + name));
     }
 
     @Override
