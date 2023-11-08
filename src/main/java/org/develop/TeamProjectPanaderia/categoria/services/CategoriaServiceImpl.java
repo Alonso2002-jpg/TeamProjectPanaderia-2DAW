@@ -52,8 +52,8 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public void deleteById(Long id) {
-        var categoria = findById(id);
-        categoriaRepository.delete(categoria);
+        findById(id);
+        categoriaRepository.deleteById(id);
     }
 
     @Override
