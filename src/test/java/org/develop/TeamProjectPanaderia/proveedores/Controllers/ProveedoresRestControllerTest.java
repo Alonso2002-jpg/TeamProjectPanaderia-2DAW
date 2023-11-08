@@ -1,7 +1,7 @@
-package org.develop.TeamProjectPanaderia.Proveedores.Controllers;
+package org.develop.TeamProjectPanaderia.proveedores.Controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.Proveedores.repositories.ProveedoresRepository;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedoresRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,9 +13,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.junit.jupiter.api.function.Executable;
-import org.junit.jupiter.api.Assertions;
 
 @SpringBootTest
 @AutoConfigureMockMvc
