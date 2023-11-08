@@ -9,7 +9,7 @@ public record ProductoCreateDto (
         @Min(value = 0, message = "El stock no puede ser negativo")
         Integer stock,
         @Min(value = 0, message = "El precio no puede ser negativo")
-        Double price,
+        Double precio,
         String imagen,
         Boolean isActivo,
         @NotBlank(message = "La categoria no puede estar vacia")
