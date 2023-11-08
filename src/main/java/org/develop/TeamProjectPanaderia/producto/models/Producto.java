@@ -42,10 +42,10 @@ public class Producto {
     private String imagen = IMAGE_DEFAULT;
     @Column(name = "precio", columnDefinition = "double default 0.0")
     @Min(value = 0, message = "El precio no puede ser negativo")
-    private Double price = 0.0;
+    private Double precio = 0.0;
     @Column(columnDefinition = "boolean default true")
     @Builder.Default
-    private final Boolean isActivo = true;
+    private Boolean isActivo = true;
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
