@@ -1,6 +1,6 @@
-package org.develop.TeamProjectPanaderia.Proveedores.repositories;
+package org.develop.TeamProjectPanaderia.proveedores.repositories;
 
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
