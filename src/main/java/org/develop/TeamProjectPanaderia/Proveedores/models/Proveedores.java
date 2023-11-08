@@ -22,12 +22,12 @@ public class Proveedores {
     @OneToOne
     @JoinColumn(name = "tipo")
     private Categoria Tipo;
-    @Column(name = "numero", unique = true, nullable = false)
+    @Column(name = "numero", unique = true)
     private String numero;
     @Column(name = "name", unique = true, nullable = false)
     private String nombre;
-    @Column(name = "fechaCreacion", nullable = false)
+    @Column(name = "fechaCreacion")
     private LocalDate fechaCreacion;
-    @Column(name = "fechaUpdate", nullable = false)
+    @Column(name = "fechaUpdate")
     private LocalDate fechaUpdate;
 }
