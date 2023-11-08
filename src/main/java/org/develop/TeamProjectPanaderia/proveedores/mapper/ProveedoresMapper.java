@@ -1,9 +1,9 @@
-package org.develop.TeamProjectPanaderia.Proveedores.mapper;
+package org.develop.TeamProjectPanaderia.proveedores.mapper;
 
-import org.develop.TeamProjectPanaderia.Proveedores.dto.ProveedoresCreateDto;
-import org.develop.TeamProjectPanaderia.Proveedores.dto.ProveedoresResponseDto;
-import org.develop.TeamProjectPanaderia.Proveedores.dto.ProveedoresUpdateDto;
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresCreateDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresResponseDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresUpdateDto;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

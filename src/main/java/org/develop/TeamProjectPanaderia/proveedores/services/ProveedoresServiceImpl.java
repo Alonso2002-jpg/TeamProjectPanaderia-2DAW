@@ -1,7 +1,7 @@
-package org.develop.TeamProjectPanaderia.Proveedores.services;
+package org.develop.TeamProjectPanaderia.proveedores.services;
 
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.Proveedores.repositories.ProveedoresRepository;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedoresRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

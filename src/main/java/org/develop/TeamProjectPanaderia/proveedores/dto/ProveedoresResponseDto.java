@@ -1,11 +1,11 @@
-package org.develop.TeamProjectPanaderia.Proveedores.dto;
+package org.develop.TeamProjectPanaderia.proveedores.dto;
 
 import lombok.Getter;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 
 import java.time.LocalDate;
 
-public class ProveedoresUpdateDto {
+public class ProveedoresResponseDto {
     @Getter
     private Long id;
     @Getter
@@ -21,7 +21,7 @@ public class ProveedoresUpdateDto {
     @Getter
     private LocalDate fechaUpdate;
 
-    public ProveedoresUpdateDto(Long id, String NIF, Categoria Tipo, String numero, String nombre, LocalDate fechaCreacion, LocalDate fechaUpdate) {
+    public ProveedoresResponseDto(Long id, String NIF, Categoria Tipo, String numero, String nombre, LocalDate fechaCreacion, LocalDate fechaUpdate) {
         this.id = id;
         this.NIF = NIF;
         this.Tipo = Tipo;
@@ -30,4 +30,5 @@ public class ProveedoresUpdateDto {
         this.fechaCreacion = fechaCreacion;
         this.fechaUpdate = fechaUpdate;
     }
+
 }

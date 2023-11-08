@@ -1,4 +1,4 @@
-package org.develop.TeamProjectPanaderia.Proveedores.exceptions;
+package org.develop.TeamProjectPanaderia.proveedores.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

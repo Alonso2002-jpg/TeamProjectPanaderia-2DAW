@@ -1,6 +1,6 @@
-package org.develop.TeamProjectPanaderia.Proveedores.services;
+package org.develop.TeamProjectPanaderia.proveedores.services;
 
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 
 import java.util.List;
 import java.util.Optional;

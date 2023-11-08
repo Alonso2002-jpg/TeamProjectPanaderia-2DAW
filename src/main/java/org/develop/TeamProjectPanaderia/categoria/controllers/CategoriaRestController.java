@@ -31,9 +31,15 @@ public class CategoriaRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaResponseDto>> findAll(){
-        var categorias = this.categoriaService.findAll();
+    public ResponseEntity<List<CategoriaResponseDto>> findAll(@RequestParam(required = false) boolean isActive){
+        var categorias = this.categoriaService.findAll(isActive);
         return ResponseEntity.ok(categoriaMapper.toResponseList(categorias));
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<CategoriaResponseDto> findByName(@PathVariable String name){
+        var categoria = this.categoriaService.findByName(name);
+        return ResponseEntity.ok(categoriaMapper.toResponse(categoria));
     }
 
     @GetMapping("/{id}")
