@@ -1,4 +1,4 @@
-package org.develop.TeamProjectPanaderia.cliente;
+package org.develop.TeamProjectPanaderia.cliente.models;
 
 
 import jakarta.persistence.*;
