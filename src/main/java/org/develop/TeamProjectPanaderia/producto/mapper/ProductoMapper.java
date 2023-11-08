@@ -1,12 +1,14 @@
 package org.develop.TeamProjectPanaderia.producto.mapper;
 
 
-import org.develop.TeamProjectPanaderia.Proveedores.models.Proveedores;
+
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
+
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

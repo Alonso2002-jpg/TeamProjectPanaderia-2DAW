@@ -20,4 +20,6 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
     @Override
     Optional<Producto> findById(UUID uuid);
     Optional<Producto> findByNombreContainingIgnoreCase(String nombre);
+    @Override
+    void deleteById(UUID uuid);
 }
