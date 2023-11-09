@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface PersonalRepository extends JpaRepository<Personal, Long> {
-    @Override
-    Optional<Personal> findById(Long aLong);
+
+    Optional<Personal> findByUUID(UUID aLong);
 
 }

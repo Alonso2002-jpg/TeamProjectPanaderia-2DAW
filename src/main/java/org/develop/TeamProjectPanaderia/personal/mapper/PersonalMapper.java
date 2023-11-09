@@ -5,12 +5,14 @@ import org.develop.TeamProjectPanaderia.personal.dto.CreateResponseDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.models.Personal;
+import org.hibernate.annotations.Comment;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.hibernate.engine.transaction.internal.jta.JtaStatusHelper.isActive;
-
+@Component
 public class PersonalMapper {
     public Personal toPersonal(PersonalCreateDto dto) {
         return Personal.builder()
