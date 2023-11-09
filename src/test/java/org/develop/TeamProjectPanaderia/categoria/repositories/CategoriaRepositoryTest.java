@@ -129,4 +129,16 @@ public class CategoriaRepositoryTest {
                 () -> assertTrue(categorias.isEmpty())
         );
     }
+
+    @Test
+    void findByIsActive(){
+        var categorias = categoriaRepository.findByIsActive(true);
+
+        assertAll(
+                () -> assertNotNull(categorias),
+                () -> assertFalse(categorias.isEmpty()),
+                () -> assertEquals(1, categorias.size()),
+                () -> assertEquals(categoria1.getNameCategory(), categorias.get(0).getNameCategory())
+        );
+    }
 }
