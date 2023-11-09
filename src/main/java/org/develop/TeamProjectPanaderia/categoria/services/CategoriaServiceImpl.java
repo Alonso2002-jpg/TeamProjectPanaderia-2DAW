@@ -27,13 +27,13 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
-    public List<Categoria> findAll() {
-        return categoriaRepository.findAll();
+    public List<Categoria> findAll(Boolean isActive) {
+        return isActive != null ? categoriaRepository.findByIsActive(isActive) : categoriaRepository.findAll();
     }
 
     @Override
     public Categoria findById(Long id) {
-        return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException(id));
+        return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException("id " + id));
     }
 
     @Override
@@ -51,9 +51,19 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    public Categoria findByName(String name) {
+        return categoriaRepository.findByNameCategoryIgnoreCase(name).orElseThrow(() -> new CategoriaNotFoundException("name " + name));
+    }
+
+    @Override
+    public List<Categoria> findByActiveIs(boolean isActive) {
+        return categoriaRepository.findByIsActive(isActive);
+    }
+
+    @Override
     public void deleteById(Long id) {
-        var categoria = findById(id);
-        categoriaRepository.delete(categoria);
+        findById(id);
+        categoriaRepository.deleteById(id);
     }
 
     @Override
