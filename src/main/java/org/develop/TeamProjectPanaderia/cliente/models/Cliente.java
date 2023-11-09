@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.hibernate.validator.constraints.Length;
 
@@ -16,6 +17,9 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "CLIENTES")
 public class Cliente {
     @Id // Indicamos que es el ID de la tabla
     @GeneratedValue(strategy = GenerationType.IDENTITY)
