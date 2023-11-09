@@ -92,7 +92,7 @@ class CategoriaRestControllerTest {
         List<Categoria> categoriasList =List.of(categoria1,categoria2);
         List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
 
-        when(categoriaService.findAll()).thenReturn(categoriasList);
+        when(categoriaService.findAll(isNull())).thenReturn(categoriasList);
         when(categoriaMapper.toResponseList(categoriasList)).thenReturn(categoriaResponseList);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -111,10 +111,33 @@ class CategoriaRestControllerTest {
                 () -> assertEquals("Charcuteria",categoriaResList.get(1).nameCategory())
         );
 
-        verify(categoriaService,times(1)).findAll();
+        verify(categoriaService,times(1)).findAll(isNull());
         verify(categoriaMapper,times(1)).toResponseList(categoriasList);
     }
 
+    @Test
+    void getAllisActive() throws Exception {
+         var localEndPoint= initEndPoint + "?isActive=true";
+        List<Categoria> categoriasList =List.of(categoria1);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto);
+
+        when(categoriaService.findAll(true)).thenReturn(categoriasList);
+        when(categoriaMapper.toResponseList(categoriasList)).thenReturn(categoriaResponseList);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                get(localEndPoint)
+                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+        List<CategoriaResponseDto> categoriaResponseDtoList = mapper.readValue(response.getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(List.class, CategoriaResponseDto.class));
+
+        assertAll(
+                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+                () -> assertNotNull(categoriaResponseDtoList),
+                () -> assertEquals(1,categoriaResponseDtoList.size()),
+                () -> assertEquals(categoria1.getNameCategory(),categoriaResponseDtoList.get(0).nameCategory())
+        );
+    }
     @Test
     void findById() throws Exception {
          var localEndPoint = initEndPoint + "/1";
@@ -140,7 +163,7 @@ class CategoriaRestControllerTest {
     void findByIdError() throws Exception {
         var localEndPoint = initEndPoint + "/100";
 
-        when(categoriaService.findById(100L)).thenThrow(new CategoriaNotFoundException(100L));
+        when(categoriaService.findById(100L)).thenThrow(new CategoriaNotFoundException("id " + 100L));
 
         MockHttpServletResponse response = mockMvc.perform(
                 get(localEndPoint)
@@ -223,7 +246,7 @@ class CategoriaRestControllerTest {
     void putCategoriaError() throws Exception {
         var localEndPoint = initEndPoint + "/1";
         CategoriaUpdateDto categoria = new CategoriaUpdateDto(categoria1.getNameCategory(),true);
-        when(categoriaService.update(1L,categoria)).thenThrow(new CategoriaNotFoundException(1L));
+        when(categoriaService.update(1L,categoria)).thenThrow(new CategoriaNotFoundException("id " + 1L));
 
         MockHttpServletResponse response = mockMvc.perform(
                 put(localEndPoint)
@@ -256,7 +279,7 @@ class CategoriaRestControllerTest {
     @Test
     void deleteNotFound() throws Exception {
         var localEndPoint = initEndPoint + "/100";
-        doThrow(new CategoriaNotFoundException(100L)).when(categoriaService).deleteById(100L);
+        doThrow(new CategoriaNotFoundException("id " + 100L)).when(categoriaService).deleteById(100L);
 
         MockHttpServletResponse response = mockMvc.perform(
                 delete(localEndPoint)

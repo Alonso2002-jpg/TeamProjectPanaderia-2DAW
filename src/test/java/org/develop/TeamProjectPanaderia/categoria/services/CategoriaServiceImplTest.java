@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -45,7 +46,7 @@ class CategoriaServiceImplTest {
         List<Categoria> categorias = List.of(categoria,categoria1);
 
         when(categoriaRepository.findAll()).thenReturn(categorias);
-        var result = categoriaService.findAll();
+        var result = categoriaService.findAll(null);
 
         assertAll(
                 () -> assertNotNull(result),
@@ -81,6 +82,41 @@ class CategoriaServiceImplTest {
         assertEquals("Categoria not found with id 100", result.getMessage());
     }
 
+    @Test
+    void findByName(){
+        when(categoriaRepository.findByNameCategoryIgnoreCase("Chucherias")).thenReturn(Optional.of(categoria1));
+        var result = categoriaService.findByName("Chucherias");
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertEquals(1,result.getId()),
+                () -> assertEquals("Chucherias",result.getNameCategory())
+        );
+
+        verify(categoriaRepository,times(1)).findByNameCategoryIgnoreCase("Chucherias");
+    }
+
+    @Test
+    void findByNameError(){
+        when(categoriaRepository.findByNameCategoryIgnoreCase("Not Exists")).thenReturn(Optional.empty());
+        var result = assertThrows(Exception.class, () -> categoriaService.findByName("Not Exists"));
+
+        assertEquals("Categoria not found with name Not Exists", result.getMessage());
+    }
+    @Test
+    void findByIsActive(){
+        when(categoriaRepository.findByIsActive(true)).thenReturn(List.of(categoria1));
+        var result = categoriaService.findByActiveIs(true);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(1,result.size()),
+                () -> assertEquals("Chucherias",result.get(0).getNameCategory())
+        );
+
+        verify(categoriaRepository,times(1)).findByIsActive(true);
+    }
     @Test
     void save(){
         CategoriaCreateDto createDto = new CategoriaCreateDto(categoria1.getNameCategory(),categoria1.isActive());
