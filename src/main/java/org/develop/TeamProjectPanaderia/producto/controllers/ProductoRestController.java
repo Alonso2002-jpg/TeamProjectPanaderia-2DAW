@@ -43,6 +43,12 @@ public class ProductoRestController {
         return ResponseEntity.ok(productoService.findById(id));
     }
 
+    @GetMapping("/{name}")
+    public ResponseEntity<Producto> getProductoByName(@PathVariable String name){
+        log.info("Buscando producto por nombre: " + name);
+        return ResponseEntity.ok(productoService.findByName(name));
+    }
+
     @PostMapping
     public ResponseEntity<Producto> createProduct(@Valid @RequestBody ProductoCreateDto productoCreateDto){
         log.info("Creando producto: " + productoCreateDto);
@@ -57,7 +63,7 @@ public class ProductoRestController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<Producto> updatePartialProduct(@PathVariable UUID id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
-        log.info("Actualizando producto por id: " + id + " con producto: " + productoUpdateDto);
+        log.info("Actualizando parcialmente producto con id: " + id + " con producto: " + productoUpdateDto);
         return ResponseEntity.ok(productoService.update(id, productoUpdateDto));
     }
 

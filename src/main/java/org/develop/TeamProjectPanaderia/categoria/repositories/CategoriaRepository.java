@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, Long> {
     Optional<Categoria> findByNameCategoryIgnoreCase(String categoryName);
-    List<Categoria> findByActiveIs(boolean isActive);
+    List<Categoria> findByIsActive(boolean isActive);
 }

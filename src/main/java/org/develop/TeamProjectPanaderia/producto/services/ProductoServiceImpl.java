@@ -42,14 +42,14 @@ public class ProductoServiceImpl implements ProductoService{
         }
         if((categoria != null && !categoria.isEmpty()) && (proveedor == null || proveedor.isEmpty())) {
             log.info("Buscando todos los productos por categoria: " + categoria);
-            return productoRepository.findAllByCategoriaContainingIgnoreCase(categoria);
+            return productoRepository.findAllByCategoriaContainsIgnoreCase(categoria);
         }
         if((categoria == null || categoria.isEmpty())){
             log.info("Buscando todos los productos por proveedor: " + proveedor);
-            return productoRepository.findAllByProveedorContainingIgnoreCase(proveedor);
+            return productoRepository.findAllByProveedorContainsIgnoreCase(proveedor);
         }
         log.info("Buscando todos los productos por categoria: " + categoria + " y proveedor: " + proveedor);
-        return productoRepository.findAllByCategoriaContainingIgnoreCaseAndProveedorContainingIgnoreCase(categoria, proveedor);
+        return productoRepository.findAllByCategoriaContainsIgnoreCaseAndProveedorContainsIgnoreCase(categoria, proveedor);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public Producto findByName(String name) {
         log.info("Buscando producto por nombre: " + name);
-        return productoRepository.findByNombreContainingIgnoreCase(name).orElseThrow(() -> new ProductoNotFound(name));
+        return productoRepository.findByNombreEqualsIgnoreCase(name).orElseThrow(() -> new ProductoNotFound(name));
     }
 
     @Override
