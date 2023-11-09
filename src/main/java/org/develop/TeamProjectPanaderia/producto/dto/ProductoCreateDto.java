@@ -14,7 +14,7 @@ public record ProductoCreateDto (
         Boolean isActivo,
         @NotBlank(message = "La categoria no puede estar vacia")
         String categoria,
-        @NotBlank(message = "La categoria no puede estar vacia")
+        @NotBlank(message = "El proveedor no puede estar vacia")
         String proveedor
         )
 { }

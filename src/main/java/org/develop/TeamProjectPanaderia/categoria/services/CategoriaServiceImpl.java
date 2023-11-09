@@ -28,7 +28,7 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public List<Categoria> findAll(Boolean isActive) {
-        return isActive != null ? categoriaRepository.findByActiveIs(isActive) : categoriaRepository.findAll();
+        return isActive != null ? categoriaRepository.findByIsActive(isActive) : categoriaRepository.findAll();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public List<Categoria> findByActiveIs(boolean isActive) {
-        return categoriaRepository.findByActiveIs(isActive);
+        return categoriaRepository.findByIsActive(isActive);
     }
 
     @Override

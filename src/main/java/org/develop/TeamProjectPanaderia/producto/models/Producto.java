@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 
 import java.time.LocalDateTime;
@@ -51,7 +52,7 @@ public class Producto {
     private Categoria categoria;
     @ManyToOne
     @JoinColumn(name = "proveedor_id")
-    private Proveedor proveedor;
+    private Proveedores proveedor;
 }
 
 
