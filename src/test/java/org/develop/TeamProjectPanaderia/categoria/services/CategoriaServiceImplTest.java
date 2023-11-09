@@ -46,7 +46,7 @@ class CategoriaServiceImplTest {
         List<Categoria> categorias = List.of(categoria,categoria1);
 
         when(categoriaRepository.findAll()).thenReturn(categorias);
-        var result = categoriaService.findAll(isNull());
+        var result = categoriaService.findAll(null);
 
         assertAll(
                 () -> assertNotNull(result),
