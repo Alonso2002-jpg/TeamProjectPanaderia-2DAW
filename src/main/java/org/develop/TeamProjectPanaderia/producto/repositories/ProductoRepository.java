@@ -18,9 +18,9 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
     List<Producto> findAllByNombreContainsIgnoreCase(String nombre);
     List<Producto> findAllByIsActivoFalse();
     List<Producto> findAllByIsActivoTrue();
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.categoria.nameCategory) LIKE LOWER(:categoria) AND LOWER(p.proveedor.nombre) LIKE LOWER(:proveedor)")
+    @Query("SELECT p FROM Producto p WHERE LOWER(p.categoria.nameCategory) LIKE LOWER(:categoria) AND LOWER(p.proveedor.NIF) LIKE LOWER(:proveedor)")
     List<Producto> findAllByCategoriaContainsIgnoreCaseAndProveedorContainsIgnoreCase(String categoria, String proveedor);
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.proveedor.nombre) LIKE LOWER(:proveedor)")
+    @Query("SELECT p FROM Producto p WHERE LOWER(p.proveedor.NIF) LIKE LOWER(:proveedor)")
     List<Producto> findAllByProveedorContainsIgnoreCase(String proveedor);
     @Override
     Optional<Producto> findById(UUID uuid);
