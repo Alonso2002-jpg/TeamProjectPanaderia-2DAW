@@ -53,15 +53,9 @@ public class ProductoRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable UUID id){
+    public ResponseEntity<Producto> getProductoById(@PathVariable String id){
         log.info("Buscando producto por id: " + id);
         return ResponseEntity.ok(productoService.findById(id));
-    }
-
-    @GetMapping("/{name}")
-    public ResponseEntity<Producto> getProductoByName(@PathVariable String name){
-        log.info("Buscando producto por nombre: " + name);
-        return ResponseEntity.ok(productoService.findByName(name));
     }
 
     @PostMapping
@@ -71,26 +65,26 @@ public class ProductoRestController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
+    public ResponseEntity<Producto> updateProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando producto por id: " + id + " con producto: " + productoUpdateDto);
         return ResponseEntity.ok(productoService.update(id, productoUpdateDto));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Producto> updatePartialProduct(@PathVariable UUID id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
+    public ResponseEntity<Producto> updatePartialProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando parcialmente producto con id: " + id + " con producto: " + productoUpdateDto);
         return ResponseEntity.ok(productoService.update(id, productoUpdateDto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id){
+    public ResponseEntity<Void> deleteProduct(@PathVariable String id){
         log.info("Borrando producto por id: " + id);
         productoService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Producto> updateImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<Producto> updateImage(@PathVariable String id, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()){
             return ResponseEntity.ok(productoService.updateImg(id,file));
         }else{
