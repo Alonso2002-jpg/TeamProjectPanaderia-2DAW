@@ -30,6 +30,8 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	// Para pasar a XML los responses, negocacion de contenido
+	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 }
 
 tasks.withType<Test> {
