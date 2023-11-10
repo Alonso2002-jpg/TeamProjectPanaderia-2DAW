@@ -17,6 +17,7 @@ public interface ProductoService {
     Producto findByName(String name);
     Producto save(ProductoCreateDto productoCreateDto);
     Producto update(UUID id, ProductoUpdateDto productoUpdateDto);
+    Producto updateImg(UUID id, MultipartFile file);
     void deleteById(UUID id);
 }
 

@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.producto.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
+import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
@@ -12,10 +13,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -24,7 +28,6 @@ import java.util.*;
 @RequestMapping("/producto")
 public class ProductoRestController {
     private final ProductoService productoService;
-
     @Autowired
     public ProductoRestController(ProductoService productoService) {
         this.productoService = productoService;
@@ -84,6 +87,15 @@ public class ProductoRestController {
         log.info("Borrando producto por id: " + id);
         productoService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Producto> updateImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file){
+        if (!file.isEmpty()){
+            return ResponseEntity.ok(productoService.updateImg(id,file));
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La Imagen no puede estar vacia");
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

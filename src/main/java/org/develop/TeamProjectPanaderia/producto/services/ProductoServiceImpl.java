@@ -13,11 +13,13 @@ import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedoresService;
+import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,13 +32,20 @@ public class ProductoServiceImpl implements ProductoService{
     private final CategoriaService categoriaService;
     private final ProveedoresService proveedoresService;
     private final ProductoMapper productoMapper;
+    private final StorageService storageService;
 
     @Autowired
-    public ProductoServiceImpl(ProductoRepository productoRepository, CategoriaService categoriaService, ProveedoresService proveedoresService, ProductoMapper productoMapper) {
+    public ProductoServiceImpl(
+            ProductoRepository productoRepository,
+            CategoriaService categoriaService,
+            ProveedoresService proveedoresService,
+            ProductoMapper productoMapper,
+            StorageService storageService) {
         this.productoRepository = productoRepository;
         this.categoriaService = categoriaService;
         this.proveedoresService = proveedoresService;
         this.productoMapper = productoMapper;
+        this.storageService = storageService;
     }
 
     @Override
@@ -124,6 +133,18 @@ public class ProductoServiceImpl implements ProductoService{
        return productoRepository.save(productoMapper.toProducto(productoUpdateDto, productoActual, categoria, proveedor));
     }
 
+    @Override
+    public Producto updateImg(UUID id, MultipartFile file){
+        log.info("Actualizando imagen de producto por id: " + id);
+        Producto productoActual = this.findById(id);
+        String img = storageService.store(file);
+        String urlImg = storageService.getUrl(img).replace(" ", "");
+        if (!productoActual.getImagen().equals(Producto.IMAGE_DEFAULT)){
+            storageService.delete(productoActual.getImagen());
+        }
+        productoActual.setImagen(urlImg);
+        return productoRepository.save(productoActual);
+    }
     @Override
     public void deleteById(UUID id) {
         log.debug("Borrando producto por id: " + id);
