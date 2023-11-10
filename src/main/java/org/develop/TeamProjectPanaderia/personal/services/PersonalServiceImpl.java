@@ -1,7 +1,6 @@
 package org.develop.TeamProjectPanaderia.personal.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.develop.TeamProjectPanaderia.personal.dto.CreateResponseDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.exceptions.PersonalException;
@@ -26,9 +25,11 @@ public class PersonalServiceImpl implements PersonalService {
     }
 
 
+
+
     @Override
-    public List<Personal> findAll() {
-        return personalRepository.findAll();
+    public List<Personal> findAll(Boolean isActive) {
+        return isActive != null ? personalRepository.findByIsActive(isActive) : personalRepository.findAll();
     }
 
     @Override
@@ -55,6 +56,16 @@ public class PersonalServiceImpl implements PersonalService {
     public void deleteById(UUID id) {
         var personal = findById(id);
         personalRepository.delete(personal);
+    }
+
+    @Override
+    public Personal findByName(String name) {
+        return null;
+    }
+
+    @Override
+    public List<Personal> findByActiveIs(boolean isActive) {
+        return personalRepository.findByIsActive(isActive);
     }
 
     @Override
