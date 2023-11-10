@@ -6,17 +6,18 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
+import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -30,11 +31,22 @@ public class ProductoRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Producto>> getAllProductos(
-            @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) String proveedor) {
-    log.info("Buscando todos los productos con categoria: " + categoria + " y proveedor: " + proveedor);
-    return ResponseEntity.ok(productoService.findAll(categoria, proveedor));
+    public ResponseEntity<PageResponse<Producto>> getAllProductos(
+            @RequestParam(required = false) Optional <String> nombre,
+            @RequestParam(required = false) Optional <Integer> stockMin,
+            @RequestParam(required = false) Optional <Double> precioMax,
+            @RequestParam(required = false) Optional <Boolean> isActivo,
+            @RequestParam(required = false) Optional <String> categoria,
+            @RequestParam(required = false) Optional <String> proveedor,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        log.info("Buscando todos los productos con las siguientes opciones: " + nombre + " " + stockMin + " " + precioMax + " " + isActivo + " " + categoria + " " + proveedor );
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(PageResponse.of(productoService.findAll(nombre, stockMin, precioMax, isActivo, categoria, proveedor, pageable), sortBy, direction));
     }
 
     @GetMapping("/{id}")
