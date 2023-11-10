@@ -3,9 +3,11 @@ package org.develop.TeamProjectPanaderia.cliente.services;
 import org.develop.TeamProjectPanaderia.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class ClienteServiceImpl implements ClienteService{
     @Override
     public List<Cliente> findAll(String categoria) {
