@@ -1,5 +1,6 @@
 package org.develop.TeamProjectPanaderia.producto.services;
 
+import jakarta.persistence.criteria.Join;
 import lombok.extern.slf4j.Slf4j;
 
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
@@ -14,10 +15,14 @@ import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedoresService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -44,21 +49,48 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public List<Producto> findAll(String categoria, String proveedor) {
-        if((categoria == null || categoria.isEmpty()) && (proveedor == null || proveedor.isEmpty())){
-            log.info("Buscando todos los productos: ");
-            return productoRepository.findAll();
-        }
-        if((categoria != null && !categoria.isEmpty()) && (proveedor == null || proveedor.isEmpty())) {
-            log.info("Buscando todos los productos por categoria: " + categoria);
-            return productoRepository.findAllByCategoriaContainsIgnoreCase(categoria);
-        }
-        if((categoria == null || categoria.isEmpty())){
-            log.info("Buscando todos los productos por proveedor: " + proveedor);
-            return productoRepository.findAllByProveedorContainsIgnoreCase(proveedor);
-        }
-        log.info("Buscando todos los productos por categoria: " + categoria + " y proveedor: " + proveedor);
-        return productoRepository.findAllByCategoriaContainsIgnoreCaseAndProveedorContainsIgnoreCase(categoria, proveedor);
+    public Page<Producto> findAll(Optional<String> nombre, Optional<Integer> stockMin, Optional<Double> precioMax, Optional<Boolean> isActivo, Optional<String> categoria, Optional<String> proveedor, Pageable pageable) {
+        // Criteerio de búsqueda por nombre
+        Specification<Producto> specNombreProducto = (root, query, criteriaBuilder) ->
+                nombre.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombre")), "%" + n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        // Criterio de busqueda por stock
+        Specification<Producto> specStockMinProducto = (root, query, criteriaBuilder) ->
+                stockMin.map(c -> criteriaBuilder.greaterThanOrEqualTo(root.get("stock"),c))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        // Criterio de busqueda por precio
+        Specification<Producto> specPrecioMaxProducto = (root, query, criteriaBuilder) ->
+                precioMax.map(p -> criteriaBuilder.lessThanOrEqualTo(root.get("precio"), p))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        // Criterio de busqueda por isActivo
+        Specification<Producto> specIsActivo = (root, query, criteriaBuilder) ->
+                isActivo.map(a -> criteriaBuilder.equal(root.get("isActivo"), a))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        // Criterio de busqueda por categoria
+        Specification<Producto> specCategoriaProducto = (root, query, criteriaBuilder) ->
+                categoria.map(c ->{
+                    Join<Producto, Categoria> categoriaJoin = root.join("categoria");
+                    return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategory")), "%" + c.toLowerCase() + "%");
+                }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        // Criterio de busqueda por proveedor
+        Specification<Producto> specProveedorProducto = (root, query, criteriaBuilder) ->
+                categoria.map(c ->{
+                    Join<Producto, Proveedores> categoriaJoin = root.join("proveedor");
+                    return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("NIF")), "%" + c.toLowerCase() + "%");
+                }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Producto> criterio = Specification.where(specNombreProducto)
+                .and(specStockMinProducto)
+                .and(specPrecioMaxProducto)
+                .and(specIsActivo)
+                .and(specCategoriaProducto)
+                .and(specProveedorProducto);
+        return productoRepository.findAll(criterio, pageable);
     }
 
     @Override
