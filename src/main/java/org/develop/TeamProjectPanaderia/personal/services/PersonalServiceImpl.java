@@ -1,6 +1,8 @@
 package org.develop.TeamProjectPanaderia.personal.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.exceptions.PersonalException;
@@ -18,10 +20,12 @@ import java.util.UUID;
 public class PersonalServiceImpl implements PersonalService {
     private final PersonalRepository personalRepository;
     private final PersonalMapper personalMapper;
+    private final CategoriaService categoriaService;
     @Autowired
-    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper) {
+    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper,  CategoriaService categoriaService) {
         this.personalRepository = personalRepository;
         this.personalMapper = personalMapper;
+        this.categoriaService = categoriaService;
     }
 
 
@@ -48,7 +52,9 @@ public class PersonalServiceImpl implements PersonalService {
     @Override
     public Personal update(UUID id, PersonalUpdateDto personalDto) {
         var personalUpd = findById(id);
-        return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd));
+        var categoria = categoriaService.findByName(personalDto.section());
+        return personalRepository.save(personalMapper.toPersonal(personalDto, personalUpd, categoria));
+
     }
 
 
@@ -58,10 +64,7 @@ public class PersonalServiceImpl implements PersonalService {
         personalRepository.delete(personal);
     }
 
-    @Override
-    public Personal findByName(String name) {
-        return null;
-    }
+
 
     @Override
     public List<Personal> findByActiveIs(boolean isActive) {

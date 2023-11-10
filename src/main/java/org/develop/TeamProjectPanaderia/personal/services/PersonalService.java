@@ -13,7 +13,6 @@ public interface PersonalService {
     Personal save(PersonalCreateDto personal);
     Personal update(UUID id, PersonalUpdateDto personal);
     void deleteById(UUID id);
-    Personal findByName(String name);
     List<Personal> findByActiveIs(boolean isActive);
     void deleteAll();
 

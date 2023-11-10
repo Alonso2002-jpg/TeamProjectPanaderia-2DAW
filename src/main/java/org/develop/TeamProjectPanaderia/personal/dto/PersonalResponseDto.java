@@ -1,6 +1,6 @@
 package org.develop.TeamProjectPanaderia.personal.dto;
 
-public record CreateResponseDto(
+public record PersonalResponseDto(
         String dni,
         String name,
         String seccion,

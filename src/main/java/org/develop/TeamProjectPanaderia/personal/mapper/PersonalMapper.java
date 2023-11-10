@@ -1,14 +1,12 @@
 package org.develop.TeamProjectPanaderia.personal.mapper;
 
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.personal.dto.CreateResponseDto;
+import org.develop.TeamProjectPanaderia.personal.dto.PersonalResponseDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.models.Personal;
-import org.hibernate.annotations.Comment;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.hibernate.engine.transaction.internal.jta.JtaStatusHelper.isActive;
@@ -20,39 +18,56 @@ public class PersonalMapper {
                 .isActive(dto.isActive())
                 .build();
     }
-    public CreateResponseDto toPersonalCreateDto(Personal personal) {
-        return  CreateResponseDto.builder()
-                .dni(personal.getDni())
-                .name(personal.getNombre())
-                .seccion(personal.getSeccion().getNameCategory())
-                .fechaAlta(personal.getFechaAlta().toString())
-                .fechaBaja(personal.getFechaBaja().toString())
-                .fechaCreacion(personal.getFechaCreacion().toString())
-                .fechaUpdate(personal.getFechaUpdate().toString())
-                .isActive(personal.isActive())
-                .build();
+    public PersonalCreateDto toCreate(Personal personal){
+        return new PersonalCreateDto(
+                personal.getDni(),
+                personal.getNombre(),
+                personal.getSeccion().getNameCategory(),
+                personal.getFechaAlta().toString(),
+                personal.getFechaBaja().toString(),
+                personal.isActive()
+        );
     }
-      public PersonalUpdateDto toPersonalUpdateDto(Personal personal) {
-        return PersonalUpdateDto.builder()
-                .nombre(personal.getNombre())
-                .section(personal.getSeccion().getNameCategory())
-                .fechaBaja(LocalDate.parse(personal.getFechaBaja().toString()))
-                .isActive(personal.isActive())
-                .build();
-        }
-        public Personal toPersonalUpdate(PersonalUpdateDto dto, Personal personal) {
+    public PersonalResponseDto toResponse(Personal personal) {
+        return  new PersonalResponseDto(
+                personal.getDni(),
+                personal.getNombre(),
+                personal.getSeccion().getNameCategory(),
+                personal.getFechaAlta().toString(),
+                personal.getFechaBaja().toString(),
+                personal.getFechaCreacion().toString(),
+                personal.getFechaUpdate().toString(),
+                personal.isActive()
+
+        );
+    }
+
+
+        public Personal toUpdate(PersonalUpdateDto dto, Personal personal, Categoria categoria) {
             return Personal.builder()
                     .nombre(dto.nombre())
-                    .seccion(personal.getSeccion())
-                    .fechaBaja(dto.fechaBaja())
+                    .seccion(categoria == null ? personal.getSeccion() : categoria)
+                    .fechaBaja(dto.fechaBaja() )
                     .isActive(dto.isActive())
                     .build();
         }
 
 
-    public List<CreateResponseDto> toResponseList(List<Personal> personals){
+
+    public List<PersonalResponseDto> toResponseList(List<Personal> personals){
         return personals.stream()
-                .map(this::toPersonalCreateDto)
+                .map(this::toResponse)
                 .toList();
+    }
+
+    public Personal toPersonal(PersonalUpdateDto personalDto, Personal personalUpd, Categoria categoria) {
+        return Personal.builder()
+                .dni(personalUpd.getDni())
+                .nombre(personalDto.nombre() == null ? personalUpd.getNombre() : personalDto.nombre())
+                .seccion(categoria == null ? personalUpd.getSeccion() : categoria)
+                .fechaAlta(personalUpd.getFechaAlta())
+                .fechaBaja(personalDto.fechaBaja() == null ? personalUpd.getFechaBaja() : personalDto.fechaBaja())
+                .isActive(personalDto.isActive() == null ? personalUpd.isActive() : personalDto.isActive())
+                .build();
     }
 }
