@@ -21,13 +21,11 @@ public class PersonalServiceImpl implements PersonalService {
     private final PersonalRepository personalRepository;
     private final PersonalMapper personalMapper;
     private final CategoriaService categoriaService;
-    private final PersonalService personalService;
     @Autowired
-    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper, CategoriaService categoriaService, PersonalService personalService) {
+    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper, CategoriaService categoriaService) {
         this.personalRepository = personalRepository;
         this.personalMapper = personalMapper;
         this.categoriaService = categoriaService;
-        this.personalService = personalService;
     }
 
 
@@ -60,9 +58,9 @@ public class PersonalServiceImpl implements PersonalService {
     public Personal save(PersonalCreateDto perosnalCreateDto) {
       log.info("Guardando Personal");
       Categoria categoria= categoriaService.findByName(perosnalCreateDto.seccion());
-      Personal personal = personalService.findById(UUID.fromString(perosnalCreateDto.dni()));
+
       UUID id = UUID.randomUUID();
-      return personalRepository.save(personalMapper.toPersonal(id, perosnalCreateDto , categoria,personal));
+      return personalRepository.save(personalMapper.toPersonal(perosnalCreateDto ));
     }
 
     @Override
