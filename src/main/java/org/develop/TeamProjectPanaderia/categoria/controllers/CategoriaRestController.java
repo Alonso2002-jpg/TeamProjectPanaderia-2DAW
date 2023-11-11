@@ -5,9 +5,14 @@ import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
 import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
+import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.repositories.CategoriaRepository;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -17,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/categoria")
@@ -31,9 +37,15 @@ public class CategoriaRestController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoriaResponseDto>> findAll(@RequestParam(required = false) Boolean isActive){
-        var categorias = this.categoriaService.findAll(isActive);
-        return ResponseEntity.ok(categoriaMapper.toResponseList(categorias));
+    public ResponseEntity<PageResponse<Categoria>> findAll(@RequestParam(required = false) Optional<Boolean> isActive,
+                                                           @RequestParam(required = false) Optional<String> name,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                           @RequestParam(defaultValue = "id") String sortBy,
+                                                           @RequestParam(defaultValue = "asc") String direction){
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.ok(PageResponse.of(categoriaService.findAll(isActive, name,pageable), sortBy, direction));
     }
 
 //    @GetMapping("/name")
