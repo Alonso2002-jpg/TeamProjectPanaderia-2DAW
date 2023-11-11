@@ -18,11 +18,15 @@ import org.develop.TeamProjectPanaderia.categoria.repositories.CategoriaReposito
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -50,8 +54,17 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
-    public List<Categoria> findAll(Boolean isActive) {
-        return isActive != null ? categoriaRepository.findByIsActive(isActive) : categoriaRepository.findAll();
+    public Page<Categoria> findAll(Optional<Boolean> isActive, Optional<String> name, Pageable pageable) {
+        Specification<Categoria> findIsActive = (root, query, criteriaBuilder) ->
+        isActive.map(isAc -> criteriaBuilder.equal(root.get("isActive"), isAc))
+                .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+        Specification<Categoria> findName = (root, query, criteriaBuilder) ->
+                name.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nameCategory")), "%" + n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Categoria> criterio = Specification.where(findIsActive).and(findName);
+
+        return categoriaRepository.findAll(criterio, pageable);
     }
 
     @Override
