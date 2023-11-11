@@ -64,13 +64,17 @@ public class CategoriaServiceImpl implements CategoriaService{
         if (categoriaRepository.findByNameCategoryIgnoreCase(categoria.nameCategory()).isPresent()){
             throw new CategoriaNotSaveException("Category already exists");
         }
-        return categoriaRepository.save(categoriaMapper.toCategoria(categoria));
+        var category = categoriaMapper.toCategoria(categoria);
+        onChange(Notificacion.Tipo.CREATE, category);
+        return categoriaRepository.save(category);
     }
 
     @Override
     public Categoria update(Long id,CategoriaUpdateDto categoria) {
         var categoriaUpd = findById(id);
-        return categoriaRepository.save(categoriaMapper.toCategoria(categoria,categoriaUpd));
+        var category = categoriaMapper.toCategoria(categoria,categoriaUpd);
+        onChange(Notificacion.Tipo.UPDATE, category);
+        return categoriaRepository.save(category);
     }
 
     @Override
@@ -85,7 +89,8 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Override
     public void deleteById(Long id) {
-        findById(id);
+        var category = findById(id);
+        onChange(Notificacion.Tipo.DELETE, category);
         categoriaRepository.deleteById(id);
     }
 
