@@ -32,7 +32,7 @@ public class CategoriaServiceImpl implements CategoriaService{
     private final WebSocketConfig webSocketConfig;
     private WebSocketHandler webSocketHandler;
     private final ObjectMapper objMapper;
-    private final NotificacionMapper notificacionMapper;
+    private final NotificacionMapper<CategoriaResponseDto> notificacionMapper;
 
     @Autowired
     public CategoriaServiceImpl(CategoriaRepository categoriaRepository,
@@ -110,7 +110,7 @@ public class CategoriaServiceImpl implements CategoriaService{
             Notificacion<NotificacionResponseDto> notificacion = new Notificacion<>(
                     "Categoria",
                     tipo,
-                    notificacionMapper.getNotificacionResponseDto(data),
+                    notificacionMapper.getNotificacionResponseDto(categoriaMapper.toResponse(data),"Categoria"),
                     LocalDate.now().toString()
             );
 
