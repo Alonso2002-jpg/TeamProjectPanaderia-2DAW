@@ -1,18 +1,15 @@
 package org.develop.TeamProjectPanaderia.producto.services;
 
-
-import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.proveedores.services.ProveedoresService;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,7 +35,7 @@ import static org.mockito.Mockito.*;
 public class ProductoServiceTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
-    private final Proveedores proveedor = new Proveedores(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
+    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
     private final Producto producto1 =
             Producto.builder()
                     .id(UUID.randomUUID())
@@ -72,7 +69,7 @@ public class ProductoServiceTest {
     @Mock
     private CategoriaService categoriaService;
     @Mock
-    private ProveedoresService proveedoresService;
+    private ProveedorService proveedoresService;
     @Mock
     private ProductoMapper productoMapper;
     @InjectMocks

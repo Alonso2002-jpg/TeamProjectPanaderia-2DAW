@@ -1,6 +1,5 @@
 package org.develop.TeamProjectPanaderia.cliente.exceptions;
 
-import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

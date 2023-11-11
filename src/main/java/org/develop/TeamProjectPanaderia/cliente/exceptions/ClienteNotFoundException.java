@@ -5,8 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
-public abstract class ClienteNotFoundException extends CategoriaException {
+public class ClienteNotFoundException extends CategoriaException {
     public ClienteNotFoundException(Long id) {
         super("Cliente not found with id " + id);
+    }
+    public ClienteNotFoundException(String nombre) {
+        super("Cliente con nombre " + nombre + " no encontrado");
     }
 }

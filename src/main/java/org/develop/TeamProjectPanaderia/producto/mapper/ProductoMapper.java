@@ -8,7 +8,7 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Component
 public class ProductoMapper {
-    public Producto toProducto(UUID id, ProductoCreateDto dto, Categoria categoria, Proveedores proveedor) {
+    public Producto toProducto(UUID id, ProductoCreateDto dto, Categoria categoria, Proveedor proveedor) {
         return Producto.builder()
                 .id(id)
                 .nombre(dto.nombre())
@@ -31,7 +31,7 @@ public class ProductoMapper {
                 .build();
     }
 
-    public Producto toProducto(ProductoUpdateDto dto, Producto producto, Categoria categoria, Proveedores proveedor) {
+    public Producto toProducto(ProductoUpdateDto dto, Producto producto, Categoria categoria, Proveedor proveedor) {
         return Producto.builder()
                 .id(producto.getId())
                 .nombre(dto.nombre() != null ? dto.nombre() : producto.getNombre())

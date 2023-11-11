@@ -12,8 +12,8 @@ import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.proveedores.services.ProveedoresService;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public class ProductoServiceImpl implements ProductoService{
     private final ProductoRepository productoRepository;
     private final CategoriaService categoriaService;
-    private final ProveedoresService proveedoresService;
+    private final ProveedorService proveedoresService;
     private final ProductoMapper productoMapper;
     private final StorageService storageService;
 
@@ -38,7 +38,7 @@ public class ProductoServiceImpl implements ProductoService{
     public ProductoServiceImpl(
             ProductoRepository productoRepository,
             CategoriaService categoriaService,
-            ProveedoresService proveedoresService,
+            ProveedorService proveedoresService,
             ProductoMapper productoMapper,
             StorageService storageService) {
         this.productoRepository = productoRepository;
@@ -80,7 +80,7 @@ public class ProductoServiceImpl implements ProductoService{
         // Criterio de busqueda por proveedor
         Specification<Producto> specProveedorProducto = (root, query, criteriaBuilder) ->
                 categoria.map(c ->{
-                    Join<Producto, Proveedores> categoriaJoin = root.join("proveedor");
+                    Join<Producto, Proveedor> categoriaJoin = root.join("proveedor");
                     return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("NIF")), "%" + c.toLowerCase() + "%");
                 }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
@@ -114,7 +114,7 @@ public class ProductoServiceImpl implements ProductoService{
     public Producto save(ProductoCreateDto productoCreateDto) {
         log.info("Guardando producto: " + productoCreateDto);
         Categoria categoria = categoriaService.findByName(productoCreateDto.categoria());
-        Proveedores proveedores = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
+        Proveedor proveedores = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
         UUID id = UUID.randomUUID();
         Producto productoToSave = productoMapper.toProducto(id,productoCreateDto, categoria, proveedores);
         return productoRepository.save(productoToSave);
@@ -125,7 +125,7 @@ public class ProductoServiceImpl implements ProductoService{
        log.info("Actualizando producto por id: " + id);
        Producto productoActual = this.findById(id);
        Categoria categoria = null;
-       Proveedores proveedor = null;
+       Proveedor proveedor = null;
        if(productoUpdateDto.categoria() != null && !productoUpdateDto.categoria().isEmpty()){
            categoria = categoriaService.findByName(productoUpdateDto.categoria());
        } else {

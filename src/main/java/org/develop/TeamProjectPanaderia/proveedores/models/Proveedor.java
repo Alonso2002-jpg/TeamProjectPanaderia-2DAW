@@ -13,15 +13,15 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "PROVEEDORES")
-public class Proveedores {
+public class Proveedor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "NIF", unique = true, nullable = false)
-    private String NIF;
+    private String nif;
     @OneToOne
     @JoinColumn(name = "tipo")
-    private Categoria Tipo;
+    private Categoria tipo;
     @Column(name = "numero", unique = true)
     private String numero;
     @Column(name = "name", unique = true, nullable = false)
