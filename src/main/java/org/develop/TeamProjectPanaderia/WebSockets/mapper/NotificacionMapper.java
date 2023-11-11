@@ -34,33 +34,54 @@ public class NotificacionMapper {
                               }
 
     public NotificacionResponseDto getNotificacionResponseDto(Object obj){
-        if (obj.getClass().equals(Categoria.class)){
-            return NotificacionResponseDto.builder()
-                    .entity("Categoria")
-                    .data(categoriaMapper.toResponse((Categoria) obj).toString())
-                    .build();
-        }else if (obj.getClass().equals(Producto.class)){
-            return NotificacionResponseDto.builder()
-                    .entity("Producto")
-                    .data(productoMapper.toProductoResponseDto((Producto) obj).toString())
-                    .build();
-        }else if (obj.getClass().equals(Personal.class)){
-            return NotificacionResponseDto.builder()
-                    .entity("Personal")
-                    .data(personalMapper.toPersonalCreateDto((Personal) obj).toString())
-                    .build();
-        }else if (obj.getClass().equals(Cliente.class)){
-            return NotificacionResponseDto.builder()
-                    .entity("Cliente")
-                    .data(clienteMapper.toClienteResponseDto((Cliente) obj).toString())
-                    .build();
-        }else if (obj.getClass().equals(Proveedores.class)){
-            return NotificacionResponseDto.builder()
-                    .entity("Proveedores")
-                    .data(proveedoresMapper.toResponse((Proveedores) obj).toString())
-                    .build();
+        if (obj instanceof Categoria categoria){
+            return getNotificacionFromCategoria(categoria);
+        }else if (obj instanceof Producto producto){
+            return getNotificacionFromProducto(producto);
+        }else if (obj instanceof Personal personal){
+            return getNotificacionFromPersonal(personal);
+        }else if (obj instanceof Cliente cliente){
+            return getNotificacionFromCliente(cliente);
+        }else if (obj instanceof Proveedores proveedores){
+            return getNotificacionFromProveedor(proveedores);
         }else{
             throw new IllegalArgumentException("Objeto no encontrado");
         }
     }
+
+    private NotificacionResponseDto getNotificacionFromProveedor(Proveedores obj) {
+        return NotificacionResponseDto.builder()
+                .entity("Proveedores")
+                .data(proveedoresMapper.toResponse(obj).toString())
+                .build();
+    }
+
+    private NotificacionResponseDto getNotificacionFromCliente(Cliente obj) {
+        return NotificacionResponseDto.builder()
+                .entity("Cliente")
+                .data(clienteMapper.toClienteResponseDto(obj).toString())
+                .build();
+    }
+
+    private NotificacionResponseDto getNotificacionFromPersonal(Personal obj) {
+        return NotificacionResponseDto.builder()
+                .entity("Personal")
+                .data(personalMapper.toPersonalCreateDto(obj).toString())
+                .build();
+    }
+
+    private NotificacionResponseDto getNotificacionFromProducto(Producto obj) {
+        return NotificacionResponseDto.builder()
+                .entity("Producto")
+                .data(productoMapper.toProductoResponseDto(obj).toString())
+                .build();
+    }
+
+    private NotificacionResponseDto getNotificacionFromCategoria(Categoria obj) {
+        return NotificacionResponseDto.builder()
+                .entity("Categoria")
+                .data(categoriaMapper.toResponse(obj).toString())
+                .build();
+    }
+
 }
