@@ -30,4 +30,8 @@ public class ProveedorUpdateDto {
         this.fechaCreacion = fechaCreacion;
         this.fechaUpdate = fechaUpdate;
     }
+
+    public ProveedorUpdateDto() {
+
+    }
 }

@@ -44,4 +44,8 @@ public class ProveedorServiceImpl implements ProveedorService {
     public List<Proveedor> findProveedoresByNombre(String nombre) {
         return proveedoresRepository.findByNombre(nombre);
     }
+
+    public Proveedor updateProveedores(long l, Proveedor proveedor1) {
+        return proveedor1;
+    }
 }
