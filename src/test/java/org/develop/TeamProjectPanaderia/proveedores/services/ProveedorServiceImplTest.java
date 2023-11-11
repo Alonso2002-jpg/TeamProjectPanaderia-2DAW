@@ -107,6 +107,22 @@ public class ProveedorServiceImplTest {
         assertEquals(1, result.size());
         verify(proveedorRepository, times(1)).findByNombre(nombre);
     }
+    @Test
+    void updateProveedores() {
+        // Configuración
+        long proveedorId = 1L;
+        Proveedor proveedorToUpdate = Proveedor.builder()
+                .id(proveedorId)
+                .nif("11")
+                .numero("12")
+                .nombre("Juan")
+                .build();
 
+        // Llamada al método
+        Proveedor updatedProveedor = proveedorService.updateProveedores(proveedorId, proveedorToUpdate);
+
+        // Verificación
+        assertEquals(proveedorToUpdate, updatedProveedor);
+    }
 }
 
