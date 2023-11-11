@@ -107,7 +107,7 @@ public class CategoriaServiceImpl implements CategoriaService{
 
         if (webSocketHandler == null){
             log.warn("No se ha podido enviar la Notificacion, no se encontro servicio");
-           initWBHandler(webSocketConfig);
+           webSocketHandler = webSocketConfig.webSocketHandler();
         }
         try{
             Notificacion<NotificacionResponseDto> notificacion = new Notificacion<>(
