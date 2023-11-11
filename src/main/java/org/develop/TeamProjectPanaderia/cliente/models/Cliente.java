@@ -9,10 +9,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.hibernate.validator.constraints.Length;
 
 
 import java.time.LocalDateTime;
+
 
 @Data
 @Builder
@@ -35,7 +37,6 @@ public class Cliente {
     private String dni;
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
     private String telefono;
-    private String producto;
     @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
@@ -43,6 +44,9 @@ public class Cliente {
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime fechaActualizacion;
 
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
