@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hibernate.engine.transaction.internal.jta.JtaStatusHelper.isActive;
 @Component
 public class PersonalMapper {
     public Personal toPersonal(PersonalCreateDto dto) {
