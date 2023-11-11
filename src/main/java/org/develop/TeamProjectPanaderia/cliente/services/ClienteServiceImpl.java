@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.cliente.services;
 
 
+import jakarta.persistence.criteria.Join;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
@@ -13,9 +14,12 @@ import org.develop.TeamProjectPanaderia.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -35,23 +39,35 @@ public class ClienteServiceImpl implements ClienteService{
         this.clienteMapper = clienteMapper;
     }
 
-    @Override
-    public List<Cliente> findAll(String categoria, String producto) {
-        if((categoria == null || categoria.isEmpty()) && (producto == null ||producto.isEmpty())){
-            log.info("Buscando todos los Clientes: ");
-            return clienteRepository.findAll();
+
+        @Override
+        public Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> producto, Optional<String> categoria, Pageable pageable){
+
+            // Criteerio de búsqueda por nombreCompleto
+            Specification<Cliente> specNombreCompleto = (root, query, criteriaBuilder) ->
+                    nombreCompleto.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombreCompleto")), "%" + n.toLowerCase() + "%"))
+                            .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+
+            // Criterio de busqueda por producto
+            Specification<Cliente> specProducto = (root, query, criteriaBuilder) ->
+                    producto.map(c ->{
+                        Join<Cliente, Producto> categoriaJoin = root.join("producto");
+                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameProducto")), "%" + c.toLowerCase() + "%");
+                    }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+            // Criterio de busqueda por categoria
+            Specification<Cliente> specCategoria = (root, query, criteriaBuilder) ->
+                    categoria.map(c ->{
+                        Join<Cliente, Categoria> categoriaJoin = root.join("categoria");
+                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategoria")), "%" + c.toLowerCase() + "%");
+                    }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+            Specification<Cliente> criterio = Specification.where(specNombreCompleto)
+                    .and(specProducto)
+                    .and(specCategoria);
+            return clienteRepository.findAll(criterio, pageable);
         }
-        if((categoria != null && !categoria.isEmpty()) && (producto == null || producto.isEmpty())) {
-            log.info("Buscando todos los Clientes por categoria: " + categoria);
-            return clienteRepository.findAllByCategoriaContainsIgnoreCase(categoria);
-        }
-        if((categoria == null || categoria.isEmpty())){
-            log.info("Buscando todos los clientes por producto: " + producto);
-            return clienteRepository.findAllByProductoContainsIgnoreCase(producto);
-        }
-        log.info("Buscando todos los clientes por categoria: " + categoria + " y producto: " +producto);
-        return clienteRepository.findAllByCategoriaContainsIgnoreCaseAndProductoContainsIgnoreCase(categoria, producto);
-    }
 
     @Override
     public Cliente findById(Long id) {
@@ -88,15 +104,15 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     @Override
-    public Cliente findByName(String nombre) {
-        log.info("Buscando cliente por nombre: " + nombre);
-        return clienteRepository.findByNombreEqualsIgnoreCase(nombre).orElseThrow(() -> new ClienteNotFoundException(nombre));
+    public Cliente findByNombreCompleto(String nombreCompleto) {
+        log.info("Buscando cliente por nombre completo: " + nombreCompleto);
+        return clienteRepository.findByNombreCompletoEqualsIgnoreCase(nombreCompleto).orElseThrow(() -> new ClienteNotFoundException(nombreCompleto));
     }
 
     @Override
     public void deleteById(Long id) {
         log.debug("Borrando cliente por id: " + id);
-        this.findById(id);
-        clienteRepository.deleteById(id);
+        Cliente clienteActual = this.findById(id);
+        clienteRepository.deleteById(clienteActual.getId());
     }
 }
