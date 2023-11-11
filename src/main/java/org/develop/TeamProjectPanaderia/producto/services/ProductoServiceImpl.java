@@ -7,6 +7,7 @@ import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
+import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
@@ -21,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -94,9 +94,14 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public Producto findById(UUID id) {
+    public Producto findById(String id) {
         log.info("Buscando producto por id: " + id);
-        return productoRepository.findById(id).orElseThrow(() -> new ProductoNotFound(id));
+        try{
+            var uuid = UUID.fromString(id);
+            return productoRepository.findById(uuid).orElseThrow(() -> new ProductoNotFound(uuid));
+        } catch (IllegalArgumentException e) {
+                throw new ProductoBadUuid(id);
+        }
     }
 
     @Override
@@ -115,7 +120,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public Producto update(UUID id, ProductoUpdateDto productoUpdateDto) {
+    public Producto update(String id, ProductoUpdateDto productoUpdateDto) {
        log.info("Actualizando producto por id: " + id);
        Producto productoActual = this.findById(id);
        Categoria categoria = null;
@@ -134,7 +139,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
-    public Producto updateImg(UUID id, MultipartFile file){
+    public Producto updateImg(String id, MultipartFile file){
         log.info("Actualizando imagen de producto por id: " + id);
         Producto productoActual = this.findById(id);
         String img = storageService.store(file);
@@ -146,9 +151,9 @@ public class ProductoServiceImpl implements ProductoService{
         return productoRepository.save(productoActual);
     }
     @Override
-    public void deleteById(UUID id) {
+    public void deleteById(String id) {
         log.debug("Borrando producto por id: " + id);
-        this.findById(id);
-        productoRepository.deleteById(id);
+        Producto productoActual = this.findById(id);
+        productoRepository.deleteById(productoActual.getId());
     }
 }

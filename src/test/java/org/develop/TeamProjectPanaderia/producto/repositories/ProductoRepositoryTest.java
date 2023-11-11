@@ -1,7 +1,5 @@
 package org.develop.TeamProjectPanaderia.producto.repositories;
 
-import jakarta.persistence.*;
-
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
@@ -74,57 +72,16 @@ class ProductoRepositoryTest {
     }
 
     @Test
-    void findAllByCategoryAndProveedor(){
-        // Act
-        List<Producto> productoList = productoRepository.findAllByCategoriaContainsIgnoreCaseAndProveedorContainsIgnoreCase("producto_test", "Y7821803T");
-
-        // Assert
-        assertAll(
-                () -> assertNotNull(productoList),
-                () -> assertFalse(productoList.isEmpty()),
-                () -> assertEquals(producto1, productoList.get(0))
-        );
-    }
-
-
-    @Test
-    void findAllByCategory(){
-        // Act
-        List<Producto> productoList = productoRepository.findAllByCategoriaContainsIgnoreCase("producto_test");
-
-        // Assert
-        assertAll(
-                () -> assertNotNull(productoList),
-                () -> assertFalse(productoList.isEmpty()),
-                () -> assertEquals(producto1, productoList.get(0))
-        );
-    }
-
-    @Test
-    void findAllByProveedor(){
-        // Act
-        List<Producto> productoList = productoRepository.findAllByProveedorContainsIgnoreCase("Y7821803T");
-
-        // Assert
-        assertAll(
-                () -> assertNotNull(productoList),
-                () -> assertFalse(productoList.isEmpty()),
-                () -> assertEquals(producto1, productoList.get(0))
-        );
-    }
-
-
-    @Test
     void findById_ExistId(){
         // Act
         UUID id = producto1.getId();
-        Optional<Producto> producto = productoRepository.findById(id);
+        Optional<Producto> foundProduct = productoRepository.findById(id);
 
         // Assert
         assertAll(
-                () -> assertNotNull(producto),
-                () -> assertTrue(producto.isPresent()),
-                () -> assertEquals(producto1.getId(), producto.get().getId())
+                () -> assertNotNull(foundProduct),
+                () -> assertTrue(foundProduct.isPresent()),
+                () -> assertEquals(producto1.getId(), foundProduct.get().getId())
         );
     }
 
@@ -132,15 +89,43 @@ class ProductoRepositoryTest {
     void findById_NotExistId(){
         // Act
         UUID id = UUID.randomUUID();
-        Optional<Producto> producto = productoRepository.findById(id);
+        Optional<Producto> foundProduct = productoRepository.findById(id);
 
         // Assert
         assertAll(
-                () -> assertNotNull(producto),
-                () -> assertTrue(producto.isEmpty())
+                () -> assertNotNull(foundProduct),
+                () -> assertTrue(foundProduct.isEmpty())
         );
     }
 
+
+    @Test
+    void findByNombre_ExistNombre(){
+        // Act
+        String nombre = producto1.getNombre();
+        Optional<Producto> foundProduct = productoRepository.findByNombreEqualsIgnoreCase(nombre);
+
+        // Assert
+        assertAll(
+                () -> assertNotNull(foundProduct),
+                () -> assertTrue(foundProduct.isEmpty())
+        );
+    }
+
+
+    @Test
+    void findByNombre_NotExistNombre(){
+        // Act
+        String nombre = "nombreNoRegistrado";
+        Optional<Producto> foundProduct = productoRepository.findByNombreEqualsIgnoreCase(nombre);
+
+        // Assert
+        assertAll(
+                () -> assertNotNull(foundProduct),
+                () -> assertTrue(foundProduct.isPresent()),
+                () -> assertEquals(producto1.getNombre(), foundProduct.get().getNombre())
+        );
+    }
 
     @Test
     void save(){
@@ -209,5 +194,19 @@ class ProductoRepositoryTest {
                 () -> assertTrue(productoList.isEmpty())
         );
     }
+
+    @Test
+    void deleteById_IdNotExist(){
+        // Act
+        UUID id = UUID.randomUUID();
+        productoRepository.deleteById(id);
+        List<Producto> productoList = productoRepository.findAll();
+
+        assertAll("delete",
+                () -> assertNotNull(productoList),
+                () -> assertEquals(1, productoList.size())
+        );
+    }
+
 
 }

@@ -13,11 +13,11 @@ import java.util.UUID;
 
 public interface ProductoService {
     Page<Producto> findAll(Optional<String> nombre, Optional <Integer> stockMin, Optional<Double> precioMax, Optional<Boolean> isActivo, Optional<String> categoria, Optional<String> proveedor, Pageable pageable);
-    Producto findById(UUID id);
+    Producto findById(String id);
     Producto findByName(String name);
     Producto save(ProductoCreateDto productoCreateDto);
-    Producto update(UUID id, ProductoUpdateDto productoUpdateDto);
-    Producto updateImg(UUID id, MultipartFile file);
-    void deleteById(UUID id);
+    Producto update(String id, ProductoUpdateDto productoUpdateDto);
+    Producto updateImg(String id, MultipartFile file);
+    void deleteById(String id);
 }
 
