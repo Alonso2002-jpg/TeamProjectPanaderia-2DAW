@@ -7,7 +7,10 @@ import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.models.Personal;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hibernate.engine.transaction.internal.jta.JtaStatusHelper.isActive;
 @Component
@@ -69,5 +72,17 @@ public class PersonalMapper {
                 .fechaBaja(personalDto.fechaBaja() == null ? personalUpd.getFechaBaja() : personalDto.fechaBaja())
                 .isActive(personalDto.isActive() == null ? personalUpd.isActive() : personalDto.isActive())
                 .build();
+    }
+    public Personal toPersonal(UUID id, PersonalCreateDto createDto,Categoria categoria, Personal personal) {
+        return  Personal.builder()
+                .id(id)
+                .nombre(createDto.name())
+                .dni(createDto.dni())
+                .seccion(categoria)
+                .fechaCreacion(LocalDate.from(LocalDateTime.now()))
+                .fechaUpdate(LocalDate.from(LocalDateTime.now()))
+                .isActive(true)
+                .build();
+
     }
 }

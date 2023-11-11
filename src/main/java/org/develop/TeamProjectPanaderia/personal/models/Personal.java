@@ -24,8 +24,8 @@ public class Personal {
     private String nombre;
     @Column(name = "dni", nullable = false, unique = true)
     private String dni;
-    @OneToOne
-    @Column(name = "seccion", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "seccion", nullable = false)
     @Builder.Default
     private Categoria seccion= Categoria.builder().nameCategory("EMPLEADO").build();
     @Builder.Default

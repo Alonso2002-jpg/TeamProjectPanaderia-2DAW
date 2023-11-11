@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface PersonalService {
-    List<Personal>findAll(Boolean isActive);
+    List<Personal>findAll(Boolean isActive, String seccion);
     Personal findById(UUID id);
     Personal save(PersonalCreateDto personal);
     Personal update(UUID id, PersonalUpdateDto personal);
     void deleteById(UUID id);
     List<Personal> findByActiveIs(boolean isActive);
-    void deleteAll();
+
 
 }
