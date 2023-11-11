@@ -116,7 +116,8 @@ public class ProductoServiceImpl implements ProductoService{
         Categoria categoria = categoriaService.findByName(productoCreateDto.categoria());
         Proveedor proveedores = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
         UUID id = UUID.randomUUID();
-        return productoRepository.save(productoMapper.toProducto(id,productoCreateDto, categoria, proveedores));
+        Producto productoToSave = productoMapper.toProducto(id,productoCreateDto, categoria, proveedores);
+        return productoRepository.save(productoToSave);
     }
 
     @Override
