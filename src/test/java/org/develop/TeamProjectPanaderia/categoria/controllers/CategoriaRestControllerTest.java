@@ -1,5 +1,6 @@
 package org.develop.TeamProjectPanaderia.categoria.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
@@ -10,6 +11,7 @@ import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotSaveExc
 import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -28,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -91,8 +95,10 @@ class CategoriaRestControllerTest {
     void getAll() throws Exception {
         List<Categoria> categoriasList =List.of(categoria1,categoria2);
         List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
+        Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
 
-        when(categoriaService.findAll(isNull())).thenReturn(categoriasList);
+        when(categoriaService.findAll(Optional.empty(),Optional.empty(),pageable)).thenReturn(responsePage);
         when(categoriaMapper.toResponseList(categoriasList)).thenReturn(categoriaResponseList);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -100,28 +106,28 @@ class CategoriaRestControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        List<CategoriaResponseDto>categoriaResList = mapper.readValue(response.getContentAsString(),
-                mapper.getTypeFactory().constructCollectionType(List.class, CategoriaResponseDto.class));
+        PageResponse<CategoriaResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        });
 
-        assertAll(
-                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
-                () -> assertNotNull(categoriaResList),
-                () -> assertEquals(2,categoriaResList.size()),
-                () -> assertEquals("Panaderia",categoriaResList.get(0).nameCategory()),
-                () -> assertEquals("Charcuteria",categoriaResList.get(1).nameCategory())
+        // Assert
+        assertAll("findall",
+                () -> assertEquals(200, response.getStatus()),
+                () -> assertEquals(2, res.content().size())
         );
 
-        verify(categoriaService,times(1)).findAll(isNull());
+        verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.empty(),pageable);
         verify(categoriaMapper,times(1)).toResponseList(categoriasList);
     }
 
     @Test
     void getAllisActive() throws Exception {
          var localEndPoint= initEndPoint + "?isActive=true";
-        List<Categoria> categoriasList =List.of(categoria1);
-        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto);
+         List<Categoria> categoriasList =List.of(categoria1,categoria2);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
+        Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
 
-        when(categoriaService.findAll(true)).thenReturn(categoriasList);
+        when(categoriaService.findAll(Optional.of(true),Optional.empty(),pageable)).thenReturn(responsePage);
         when(categoriaMapper.toResponseList(categoriasList)).thenReturn(categoriaResponseList);
 
         MockHttpServletResponse response = mockMvc.perform(
