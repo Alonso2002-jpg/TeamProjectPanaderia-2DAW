@@ -99,12 +99,15 @@ public class CategoriaServiceImpl implements CategoriaService{
         categoriaRepository.deleteAll();
     }
 
+    void initWBHandler(WebSocketConfig webSocketConfig){
+        webSocketHandler = webSocketConfig.webSocketHandler();
+    }
     void onChange(Notificacion.Tipo tipo, Categoria data){
         log.debug("Servicio de productos onChange con tipo: " + tipo + " y datos: " + data);
 
         if (webSocketHandler == null){
             log.warn("No se ha podido enviar la Notificacion, no se encontro servicio");
-            webSocketHandler = this.webSocketConfig.webSocketHandler();
+           webSocketHandler = webSocketConfig.webSocketHandler();
         }
         try{
             Notificacion<NotificacionResponseDto> notificacion = new Notificacion<>(
