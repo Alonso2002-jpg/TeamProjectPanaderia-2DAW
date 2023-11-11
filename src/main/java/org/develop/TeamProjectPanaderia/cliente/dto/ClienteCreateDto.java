@@ -10,17 +10,18 @@ import org.hibernate.validator.constraints.Length;
 public class ClienteCreateDto  {
     @NotBlank( message = "El nombre no puede estar vacio")
     @Length(min = 8, message = "El nombre debe tener al menos 8 caracteres")
-   String nombreCompleto;
+    private String nombreCompleto;
     @NotBlank(message = "El correo no puede estar vacio")
     @Pattern(regexp = ".*@.*\\..*", message = "El correo debe contener al menos un '@' y al menos un '.'")
-   String correo;
+    private String correo;
     @NotBlank( message = "El DNI no puede estar vacia")
     @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 números seguidos de una letra")
-    String dni;
+    private String dni;
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
-    String telefono;
+    private String telefono;
+    private String imagen;
     @NotBlank(message = "El producto no puede estar vacio")
-    String producto;
+    private String producto;
     @NotBlank(message = "La categoria no puede estar vacio")
-    String categoria;
+    private String categoria;
 }

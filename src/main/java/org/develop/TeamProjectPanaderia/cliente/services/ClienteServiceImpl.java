@@ -13,11 +13,13 @@ import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
+import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -30,13 +32,15 @@ public class ClienteServiceImpl implements ClienteService{
     private final CategoriaService categoriaService;
     private final ProductoService productoService;
     private final ClienteMapper clienteMapper;
+    private final StorageService storageService;
 
     @Autowired
-    public ClienteServiceImpl(ClienteRepository clienteRepository, CategoriaService categoriaService, ProductoService productoService, ClienteMapper clienteMapper) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, CategoriaService categoriaService, ProductoService productoService, ClienteMapper clienteMapper, StorageService storageService) {
         this.clienteRepository = clienteRepository;
         this.categoriaService = categoriaService;
         this.productoService = productoService;
         this.clienteMapper = clienteMapper;
+        this.storageService = storageService;
     }
 
 
@@ -52,15 +56,15 @@ public class ClienteServiceImpl implements ClienteService{
             // Criterio de busqueda por producto
             Specification<Cliente> specProducto = (root, query, criteriaBuilder) ->
                     producto.map(c ->{
-                        Join<Cliente, Producto> categoriaJoin = root.join("producto");
-                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameProducto")), "%" + c.toLowerCase() + "%");
+                        Join<Cliente, Producto> produtoJoin = root.join("producto");
+                        return criteriaBuilder.like(criteriaBuilder.lower(produtoJoin.get("nombre")), "%" + c.toLowerCase() + "%");
                     }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
             // Criterio de busqueda por categoria
             Specification<Cliente> specCategoria = (root, query, criteriaBuilder) ->
                     categoria.map(c ->{
                         Join<Cliente, Categoria> categoriaJoin = root.join("categoria");
-                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategoria")), "%" + c.toLowerCase() + "%");
+                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategory")), "%" + c.toLowerCase() + "%");
                     }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
             Specification<Cliente> criterio = Specification.where(specNombreCompleto)
@@ -104,9 +108,22 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     @Override
-    public Cliente findByNombreCompleto(String nombreCompleto) {
-        log.info("Buscando cliente por nombre completo: " + nombreCompleto);
-        return clienteRepository.findByNombreCompletoEqualsIgnoreCase(nombreCompleto).orElseThrow(() -> new ClienteNotFoundException(nombreCompleto));
+    public Cliente updateImg(Long id, MultipartFile file){
+        log.info("Actualizando imagen de client por id: " + id);
+        Cliente clienteActual = this.findById(id);
+        String img = storageService.store(file);
+        String urlImg = storageService.getUrl(img).replace(" ", "");
+        if (!clienteActual.getImagen().equals(Cliente.IMAGE_DEFAULT)){
+            storageService.delete(clienteActual.getImagen());
+        }
+        clienteActual.setImagen(urlImg);
+        return clienteRepository.save(clienteActual);
+    }
+
+    @Override
+    public Cliente findByDni(String dni) {
+        log.info("Buscando cliente por dni: " + dni);
+        return clienteRepository.findClienteByDniEqualsIgnoreCase(dni).orElseThrow(() -> new ClienteNotFoundException(dni));
     }
 
     @Override

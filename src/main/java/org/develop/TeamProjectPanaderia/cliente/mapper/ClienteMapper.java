@@ -21,6 +21,7 @@ public class ClienteMapper {
                 .correo(dto.getCorreo())
                 .dni(dto.getDni())
                 .telefono(dto.getTelefono())
+                .imagen(dto.getImagen())
                 .producto(producto)
                 .categoria(categoria)
                 .fechaCreacion(LocalDateTime.now())
@@ -35,9 +36,10 @@ public class ClienteMapper {
                 .correo(dto.getCorreo() != null ? dto.getCorreo() : cliente.getCorreo())
                 .dni(cliente.getDni())
                 .telefono(dto.getTelefono() != null ? dto.getTelefono() : cliente.getTelefono())
+                .imagen(dto.getImagen() != null ? dto.getImagen() : cliente.getImagen())
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(LocalDateTime.now())
-                .producto(producto) // PROVISIONAL
+                .producto(producto)
                 .categoria(categoria)
                 .build();
     }
@@ -49,6 +51,7 @@ public class ClienteMapper {
                 .correo(cliente.getCorreo())
                 .dni(cliente.getDni())
                 .telefono(cliente.getTelefono())
+                .imagen(cliente.getImagen())
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(cliente.getFechaActualizacion())
                 .producto(cliente.getProducto().getNombre())

@@ -12,10 +12,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,6 +81,15 @@ public class ClienteRestController {
         log.info("Borrando cliente por id: " + id);
         clienteService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Cliente> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file){
+        if (!file.isEmpty()){
+            return ResponseEntity.ok(clienteService.updateImg(id,file));
+        }else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La Imagen no puede estar vacia");
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

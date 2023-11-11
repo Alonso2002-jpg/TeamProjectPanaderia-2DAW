@@ -15,7 +15,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> , JpaSpe
     @Override
     Optional<Cliente> findById(Long id);
 
-    Optional<Cliente> findByNombreCompletoEqualsIgnoreCase(String nombreCompleto);
+    Optional<Cliente> findClienteByDniEqualsIgnoreCase(String dni);
 
     @Override
     void deleteById(Long id);

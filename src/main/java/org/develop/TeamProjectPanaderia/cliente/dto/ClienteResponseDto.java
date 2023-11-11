@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
 @Builder
 public class ClienteResponseDto {
 
-    Long id;
-    String nombreCompleto;
-    String correo;
-    String dni;
-    String telefono;
-    LocalDateTime fechaCreacion;
-    LocalDateTime fechaActualizacion;
-    String producto;
-    String categoria;
+    private Long id;
+    private String nombreCompleto;
+    private String correo;
+    private String dni;
+    private String telefono;
+    private String imagen;
+    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaActualizacion;
+    private String producto;
+    private String categoria;
 }

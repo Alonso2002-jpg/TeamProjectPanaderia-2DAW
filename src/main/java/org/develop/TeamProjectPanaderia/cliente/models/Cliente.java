@@ -2,6 +2,7 @@ package org.develop.TeamProjectPanaderia.cliente.models;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -10,10 +11,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.hibernate.validator.constraints.Length;
 
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Data
@@ -23,6 +26,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "CLIENTES")
 public class Cliente {
+    @Builder.Default
+    public static final String IMAGE_DEFAULT = "https://via.placeholder.com/150";
     @Id // Indicamos que es el ID de la tabla
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,10 +40,15 @@ public class Cliente {
     @NotBlank( message = "El DNI no puede estar vacia")
     @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 números seguidos de una letra")
     private String dni;
+    @Column(columnDefinition = "TEXT default ''")
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
-    private String telefono;
+    @Builder.Default
+    private String telefono = "";
+    @Column(columnDefinition = "TEXT default '" + IMAGE_DEFAULT + "'")
+    @Builder.Default
+    private String imagen = IMAGE_DEFAULT;
     @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
-    @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
     @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
@@ -53,3 +63,4 @@ public class Cliente {
     private Categoria categoria;
 
 }
+
