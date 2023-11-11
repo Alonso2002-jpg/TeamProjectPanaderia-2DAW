@@ -57,7 +57,7 @@ public class ProductoMapper {
                 producto.getPrecio(),
                 producto.getIsActivo(),
                 producto.getCategoria().getNameCategory(),
-                producto.getProveedor().getNIF()
+                producto.getProveedor().getNif()
         );
     }
 }
