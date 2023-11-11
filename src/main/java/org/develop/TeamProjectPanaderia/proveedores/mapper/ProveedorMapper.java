@@ -14,7 +14,7 @@ public class ProveedorMapper {
     public ProveedorResponseDto toResponse(Proveedor proveedores){
         return new ProveedorResponseDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
@@ -30,7 +30,7 @@ public class ProveedorMapper {
     public ProveedorCreateDto ToCreate(Proveedor proveedores){
         return new ProveedorCreateDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
@@ -46,7 +46,7 @@ public class ProveedorMapper {
     public ProveedorUpdateDto ToUpdate(Proveedor proveedores){
         return new ProveedorUpdateDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
