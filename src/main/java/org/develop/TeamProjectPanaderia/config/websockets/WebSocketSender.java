@@ -1,2 +1,8 @@
-package org.develop.TeamProjectPanaderia.config.websockets;public class WebSocketSender {
+package org.develop.TeamProjectPanaderia.config.websockets;
+
+import java.io.IOException;
+
+public interface WebSocketSender {
+    void sendMessage(String message) throws IOException;
+    void sendPeriodicMessage(String message) throws IOException;
 }
