@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.WebSockets.mapper;
 
 import org.develop.TeamProjectPanaderia.WebSockets.dto.NotificacionResponseDto;
+import org.develop.TeamProjectPanaderia.WebSockets.exceptions.ObjectNotiNotFoundException;
 import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
@@ -11,6 +12,7 @@ import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.proveedores.mapper.ProveedoresMapper;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,6 +23,7 @@ public class NotificacionMapper {
     private final ProveedoresMapper proveedoresMapper;
     private final PersonalMapper personalMapper;
 
+    @Autowired
     public NotificacionMapper(ProductoMapper productoMapper,
                               CategoriaMapper categoriaMapper,
                               ClienteMapper clienteMapper,
@@ -45,7 +48,7 @@ public class NotificacionMapper {
         }else if (obj instanceof Proveedores proveedores){
             return getNotificacionFromProveedor(proveedores);
         }else{
-            throw new IllegalArgumentException("Objeto no encontrado");
+            throw new ObjectNotiNotFoundException("Mala Conversion, Objeto no encontrado");
         }
     }
 
