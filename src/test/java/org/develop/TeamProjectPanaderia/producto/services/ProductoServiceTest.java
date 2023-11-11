@@ -310,9 +310,11 @@ public class ProductoServiceTest {
                         .proveedor(proveedor)
                         .build();
 
+        when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenReturn(proveedor);
         when(categoriaService.findByName(productoCreateDto.categoria())).thenReturn(categoriaProducto);
-        when(productoMapper.toProducto(uuid, productoCreateDto, categoriaProducto, proveedor)).thenReturn(expectedProduct);
+        when(productoMapper.toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor))).thenReturn(expectedProduct);
         when(productoRepository.save(expectedProduct)).thenReturn(expectedProduct);
+
 
         // Act
         Producto actualProduct = productoService.save(productoCreateDto);
@@ -322,8 +324,15 @@ public class ProductoServiceTest {
 
 
         // Verify
+        verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.proveedor());
         verify(categoriaService, times(1)).findByName(productoCreateDto.categoria());
         verify(productoRepository, times(1)).save(expectedProduct);
-        verify(productoMapper, times(1)).toProducto(uuid, productoCreateDto, categoriaProducto, proveedor);
+        verify(productoMapper, times(1)).toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor));
     }
+
+
+
+
+
+
 }

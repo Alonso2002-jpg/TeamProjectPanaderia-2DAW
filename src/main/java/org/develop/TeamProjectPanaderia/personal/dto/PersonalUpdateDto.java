@@ -2,6 +2,9 @@ package org.develop.TeamProjectPanaderia.personal.dto;
 
 import java.time.LocalDate;
 
+import lombok.Builder;
+
+@Builder
 public record PersonalUpdateDto(
         String nombre,
         String section,

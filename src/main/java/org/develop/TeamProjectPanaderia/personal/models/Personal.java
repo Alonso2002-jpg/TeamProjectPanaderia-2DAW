@@ -24,23 +24,23 @@ public class Personal {
     private String nombre;
     @Column(name = "dni", nullable = false, unique = true)
     private String dni;
-    @OneToOne
-    @Column(name = "seccion", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
     @Builder.Default
     private Categoria seccion= Categoria.builder().nameCategory("EMPLEADO").build();
     @Builder.Default
-    @Column(name = "fecha_alta", nullable = false, columnDefinition = "Fecha de alta del personal")
+    @Column(name = "fecha_alta", nullable = false)
     private LocalDate fechaAlta = LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_baja", nullable = false, columnDefinition = "Fecha de baja del personal")
+    @Column(name = "fecha_baja", nullable = false)
     private LocalDate fechaBaja= LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_creacion", nullable = false, columnDefinition = "Fecha de creacion del personal")
+    @Column(name = "fecha_creacion", nullable = false)
     private LocalDate fechaCreacion = LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_actualizacion", nullable = false, columnDefinition = "Fecha de actualizacion del personal")
+    @Column(name = "fecha_actualizacion", nullable = false)
     private LocalDate fechaUpdate=LocalDate.now();
-    @Column(name = "active", nullable = false, columnDefinition = "avtivado por defecto true")
+    @Column(name = "active", nullable = false)
     @Builder.Default
     private boolean isActive=true;
 
