@@ -1,20 +1,20 @@
 package org.develop.TeamProjectPanaderia.proveedores.mapper;
 
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresCreateDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresResponseDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedoresUpdateDto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorResponseDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Component
-public class ProveedoresMapper {
+public class ProveedorMapper {
 
-    public ProveedoresResponseDto toResponse(Proveedores proveedores){
-        return new ProveedoresResponseDto(
+    public ProveedorResponseDto toResponse(Proveedor proveedores){
+        return new ProveedorResponseDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
@@ -23,14 +23,14 @@ public class ProveedoresMapper {
         );
     }
 
-    public List<ProveedoresResponseDto> toResponse(List<Proveedores> proveedores){
+    public List<ProveedorResponseDto> toResponse(List<Proveedor> proveedores){
         return proveedores.stream().map(this::toResponse).toList();
     }
 
-    public ProveedoresCreateDto ToCreate(Proveedores proveedores){
-        return new ProveedoresCreateDto(
+    public ProveedorCreateDto ToCreate(Proveedor proveedores){
+        return new ProveedorCreateDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
@@ -39,14 +39,14 @@ public class ProveedoresMapper {
         );
     }
 
-    public List<ProveedoresCreateDto> ToCreate(List<Proveedores> proveedores){
+    public List<ProveedorCreateDto> ToCreate(List<Proveedor> proveedores){
         return proveedores.stream().map(this::ToCreate).toList();
     }
 
-    public ProveedoresUpdateDto ToUpdate(Proveedores proveedores){
-        return new ProveedoresUpdateDto(
+    public ProveedorUpdateDto ToUpdate(Proveedor proveedores){
+        return new ProveedorUpdateDto(
                 proveedores.getId(),
-                proveedores.getNIF(),
+                proveedores.getNif(),
                 proveedores.getTipo(),
                 proveedores.getNumero(),
                 proveedores.getNombre(),
@@ -55,7 +55,7 @@ public class ProveedoresMapper {
         );
     }
 
-    public List<ProveedoresUpdateDto> ToUpdate(List<Proveedores> proveedores){
+    public List<ProveedorUpdateDto> ToUpdate(List<Proveedor> proveedores){
         return proveedores.stream().map(this::ToUpdate).toList();
     }
 }
