@@ -19,7 +19,7 @@ import java.util.Optional;
 @TestPropertySource(properties = "spring.sql.init.mode = never")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DataJpaTest
-public class CategoriaRepositoryTest {
+class CategoriaRepositoryTest {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
