@@ -1,27 +1,27 @@
 package org.develop.TeamProjectPanaderia.proveedores.services;
 
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedoresRepository;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
-public class ProveedoresServiceImpl implements ProveedoresService {
+public class ProveedorServiceImpl implements ProveedorService {
 
-    private final ProveedoresRepository proveedoresRepository;
+    private final ProveedorRepository proveedoresRepository;
 
-    public ProveedoresServiceImpl(ProveedoresRepository proveedoresRepository) {
+    public ProveedorServiceImpl(ProveedorRepository proveedoresRepository) {
         this.proveedoresRepository = proveedoresRepository;
     }
 
     @Override
-    public Proveedores saveProveedores(Proveedores proveedores) {
+    public Proveedor saveProveedores(Proveedor proveedores) {
         return proveedoresRepository.save(proveedores);
     }
 
     @Override
-    public Optional<Proveedores> getProveedoresById(Long id) {
+    public Optional<Proveedor> getProveedoresById(Long id) {
         return proveedoresRepository.findById(id);
     }
 
@@ -31,17 +31,17 @@ public class ProveedoresServiceImpl implements ProveedoresService {
     }
 
     @Override
-    public List<Proveedores> getAllProveedores() {
+    public List<Proveedor> getAllProveedores() {
         return proveedoresRepository.findAll();
     }
 
     @Override
-    public Proveedores findProveedoresByNIF(String nif) {
+    public Proveedor findProveedoresByNIF(String nif) {
         return proveedoresRepository.findByNIF(nif);
     }
 
     @Override
-    public List<Proveedores> findProveedoresByNombre(String nombre) {
+    public List<Proveedor> findProveedoresByNombre(String nombre) {
         return proveedoresRepository.findByNombre(nombre);
     }
 }

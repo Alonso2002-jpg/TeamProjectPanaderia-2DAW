@@ -5,7 +5,7 @@ import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 
 import java.time.LocalDate;
 
-public class ProveedoresCreateDto {
+public class ProveedorCreateDto {
     @Getter
     private Long id;
     @Getter
@@ -21,7 +21,7 @@ public class ProveedoresCreateDto {
     @Getter
     private LocalDate fechaUpdate;
 
-    public ProveedoresCreateDto(Long id, String NIF, Categoria Tipo, String numero, String nombre, LocalDate fechaCreacion, LocalDate fechaUpdate) {
+    public ProveedorCreateDto(Long id, String NIF, Categoria Tipo, String numero, String nombre, LocalDate fechaCreacion, LocalDate fechaUpdate) {
         this.id = id;
         this.NIF = NIF;
         this.Tipo = Tipo;
