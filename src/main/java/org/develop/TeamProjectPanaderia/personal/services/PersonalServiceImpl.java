@@ -1,7 +1,8 @@
 package org.develop.TeamProjectPanaderia.personal.services;
 
 import lombok.extern.slf4j.Slf4j;
-import org.develop.TeamProjectPanaderia.personal.dto.CreateResponseDto;
+import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.exceptions.PersonalException;
@@ -19,16 +20,33 @@ import java.util.UUID;
 public class PersonalServiceImpl implements PersonalService {
     private final PersonalRepository personalRepository;
     private final PersonalMapper personalMapper;
+    private final CategoriaService categoriaService;
     @Autowired
-    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper) {
+    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper, CategoriaService categoriaService) {
         this.personalRepository = personalRepository;
         this.personalMapper = personalMapper;
+        this.categoriaService = categoriaService;
     }
 
 
+
+
     @Override
-    public List<Personal> findAll() {
+    public List<Personal> findAll(Boolean isActive, String seccion) {
+        if ((seccion == null || seccion.isEmpty()) && (isActive== null || isActive )) {
+            log.info("Buscando todos los personales ");
         return personalRepository.findAll();
+        }
+        if (seccion != null && !seccion.isEmpty() && (isActive==null || isActive)) {
+            log.info("Buscando todos los personales por categoria ");
+            return personalRepository.findAllByCategoriaContainsIgnoreCase(seccion);
+        }
+        if ( (seccion ==null || seccion.isEmpty())){
+            log.info("Buscando todas las secciones por personal");
+            return personalRepository.findAllByIsActiveIgnereCase(isActive);
+        }
+        log.info("Buscando todo todos los perosnales por seccion: "+ seccion+" y si esta activo o no: "+isActive);
+        return  personalRepository.findAllByIsActiveIgnorecaseCategoryIgnoreCase( seccion ,isActive);
     }
 
     @Override
@@ -37,29 +55,36 @@ public class PersonalServiceImpl implements PersonalService {
     }
 
     @Override
-    public Personal save(PersonalCreateDto personal) {
-        if (personalRepository.findByUUID(UUID.fromString(personal.dni())).isPresent()){
-            throw new PersonalException("Personal ya existe");
-        }
-        return personalRepository.save(personalMapper.toPersonal(personal));
+    public Personal save(PersonalCreateDto perosnalCreateDto) {
+      log.info("Guardando Personal");
+      Categoria categoria= categoriaService.findByName(perosnalCreateDto.seccion());
+
+      UUID id = UUID.randomUUID();
+      return personalRepository.save(personalMapper.toPersonal(perosnalCreateDto ));
     }
 
     @Override
     public Personal update(UUID id, PersonalUpdateDto personalDto) {
+        log.info("Actualizando");
         var personalUpd = findById(id);
-        return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd));
+        var categoria = categoriaService.findByName(personalDto.section());
+        return personalRepository.save(personalMapper.toPersonal(personalDto, personalUpd, categoria));
+
     }
 
 
     @Override
     public void deleteById(UUID id) {
+        log.info("Borrando por id");
         var personal = findById(id);
         personalRepository.delete(personal);
     }
 
-    @Override
-    public void deleteAll() {
-        personalRepository.deleteAll();
 
+    @Override
+    public List<Personal> findByActiveIs(boolean isActive) {
+        return personalRepository.findByIsActive(isActive);
     }
+
+
 }

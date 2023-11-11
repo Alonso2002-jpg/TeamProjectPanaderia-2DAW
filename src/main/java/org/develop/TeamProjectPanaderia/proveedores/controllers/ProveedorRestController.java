@@ -1,9 +1,9 @@
 package org.develop.TeamProjectPanaderia.proveedores.controllers;
 
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedoresNotFoundException;
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedoresNotSaveException;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
-import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedoresRepository;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotFoundException;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotSaveException;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -14,39 +14,39 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/proveedores")
-public class ProveedoresRestController {
-    private final ProveedoresRepository proveedoresRepository;
+public class ProveedorRestController {
+    private final ProveedorRepository proveedoresRepository;
 
-    public ProveedoresRestController(ProveedoresRepository proveedoresRepository) {
+    public ProveedorRestController(ProveedorRepository proveedoresRepository) {
         this.proveedoresRepository = proveedoresRepository;
     }
 
     // Endpoint para obtener todos los proveedores
     @GetMapping
-    public Iterable<Proveedores> getAllProveedores() {
+    public Iterable<Proveedor> getAllProveedores() {
         return proveedoresRepository.findAll();
     }
 
     // Endpoint para obtener un proveedor por su ID
     @GetMapping("/{id}")
-    public Proveedores getProveedorById(@PathVariable Long id) {
+    public Proveedor getProveedorById(@PathVariable Long id) {
         return proveedoresRepository.findById(id)
-                .orElseThrow(() -> new ProveedoresNotFoundException(id));
+                .orElseThrow(() -> new ProveedorNotFoundException(id));
     }
 
     // Endpoint para crear un nuevo proveedor
     @PostMapping
-    public Proveedores createProveedor(@RequestBody Proveedores proveedor) {
-        Proveedores ProveedorGuardado = proveedoresRepository.save(proveedor);
+    public Proveedor createProveedor(@RequestBody Proveedor proveedor) {
+        Proveedor ProveedorGuardado = proveedoresRepository.save(proveedor);
         if (ProveedorGuardado == null) {
-            throw new ProveedoresNotSaveException("No se pudo guardar el proveedor");
+            throw new ProveedorNotSaveException("No se pudo guardar el proveedor");
         }
         return ProveedorGuardado;
     }
 
     // Endpoint para actualizar un proveedor existente
     @PutMapping("/{id}")
-    public Proveedores updateProveedor(@PathVariable Long id, @RequestBody Proveedores proveedor) {
+    public Proveedor updateProveedor(@PathVariable Long id, @RequestBody Proveedor proveedor) {
         proveedor.setId(id);
         return proveedoresRepository.save(proveedor);
     }

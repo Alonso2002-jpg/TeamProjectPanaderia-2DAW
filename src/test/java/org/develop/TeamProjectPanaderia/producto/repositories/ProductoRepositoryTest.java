@@ -2,7 +2,7 @@ package org.develop.TeamProjectPanaderia.producto.repositories;
 
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedores;
+import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class ProductoRepositoryTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
-    private final Proveedores proveedor = new Proveedores(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
+    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
     private final Producto producto1 =
                 Producto.builder()
                         .id(UUID.randomUUID())
