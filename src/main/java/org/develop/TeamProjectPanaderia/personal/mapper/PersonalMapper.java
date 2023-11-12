@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Component
 public class PersonalMapper {
-    public Personal toPersonal(PersonalCreateDto dto) {
+    public Personal toPersonal(UUID id, Categoria categoria, PersonalCreateDto dto) {
         return Personal.builder()
                 .dni(dto.dni())
                 .isActive(dto.isActive())
