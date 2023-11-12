@@ -357,6 +357,7 @@ class ProductoServiceTest {
                         .proveedor(proveedor)
                         .build();
 
+        when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenReturn(proveedor);
         when(categoriaService.findByName(productoCreateDto.categoria())).thenReturn(categoriaProducto);
         when(productoMapper.toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor))).thenReturn(expectedProduct);
@@ -373,6 +374,7 @@ class ProductoServiceTest {
         verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.proveedor());
         verify(categoriaService, times(1)).findByName(productoCreateDto.categoria());
         verify(productoRepository, times(1)).save(expectedProduct);
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
         verify(productoMapper, times(1)).toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor));
     }
 
@@ -381,6 +383,7 @@ class ProductoServiceTest {
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
+        when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(categoriaService.findByName(productoCreateDto.categoria())).thenThrow(new CategoriaNotFoundException(productoCreateDto.categoria()));
 
         // Act
@@ -389,6 +392,7 @@ class ProductoServiceTest {
 
         // Verift
         verify(categoriaService, times(1)).findByName(productoCreateDto.categoria());
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
     }
 /*
     @Test
@@ -396,6 +400,7 @@ class ProductoServiceTest {
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
+        when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenThrow(new ProveedoresNotFoundException(productoCreateDto.proveedor()));
 
         // Act
@@ -404,6 +409,7 @@ class ProductoServiceTest {
 
         // Verify
         verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.categoria());
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
     }
 */
 
