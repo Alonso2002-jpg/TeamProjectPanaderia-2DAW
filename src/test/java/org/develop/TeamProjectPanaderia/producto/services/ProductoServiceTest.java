@@ -1,8 +1,11 @@
 package org.develop.TeamProjectPanaderia.producto.services;
 
+import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
+import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
@@ -13,6 +16,7 @@ import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,7 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ProductoServiceTest {
+class ProductoServiceTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
@@ -64,6 +68,7 @@ public class ProductoServiceTest {
                     .categoria(categoriaProducto)
                     .proveedor(proveedor)
                     .build();
+    WebSocketHandler webSocketHandlerMock = mock (WebSocketHandler.class);
     @Mock
     private ProductoRepository productoRepository;
     @Mock
@@ -76,6 +81,15 @@ public class ProductoServiceTest {
     private ProductoMapper productoMapper;
     @InjectMocks
     private ProductoServiceImpl productoService;
+    @Mock
+    private WebSocketConfig webSocketConfig;
+    @Mock
+    private NotificacionMapper<Producto> funkoNotificationMapper;
+
+    @BeforeEach
+    void setUp(){
+        productoService.setWebSocketService(webSocketHandlerMock);
+    }
 
     @Test
     void findAll_NotParameters(){
@@ -326,7 +340,7 @@ public class ProductoServiceTest {
     }
 
     @Test
-    void save_() {
+    void save_() throws IOException {
         // Arrange
         UUID uuid = UUID.randomUUID();
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
@@ -347,7 +361,7 @@ public class ProductoServiceTest {
         when(categoriaService.findByName(productoCreateDto.categoria())).thenReturn(categoriaProducto);
         when(productoMapper.toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor))).thenReturn(expectedProduct);
         when(productoRepository.save(expectedProduct)).thenReturn(expectedProduct);
-
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
         Producto actualProduct = productoService.save(productoCreateDto);
@@ -395,7 +409,7 @@ public class ProductoServiceTest {
 
 
     @Test
-    void update() {
+    void update() throws IOException {
         // Arrange
         UUID id = producto1.getId();
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
@@ -405,6 +419,7 @@ public class ProductoServiceTest {
         when(productoMapper.toProducto(productoUpdateDto, producto1, categoriaProducto, proveedor)).thenReturn(producto1);
         when(categoriaService.findByName(productoUpdateDto.categoria())).thenReturn(categoriaProducto);
         when(proveedoresService.findProveedoresByNIF(productoUpdateDto.proveedor())).thenReturn(proveedor);
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
         Producto productoActualizado = productoService.update(id.toString(), productoUpdateDto);
@@ -423,7 +438,7 @@ public class ProductoServiceTest {
     }
 
     @Test
-    void update_WithNotCategoryAndNotProveedor() {
+    void update_WithNotCategoryAndNotProveedor() throws IOException {
         // Arrange
         UUID id = producto1.getId();
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, "", "");
@@ -431,6 +446,7 @@ public class ProductoServiceTest {
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto1));
         when(productoRepository.save(producto1)).thenReturn(producto1);
         when(productoMapper.toProducto(productoUpdateDto, producto1, categoriaProducto, proveedor)).thenReturn(producto1);
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
         Producto productoActualizado = productoService.update(id.toString(), productoUpdateDto);
@@ -504,12 +520,13 @@ public class ProductoServiceTest {
 
 
     @Test
-    void deleteById() {
+    void deleteById() throws IOException {
         // Arrange
         UUID id = producto2.getId();
         String uuid = id.toString();
 
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto2));
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
         productoService.deleteById(uuid);
@@ -548,7 +565,7 @@ public class ProductoServiceTest {
     */
 
     @Test
-    void updateImage() {
+    void updateImage() throws IOException {
         // Arrange
         String imageUrl = "test1.png";
 
@@ -559,6 +576,8 @@ public class ProductoServiceTest {
         when((storageService.getUrl(imageUrl))).thenReturn(imageUrl);
         when(productoRepository.save(any(Producto.class))).thenReturn(producto1);
         doNothing().when(storageService).delete(imageUrl);
+        doNothing().when(webSocketHandlerMock).sendMessage(anyString());
+
 
         // Act
         Producto updatedProducto = productoService.updateImg(producto1.getId().toString(), multipartFile);
