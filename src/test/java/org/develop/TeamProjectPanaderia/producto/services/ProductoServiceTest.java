@@ -10,6 +10,7 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
+import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotSaved;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
@@ -377,6 +378,21 @@ class ProductoServiceTest {
         verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
         verify(productoMapper, times(1)).toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor));
     }
+
+    @Test
+    void save_ProductNameAlreadyExist() throws IOException {
+        // Arrange
+        String nombre = "Nombre_existe";
+        when(productoRepository.findByNombreEqualsIgnoreCase(nombre)).thenReturn(Optional.of(producto1));
+
+        // Act
+        var res = assertThrows(ProductoNotSaved.class, () -> productoService.save(any(ProductoCreateDto.class)));
+        assertEquals("El producto " + nombre + " ya existe en la BD", res.getMessage());
+
+        // Verify
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase(nombre);
+    }
+
 
     @Test
     void save_categoryNotExist(){
