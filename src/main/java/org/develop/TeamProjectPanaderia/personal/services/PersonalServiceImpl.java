@@ -58,9 +58,8 @@ public class PersonalServiceImpl implements PersonalService {
     public Personal save(PersonalCreateDto perosnalCreateDto) {
       log.info("Guardando Personal");
       Categoria categoria= categoriaService.findByName(perosnalCreateDto.seccion());
-
-      UUID id = UUID.randomUUID();
-      return personalRepository.save(personalMapper.toPersonal(perosnalCreateDto ));
+        UUID id= UUID.randomUUID();
+        return personalRepository.save( personalMapper.toPersonal(id, categoria, perosnalCreateDto));
     }
 
     @Override
