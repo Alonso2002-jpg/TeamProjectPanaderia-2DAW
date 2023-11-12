@@ -378,7 +378,7 @@ public class ProductoServiceTest {
     }
 /*
     @Test
-    void save_categoryNotProveedor(){
+    void save_proveedorNotExist(){
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
@@ -483,18 +483,18 @@ public class ProductoServiceTest {
         verify(categoriaService, times(1)).findByName(category);
     }
 
-    /*
+/*
     @Test
-    void update_ProveedorExist() {
+    void update_ProveedorNotExist() {
         // Arrange
-        String category = "Categoria_Falsa";
+        String proveedor = "Proveedor_Falso";
         UUID id = producto1.getId();
         String uuid = id.toString();
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, "Categoria_Falsa", proveedor.getNif());
 
         when(productoRepository.findById(any(UUID.class))).thenReturn(Optional.of(producto1));
-        when(categoriaService.findByName(category)).thenReturn(categoriaProducto);
-        when(proveedoresService.findProveedoresByNIF(proveedor.getNif())).thenThrow(new ProveedoresNotFoundException(proveedor.getNif()));
+        when(categoriaService.findByName(categoriaProducto.getNameCategory())).thenReturn(categoriaProducto);
+        when(proveedoresService.findProveedoresByNIF(proveedor)).thenThrow(new ProveedoresNotFoundException(proveedor.getNif()));
 
         // Act & Assert
         var res = assertThrows(ProveedoresNotFoundException.class, () -> productoService.update(uuid, productoUpdateDto));
@@ -504,7 +504,7 @@ public class ProductoServiceTest {
 
 
     @Test
-    void deleteById() throws IOException {
+    void deleteById() {
         // Arrange
         UUID id = producto2.getId();
         String uuid = id.toString();
