@@ -48,11 +48,6 @@ public class CategoriaRestController {
         return ResponseEntity.ok(PageResponse.of(categoriaService.findAll(isActive, name,pageable), sortBy, direction));
     }
 
-//    @GetMapping("/name")
-//    public ResponseEntity<CategoriaResponseDto> findByName(@RequestParam(required = true, defaultValue = "Default") String name){
-//        var categoria = this.categoriaService.findByName(name);
-//        return ResponseEntity.ok(categoriaMapper.toResponse(categoria));
-//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDto> findById(@PathVariable Long id){
