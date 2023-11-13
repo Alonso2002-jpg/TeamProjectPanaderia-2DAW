@@ -13,13 +13,12 @@ import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.cliente.exceptions.ClienteNotFoundException;
+import org.develop.TeamProjectPanaderia.cliente.exceptions.ClienteNotSaveException;
 import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,7 +37,6 @@ public class ClienteServiceImpl implements ClienteService{
 
     private final ClienteRepository clienteRepository;
     private final CategoriaService categoriaService;
-    private final ProductoService productoService;
     private final ClienteMapper clienteMapper;
     private final StorageService storageService;
     private final WebSocketConfig webSocketConfig;
@@ -47,10 +45,9 @@ public class ClienteServiceImpl implements ClienteService{
     private WebSocketHandler webSocketService;
 
     @Autowired
-    public ClienteServiceImpl(ClienteRepository clienteRepository, CategoriaService categoriaService, ProductoService productoService, ClienteMapper clienteMapper, StorageService storageService, WebSocketConfig webSocketConfig, ObjectMapper mapper, NotificacionMapper<Cliente> clienteNotificacionMapper) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository, CategoriaService categoriaService, ClienteMapper clienteMapper, StorageService storageService, WebSocketConfig webSocketConfig, ObjectMapper mapper, NotificacionMapper<Cliente> clienteNotificacionMapper) {
         this.clienteRepository = clienteRepository;
         this.categoriaService = categoriaService;
-        this.productoService = productoService;
         this.clienteMapper = clienteMapper;
         this.storageService = storageService;
         this.webSocketConfig = webSocketConfig;
@@ -60,34 +57,26 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
 
-        @Override
-        public Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> producto, Optional<String> categoria, Pageable pageable){
+    @Override
+    public Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> categoria, Pageable pageable){
 
-            // Criteerio de búsqueda por nombreCompleto
-            Specification<Cliente> specNombreCompleto = (root, query, criteriaBuilder) ->
-                    nombreCompleto.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombreCompleto")), "%" + n.toLowerCase() + "%"))
-                            .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+        // Criteerio de búsqueda por nombreCompleto
+        Specification<Cliente> specNombreCompleto = (root, query, criteriaBuilder) ->
+                nombreCompleto.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombreCompleto")), "%" + n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
 
-            // Criterio de busqueda por producto
-            Specification<Cliente> specProducto = (root, query, criteriaBuilder) ->
-                    producto.map(c ->{
-                        Join<Cliente, Producto> produtoJoin = root.join("producto");
-                        return criteriaBuilder.like(criteriaBuilder.lower(produtoJoin.get("nombre")), "%" + c.toLowerCase() + "%");
-                    }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+        // Criterio de busqueda por categoria
+        Specification<Cliente> specCategoria = (root, query, criteriaBuilder) ->
+                categoria.map(c ->{
+                    Join<Cliente, Categoria> categoriaJoin = root.join("categoria");
+                    return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategory")), "%" + c.toLowerCase() + "%");
+                }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
-            // Criterio de busqueda por categoria
-            Specification<Cliente> specCategoria = (root, query, criteriaBuilder) ->
-                    categoria.map(c ->{
-                        Join<Cliente, Categoria> categoriaJoin = root.join("categoria");
-                        return criteriaBuilder.like(criteriaBuilder.lower(categoriaJoin.get("nameCategory")), "%" + c.toLowerCase() + "%");
-                    }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
-
-            Specification<Cliente> criterio = Specification.where(specNombreCompleto)
-                    .and(specProducto)
-                    .and(specCategoria);
-            return clienteRepository.findAll(criterio, pageable);
-        }
+        Specification<Cliente> criterio = Specification.where(specNombreCompleto)
+                 .and(specCategoria);
+         return clienteRepository.findAll(criterio, pageable);
+    }
 
     @Override
     public Cliente findById(Long id) {
@@ -98,31 +87,26 @@ public class ClienteServiceImpl implements ClienteService{
     @Override
     public Cliente save(ClienteCreateDto clienteCreateDto) {
         log.info("Guardando cliente: " + clienteCreateDto);
+        if(clienteRepository.findClienteByDniEqualsIgnoreCase(clienteCreateDto.getDni()).isPresent()){
+            throw new ClienteNotSaveException(clienteCreateDto.getDni());
+        }
         Categoria categoria = categoriaService.findByName(clienteCreateDto.getCategoria());
-        Producto producto = productoService.findByName(clienteCreateDto.getProducto());
-        Cliente clienteSaved = clienteRepository.save(clienteMapper.toCliente(clienteCreateDto, categoria, producto));
+        Cliente clienteSaved = clienteRepository.save(clienteMapper.toCliente(clienteCreateDto, categoria));
         onChange(Notificacion.Tipo.CREATE, clienteSaved);
         return clienteSaved;
     }
-
 
     @Override
     public Cliente update(Long id, ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando cliente por id: " + id);
         Cliente clienteActual = this.findById(id);
         Categoria categoria = null;
-        Producto producto = null;
         if(clienteUpdateDto.getCategoria() != null && !clienteUpdateDto.getCategoria().isEmpty()){
             categoria = categoriaService.findByName(clienteUpdateDto.getCategoria());
         } else {
             categoria = clienteActual.getCategoria();
         }
-        if(clienteUpdateDto.getProducto() != null && !clienteUpdateDto.getProducto().isEmpty()){
-            producto = productoService.findByName(clienteUpdateDto.getProducto());
-        } else {
-            producto = clienteActual.getProducto();
-        }
-        Cliente clienteMapped = clienteMapper.toCliente(clienteUpdateDto, clienteActual, categoria, producto);
+        Cliente clienteMapped = clienteMapper.toCliente(clienteUpdateDto, clienteActual, categoria);
         Cliente clienteUpdated = clienteRepository.save(clienteMapped);
         onChange(Notificacion.Tipo.UPDATE, clienteUpdated);
         return clienteUpdated;

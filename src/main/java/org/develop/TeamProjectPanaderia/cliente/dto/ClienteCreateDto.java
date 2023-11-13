@@ -20,8 +20,6 @@ public class ClienteCreateDto  {
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
     private String telefono;
     private String imagen;
-    @NotBlank(message = "El producto no puede estar vacio")
-    private String producto;
     @NotBlank(message = "La categoria no puede estar vacio")
     private String categoria;
 }
