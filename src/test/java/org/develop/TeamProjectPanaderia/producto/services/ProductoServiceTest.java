@@ -380,17 +380,18 @@ class ProductoServiceTest {
     }
 
     @Test
-    void save_ProductNameAlreadyExist() throws IOException {
+    void save_ProductNameAlreadyExist()  {
         // Arrange
-        String nombre = "Nombre_existe";
-        when(productoRepository.findByNombreEqualsIgnoreCase(nombre)).thenReturn(Optional.of(producto1));
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("TEST-1",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        when(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre())).thenReturn(Optional.of(producto1));
 
         // Act
-        var res = assertThrows(ProductoNotSaved.class, () -> productoService.save(any(ProductoCreateDto.class)));
-        assertEquals("El producto " + nombre + " ya existe en la BD", res.getMessage());
+        var res = assertThrows(ProductoNotSaved.class, () -> productoService.save(productoCreateDto));
+        assertEquals("El producto " + productoCreateDto.nombre() + " ya existe en la BD", res.getMessage());
 
         // Verify
-        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase(nombre);
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase(productoCreateDto.nombre());
     }
 
 

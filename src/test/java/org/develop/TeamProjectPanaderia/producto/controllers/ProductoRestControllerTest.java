@@ -413,7 +413,7 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void createProduct_BadRequest_Nombre() throws Exception {
+    void createProduct_BadRequest_NombreIsNull() throws Exception {
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto(null,33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
@@ -428,6 +428,25 @@ class ProductoRestControllerTest {
         assertAll(
                 () -> assertEquals(400, response.getStatus()),
                 () -> assertTrue(response.getContentAsString().contains("El nombre no puede estar vacio"))
+        );
+    }
+
+    @Test
+    void createProduct_BadRequest_NombreInvalid() throws Exception {
+        // Arrange
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("PR",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        post(myEndpoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Assert
+        assertAll(
+                () -> assertEquals(400, response.getStatus()),
+                () -> assertTrue(response.getContentAsString().contains("El nombre debe contener al menos 3 letras"))
         );
     }
 
@@ -559,6 +578,33 @@ class ProductoRestControllerTest {
 
         // Assert
         assertEquals(404, response.getStatus());
+    }
+
+
+    @Test
+    void updateProduct_BadRequest_Nombre() throws Exception {
+        // Arrange
+        UUID uuid = producto1.getId();
+        String id = uuid.toString();
+        String myLocalEndpoint = myEndpoint + "/" + id;
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        // Arrange
+        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
+
+        // Consulto el endpoint
+        MockHttpServletResponse response = mockMvc.perform(
+                        put(myLocalEndpoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        // Assert
+        assertAll(
+                () -> assertEquals(400, response.getStatus()),
+                () -> assertTrue(response.getContentAsString().contains("El nombre debe contener al menos 3 letras"))
+        );
     }
 
     @Test
