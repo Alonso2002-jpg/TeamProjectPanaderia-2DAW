@@ -57,6 +57,8 @@ public class ProveedorRestController {
     public void deleteProveedor(@PathVariable Long id) {
         proveedoresRepository.deleteById(id);
     }
+
+    //Para mostrar los errores.
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(
