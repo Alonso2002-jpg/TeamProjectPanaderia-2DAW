@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,7 +24,7 @@ public class ProveedorRestController {
 
     // Endpoint para obtener todos los proveedores
     @GetMapping
-    public Iterable<Proveedor> getAllProveedores() {
+    public List<Proveedor> getAllProveedores() {
         return proveedoresRepository.findAll();
     }
 
