@@ -1,8 +1,10 @@
 package org.develop.TeamProjectPanaderia.cliente.services;
 
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
+import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
@@ -22,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -38,7 +42,7 @@ public class ClienteServiceImplTest {
     private final Cliente cliente1 =
             Cliente.builder()
                     .id(1L)
-                    .nombreCompleto("TEST1")
+                    .nombreCompleto("TEST1_LOLA")
                     .correo("test1@gmail.com")
                     .dni("03480731A")
                     .telefono("602697979")
@@ -48,7 +52,7 @@ public class ClienteServiceImplTest {
     private final Cliente cliente2 =
             Cliente.builder()
                     .id(1L)
-                    .nombreCompleto("TEST2")
+                    .nombreCompleto("TEST2_LILA")
                     .correo("test2@gmail.com")
                     .dni("03480731B")
                     .telefono("602697971")
@@ -210,7 +214,7 @@ public class ClienteServiceImplTest {
         verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase(dniNoExiste);
     }
 
-   /* @Test
+    @Test
     void save() throws IOException {
         // Arrange
         Long id = 1L;
@@ -229,7 +233,7 @@ public class ClienteServiceImplTest {
 
         when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenReturn(categoriaCliente);
-        when(productoMapper.toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor))).thenReturn(expectedProduct);
+        when(clienteMapper.toCliente(clienteCreateDto, categoriaCliente)).thenReturn(expecCliente);
         when(clienteRepository.save(expecCliente)).thenReturn(expecCliente);
         doNothing().when(webSocketHandlerMock).sendMessage(any());
 
@@ -243,18 +247,36 @@ public class ClienteServiceImplTest {
         verify(categoriaService, times(1)).findByName(clienteCreateDto.getCategoria());
         verify(clienteRepository, times(1)).save(expecCliente);
         verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase((any(String.class)));
-        verify(clienteMapper, times(1)).toCliente(any(Long.class), eq(clienteCreateDto), eq(categoriaCliente));
-    }**/
+        verify(clienteMapper, times(1)).toCliente(clienteCreateDto, categoriaCliente);
+    }
 
     @Test
     void save_categoryNotExist(){
+        // Arrange
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory());
+
+        when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
+        when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenThrow(new CategoriaNotFoundException(clienteCreateDto.getCategoria()));
+
+        // Act
+        var res = assertThrows(CategoriaNotFoundException.class, () -> clienteService.save(clienteCreateDto));
+        assertEquals("Categoria not found with " + clienteCreateDto.getCategoria(), res.getMessage());
+
+        // Verift
+        verify(categoriaService, times(1)).findByName(clienteCreateDto.getCategoria());
+        verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase((any(String.class)));
     }
 
     @Test
     void update() throws IOException {
         // Arrange
         Long id = cliente1.getId();
-        ClienteUpdateDto clienteUpdateDto = new  ClienteUpdateDto("testActualizado", "test@gmail.com", "03480734A", "602897874","testActua.jpg", categoriaCliente.getNameCategory());
+
+        ClienteUpdateDto clienteUpdateDto =  ClienteUpdateDto.builder()
+                .nombreCompleto("EvelynObando")
+                .correo("evelynobando@gmail.com")
+                .telefono("722663186")
+                .build();
 
         when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente1));
         when(clienteRepository.save(cliente1)).thenReturn(cliente1);
@@ -263,7 +285,7 @@ public class ClienteServiceImplTest {
         doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
-        Cliente clienteActualizado = clienteService.update(id, clienteUpdateDto);
+        Cliente  clienteActualizado = clienteService.update(id,clienteUpdateDto);
 
         // Assert
         assertAll(
@@ -276,6 +298,49 @@ public class ClienteServiceImplTest {
         verify(categoriaService, times(1)).findByName(clienteUpdateDto.getCategoria());
         verify(clienteMapper, times(1)).toCliente(clienteUpdateDto, cliente1, categoriaCliente);
     }
+
+    @Test
+    void update_IdNotExist() {
+        // Arrange
+        Long id = cliente1.getId();
+        ClienteUpdateDto clienteUpdateDto = ClienteUpdateDto.builder()
+                .nombreCompleto("EvelynObando")
+                .correo("evelynobando@gmail.com")
+                .telefono("722663186")
+                .build();
+
+        when(clienteRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.update(id,clienteUpdateDto));
+        assertEquals("Cliente con id " + id + " no encontrado", res.getMessage());
+
+        verify(clienteRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void update_CategoryNotExist() {
+        // Arrange
+        String category = "Categoria_Falsa";
+        Long id = cliente1.getId();
+        ClienteUpdateDto clienteUpdateDto =  ClienteUpdateDto.builder()
+                .nombreCompleto("EvelynObando")
+                .correo("evelynobando@gmail.com")
+                .telefono("722663186")
+                .categoria("Categoria_Falsa")
+                .build();
+        when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente1));
+        when(categoriaService.findByName(category)).thenThrow(new CategoriaNotFoundException(category));
+
+        // Act & Assert
+        var res = assertThrows(CategoriaNotFoundException.class, () -> clienteService.update(id, clienteUpdateDto));
+        assertEquals("Categoria not found with " + category, res.getMessage());
+
+        // Verify
+        verify(clienteRepository, times(1)).findById(id);
+        verify(categoriaService, times(1)).findByName(category);
+    }
+
 
     @Test
     void deleteById() throws IOException {
