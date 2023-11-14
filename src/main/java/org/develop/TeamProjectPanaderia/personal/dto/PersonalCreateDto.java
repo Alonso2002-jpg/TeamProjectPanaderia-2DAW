@@ -10,7 +10,7 @@ public record PersonalCreateDto(
         String seccion,
         String fechaAlta,
         String fechaBaja,
-        boolean isActive
+        Boolean isActive
 ) {
 }
 
