@@ -85,7 +85,7 @@ class ProductoServiceTest {
     @Mock
     private WebSocketConfig webSocketConfig;
     @Mock
-    private NotificacionMapper<Producto> funkoNotificationMapper;
+    private NotificacionMapper<Producto> productoNotificationMapper;
 
     @BeforeEach
     void setUp(){
