@@ -5,12 +5,15 @@ import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotFound
 import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotSaveException;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 @Service
-public class ProveedorServiceImpl implements ProveedorService {
+public abstract class ProveedorServiceImpl implements ProveedorService {
 
     private final ProveedorRepository proveedoresRepository;
 
@@ -37,13 +40,18 @@ public class ProveedorServiceImpl implements ProveedorService {
         proveedoresRepository.deleteById(id);
     }
 
-    @Override
-    public List<Proveedor> getAllProveedores() {
-        List<Proveedor> proveedores = proveedoresRepository.findAll();
-        if (proveedores.isEmpty()) {
-            throw new ProveedorNotFoundedException("No se encontraron proveedores");
-        }
-        return proveedores;
+    public Page<Proveedor> findAll(Optional<String> nif, Optional<String> nombre, Pageable pageable) {
+        Specification<Proveedor> findIsActive = (root, query, criteriaBuilder) ->
+                nif.map(n -> criteriaBuilder.equal(root.get("nif"), n))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Proveedor> findName = (root, query, criteriaBuilder) ->
+                nombre.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombre")), "%" + n.toLowerCase() + "%"))
+                        .orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Proveedor> criterio = Specification.where(findIsActive).and(findName);
+
+        return proveedoresRepository.findAll(criterio, pageable);
     }
 
 
