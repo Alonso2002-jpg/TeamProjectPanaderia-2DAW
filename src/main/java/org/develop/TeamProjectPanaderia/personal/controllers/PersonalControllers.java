@@ -25,12 +25,12 @@ import java.util.UUID;
 @RequestMapping("/personal")
 public class PersonalControllers {
     private final PersonalService personalService;
-    private final PersonalMapper personalMapper;
+
 
     @Autowired
-    public PersonalControllers(PersonalService personalService, PersonalMapper personalMapper) {
+    public PersonalControllers(PersonalService personalService) {
         this.personalService = personalService;
-        this.personalMapper = personalMapper;
+
     }
     @GetMapping
     public ResponseEntity<List<Personal>> getAllPersonal(
@@ -66,6 +66,7 @@ public class PersonalControllers {
         personalService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(
