@@ -3,6 +3,8 @@ package org.develop.TeamProjectPanaderia.cliente.services;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.cliente.repositories.ClienteRepository;
@@ -141,6 +143,167 @@ public class ClienteServiceImplTest {
 
         // Verify
         verify(clienteRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void findById_IdTrue() {
+        // Arrange
+        Long id = cliente1.getId();
+        Cliente expecCliente = cliente1;
+        when(clienteRepository.findById(id)).thenReturn(Optional.of(expecCliente));
+
+        // Act
+        Cliente clienteActual = clienteService.findById(id);
+
+        // Assert
+        assertEquals(expecCliente, clienteActual);
+
+        // Verify
+        verify(clienteRepository, times(1)).findById(id);
+    }
+
+    @Test
+    void findById_IdFalse() {
+        // Arrange
+        Long id = 99L;
+
+        when(clienteRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.findById(id));
+        assertEquals("Cliente con id " + id + " no encontrado", res.getMessage());
+
+        // Verify
+        verify(clienteRepository, times(1)).findById(id);
+    }
+
+
+    @Test
+    void findByDni(){
+        // Arrange
+        String dni = cliente1.getDni();
+        Cliente expecCliente = cliente1;
+        when(clienteRepository.findClienteByDniEqualsIgnoreCase(dni)).thenReturn(Optional.of(expecCliente));
+
+        // Act
+        Cliente clienteActual = clienteService.findByDni(dni);
+
+        // Assert
+        assertEquals(expecCliente, clienteActual);
+
+        // Verify
+        verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase(dni);
+    }
+
+    @Test
+    void findByDniNotExist(){
+        // Arrange
+        String dniNoExiste = "dni_falso";
+
+        when(clienteRepository.findClienteByDniEqualsIgnoreCase(dniNoExiste)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.findByDni(dniNoExiste));
+        assertEquals("Cliente con DNI " + dniNoExiste + " no encontrado", res.getMessage());
+
+        // Verify
+        verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase(dniNoExiste);
+    }
+
+   /* @Test
+    void save() throws IOException {
+        // Arrange
+        Long id = 1L;
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory());
+        Cliente expecCliente = Cliente.builder()
+                .id(1L)
+                .nombreCompleto("nuevo_cliente")
+                .correo("nuevo_cliente@gmail.com")
+                .fechaCreacion(LocalDateTime.now())
+                .fechaActualizacion(LocalDateTime.now())
+                .dni("03480731C")
+                .telefono("602697985")
+                .imagen("test3.jpg")
+                .categoria(categoriaCliente)
+                .build();
+
+        when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
+        when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenReturn(categoriaCliente);
+        when(productoMapper.toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor))).thenReturn(expectedProduct);
+        when(clienteRepository.save(expecCliente)).thenReturn(expecCliente);
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
+
+        // Act
+        Cliente clienteActual = clienteService.save(clienteCreateDto);
+
+        // Assert
+        assertEquals(expecCliente, clienteActual);
+
+        // Verify
+        verify(categoriaService, times(1)).findByName(clienteCreateDto.getCategoria());
+        verify(clienteRepository, times(1)).save(expecCliente);
+        verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase((any(String.class)));
+        verify(clienteMapper, times(1)).toCliente(any(Long.class), eq(clienteCreateDto), eq(categoriaCliente));
+    }**/
+
+    @Test
+    void save_categoryNotExist(){
+    }
+
+    @Test
+    void update() throws IOException {
+        // Arrange
+        Long id = cliente1.getId();
+        ClienteUpdateDto clienteUpdateDto = new  ClienteUpdateDto("testActualizado", "test@gmail.com", "03480734A", "602897874","testActua.jpg", categoriaCliente.getNameCategory());
+
+        when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente1));
+        when(clienteRepository.save(cliente1)).thenReturn(cliente1);
+        when(clienteMapper.toCliente(clienteUpdateDto, cliente1, categoriaCliente)).thenReturn(cliente1);
+        when(categoriaService.findByName(clienteUpdateDto.getCategoria())).thenReturn(categoriaCliente);
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
+
+        // Act
+        Cliente clienteActualizado = clienteService.update(id, clienteUpdateDto);
+
+        // Assert
+        assertAll(
+                () -> assertNotNull(clienteActualizado),
+                () -> assertEquals(cliente1, clienteActualizado)
+        );
+
+        verify(clienteRepository, times(1)).findById(id);
+        verify(clienteRepository, times(1)).save(cliente1);
+        verify(categoriaService, times(1)).findByName(clienteUpdateDto.getCategoria());
+        verify(clienteMapper, times(1)).toCliente(clienteUpdateDto, cliente1, categoriaCliente);
+    }
+
+    @Test
+    void deleteById() throws IOException {
+        // Arrange
+        Long id = cliente2.getId();
+
+        when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente2));
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
+
+        // Act
+        clienteService.deleteById(id);
+
+        verify(clienteRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    void deleteById_idNotExist(){
+        // Arrange
+        Long id = cliente2.getId();
+
+        when( clienteRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        var res = assertThrows(ClienteNotFoundException.class, () ->  clienteService.deleteById(id));
+        assertEquals("Cliente con id " + id + " no encontrado", res.getMessage());
+
+        verify(clienteRepository, times(1)).findById(id);
+        verify(clienteRepository, times(0)).deleteById(id);
     }
 
     @Test
