@@ -39,17 +39,16 @@ public class ClienteRestController {
     @GetMapping
     public ResponseEntity<PageResponse<Cliente>> getAllCliente(
             @RequestParam(required = false) Optional<String> nombreCompleto,
-            @RequestParam(required = false) Optional<String> producto,
             @RequestParam(required = false) Optional<String> categoria,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
 
-        log.info("Buscando todos los clientes con las siguientes opciones: " + nombreCompleto + " " + producto + " " + categoria);
+        log.info("Buscando todos los clientes con las siguientes opciones: " + nombreCompleto + " " + categoria);
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(PageResponse.of(clienteService.findAll(nombreCompleto, producto, categoria, pageable), sortBy, direction));
+        return ResponseEntity.ok(PageResponse.of(clienteService.findAll(nombreCompleto, categoria, pageable), sortBy, direction));
     }
 
     @GetMapping("/{id}")
