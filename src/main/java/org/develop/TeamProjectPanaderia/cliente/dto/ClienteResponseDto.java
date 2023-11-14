@@ -17,6 +17,5 @@ public class ClienteResponseDto {
     private String imagen;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
-    private String producto;
     private String categoria;
 }
