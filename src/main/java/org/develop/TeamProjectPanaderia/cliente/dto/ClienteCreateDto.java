@@ -3,10 +3,12 @@ package org.develop.TeamProjectPanaderia.cliente.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
+@AllArgsConstructor
 public class ClienteCreateDto  {
     @NotBlank( message = "El nombre no puede estar vacio")
     @Length(min = 8, message = "El nombre debe tener al menos 8 caracteres")

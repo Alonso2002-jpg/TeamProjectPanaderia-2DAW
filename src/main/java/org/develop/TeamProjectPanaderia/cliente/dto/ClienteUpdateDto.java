@@ -1,9 +1,11 @@
 package org.develop.TeamProjectPanaderia.cliente.dto;
 
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+@Builder
 @Data
 public class ClienteUpdateDto {
 
