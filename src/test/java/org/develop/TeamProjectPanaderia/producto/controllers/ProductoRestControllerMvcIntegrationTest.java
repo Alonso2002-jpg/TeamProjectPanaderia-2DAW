@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -770,6 +771,4 @@ class ProductoRestControllerMvcIntegrationTest {
         verify(productoService, times(1)).updateImg(anyString(), any(MultipartFile.class));
     }
 }
-
-
 
