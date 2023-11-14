@@ -1,8 +1,5 @@
 package org.develop.TeamProjectPanaderia.producto.controllers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
@@ -14,21 +11,16 @@ import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,26 +29,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
 class ProductoRestControllerTest {
-    private final String myEndpoint = "/v1/producto";
-    private final ObjectMapper mapper = new ObjectMapper();
-    @Autowired
-    MockMvc mockMvc;
-    @MockBean
-    private ProductoService productoService;
-    @Autowired
-    private JacksonTester<ProductoCreateDto> jsonProductoCreateDto;
-    @Autowired
-    private JacksonTester <ProductoUpdateDto> jsonProductoUpdateDto;
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
@@ -86,15 +62,13 @@ class ProductoRestControllerTest {
                     .categoria(categoriaProducto)
                     .proveedor(proveedor)
                     .build();
-
-    @Autowired
-    public ProductoRestControllerTest(ProductoService productoService){
-        this.productoService = productoService;
-        mapper.registerModule(new JavaTimeModule());
-    }
+    @Mock
+    private ProductoService productoService;
+    @InjectMocks
+    private ProductoRestController productoController;
 
     @Test
-    void getAllProducts() throws Exception {
+    void getAllProducts() {
         List<Producto> expectedProducts = List.of(producto1, producto2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
@@ -102,227 +76,166 @@ class ProductoRestControllerTest {
         // Arrange
         when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myEndpoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(2, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
-    void getAllProducts_ByNombre() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1);
-        String myLocalEndPoint = myEndpoint + "?nombre=TEST-1";
-        Optional<String> nombre = Optional.of("TEST-1");
+    void getAllProducts_ByNombre() {
+        Optional<String> nombre = Optional.of("TEST-2");
+        List<Producto> expectedProducts = List.of(producto2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(1, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(1, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
-    void getAllProducts_ByStockMin() throws Exception {
+    void getAllProducts_ByStockMin() {
+        Optional<Integer> stockMin = Optional.of(40);
         List<Producto> expectedProducts = List.of(producto2);
-        String myLocalEndPoint = myEndpoint + "?stockMin=45";
-        Optional<Integer> stockMin = Optional.of(45);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(1, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(1, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
     }
 
+
     @Test
-    void getAllProducts_ByPrecioMax() throws Exception {
+    void getAllProducts_ByPrecioMax() {
+        Optional<Double> precioMax = Optional.of(60.00);
         List<Producto> expectedProducts = List.of(producto1, producto2);
-        String myLocalEndPoint = myEndpoint + "?precioMax=50";
-        Optional<Double> precioMax = Optional.of(45.0);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(2, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
-    void getAllProducts_ByIsActivo() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        String myLocalEndPoint = myEndpoint + "?isActivo=true";
+    void getAllProducts_ByIsActivo() {
         Optional<Boolean> isActivo = Optional.of(true);
+        List<Producto> expectedProducts = List.of(producto1, producto2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(2, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable);
     }
 
     @Test
-    void getAllProducts_ByCategoria() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        String myLocalEndPoint = myEndpoint + "?categoria=PRODUCTO_TEST";
+    void getAllProducts_ByCategoria() {
         Optional<String> categoria = Optional.of("PRODUCTO_TEST");
+        List<Producto> expectedProducts = List.of(producto1, producto2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(2, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable);
     }
 
     @Test
-    void getAllProducts_ByProveedor() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        String myLocalEndPoint = myEndpoint + "?proveedor=Y7821803T";
+    void getAllProducts_ByProveedor() {
         Optional<String> proveedor = Optional.of("Y7821803T");
+        List<Producto> expectedProducts = List.of(producto1, producto2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(expectedProducts);
 
         // Arrange
         when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable)).thenReturn(page);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
+        ResponseEntity<PageResponse<Producto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, 0 , 10, "id", "asc");
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertNotNull(responseEntity.getBody());
+        assertEquals(2, responseEntity.getBody().content().size());
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable);
     }
 
 
-
     @Test
-    void getProductById() throws Exception {
+    void getProductById(){
         // Arrange
         String uuid = producto2.getId().toString();
-        String myLocalEndPoint = myEndpoint + "/" + uuid;
 
         when(productoService.findById(uuid)).thenReturn(producto2);
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ResponseEntity<Producto> responseEntity = productoController.getProductoById(uuid);
 
         // Assert
         assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(producto1, responseEntity.getBody())
         );
 
         // verify
@@ -330,51 +243,41 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void getProductById_idNotExists() throws Exception {
+    void getProductById_idNotExists() {
         // Arrange
         UUID uuid = UUID.randomUUID();
         String uuidFalso = uuid.toString();
-        String myLocalEndPoint = myEndpoint + "/" + uuidFalso;
 
         when(productoService.findById(uuidFalso)).thenThrow(new ProductoNotFound(uuid));
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.getProductoById(uuidFalso);
 
         // Assert
-        assertEquals(404, response.getStatus());
+        assertEquals(404, responseEntity.getStatusCode().value());
 
-        // verify
+        // Verify
         verify(productoService, times(1)).findById(uuidFalso);
     }
 
     @Test
-    void getProductById_InvalidadUuid() throws Exception {
+    void getProductById_InvalidadUuid() {
         // Arrange
         String uuidInvalido = "uuid_invalido";
-        String myLocalEndPoint = myEndpoint + "/" + uuidInvalido;
 
         when(productoService.findById(uuidInvalido)).thenThrow(new ProductoBadUuid(uuidInvalido));
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        get(myLocalEndPoint)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        ResponseEntity<Producto> responseEntity = productoController.getProductoById(uuidInvalido);
 
         // Assert
-        assertEquals(404, response.getStatus());
+        assertEquals(400, responseEntity.getStatusCode().value());
 
         // verify
         verify(productoService, times(1)).findById(uuidInvalido);
     }
 
-
     @Test
-    void createProduct() throws Exception{
+    void createProduct(){
         // Arrange
         UUID uuid = UUID.randomUUID();
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
@@ -393,145 +296,133 @@ class ProductoRestControllerTest {
 
         when(productoService.save(productoCreateDto)).thenReturn(expectedProduct);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(201, response.getStatus()),
-                () -> assertEquals(expectedProduct, result)
+                () -> assertEquals(201, responseEntity.getStatusCode().value()),
+                () -> assertEquals(expectedProduct, responseEntity.getBody())
         );
 
         // Verify
         verify(productoService, times(1)).save(productoCreateDto);
     }
 
-    @Test
-    void createProduct_BadRequest_Nombre() throws Exception {
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto(null,33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+    @Test
+    void createProduct_BadRequest_NombreIsNull() {
+        // Arrange
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto(null, 33, 25.99, "test3.png", true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El nombre no puede estar vacio"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El nombre no puede estar vacio"))
+        );
+
+        // Verify
+        verify(productoService, times(0)).save(productoCreateDto);
+    }
+
+    @Test
+    void createProduct_BadRequest_NombreInvalid() {
+        // Arrange
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("PR",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
+
+        // Assert
+        assertAll(
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El nombre debe contener al menos 3 letras"))
         );
     }
 
 
     @Test
-    void createProduct_BadRequest_Stock() throws Exception {
+    void createProduct_BadRequest_Stock() {
         // Arrange
         ProductoCreateDto productoCreateDto =  new ProductoCreateDto("nuevo_producto",-20,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El stock no puede ser negativo"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El stock no puede ser negativo"))
         );
     }
 
 
     @Test
-    void createProduct_BadRequest_Precio() throws Exception {
+    void createProduct_BadRequest_Precio()  {
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,-20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El precio no puede ser negativo"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El precio no puede ser negativo"))
         );
     }
 
 
     @Test
-    void createProduct_BadRequest_Categoria() throws Exception {
+    void createProduct_BadRequest_Categoria(){
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, null, proveedor.getNif());
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("La categoria no puede estar vacia"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("La categoria no puede estar vacia"))
         );
     }
 
     @Test
-    void createProduct_BadRequest_Proveedor() throws Exception {
+    void createProduct_BadRequest_Proveedor() {
         // Arrange
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), null);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        post(myEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoCreateDto.write(productoCreateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El proveedor no puede estar vacia"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El proveedor no puede estar vacia"))
         );
     }
 
+
     @Test
-    void updateProduct() throws Exception {
+    void updateProduct() {
         // Arrange
         String id = producto1.getId().toString();
-        String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                        put(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(producto1, responseEntity.getBody())
         );
 
         // Verify
@@ -539,103 +430,95 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void updateProduct_NotFound() throws Exception {
+    void updateProduct_NotFound() {
         // Arrange
         UUID uuid = UUID.randomUUID();
         String id = uuid.toString();
-        String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        // Arrange
         when(productoService.update(id, productoUpdateDto)).thenThrow(new ProductoNotFound(uuid));
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        put(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
 
         // Assert
-        assertEquals(404, response.getStatus());
+        assertEquals(404, responseEntity.getStatusCode().value());
     }
 
+
     @Test
-    void updateProduct_BadRequest_Stock() throws Exception {
+    void updateProduct_BadRequest_Nombre() {
         // Arrange
         UUID uuid = producto1.getId();
         String id = uuid.toString();
-        String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        // Arrange
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        put(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El stock no puede ser negativo"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El nombre debe contener al menos 3 letras"))
         );
     }
 
     @Test
-    void updateProduct_BadRequest_Precio() throws Exception {
+    void updateProduct_BadRequest_Stock()  {
         // Arrange
         UUID uuid = producto1.getId();
         String id = uuid.toString();
-        String myLocalEndpoint = myEndpoint + "/" + id;
+              ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
+
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
+
+        // Assert
+        assertAll(
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El stock no puede ser negativo"))
+        );
+    }
+
+    @Test
+    void updateProduct_BadRequest_Precio() {
+        // Arrange
+        UUID uuid = producto1.getId();
+        String id = uuid.toString();
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", 100, "producto_actualizado.jpg", -80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        // Arrange
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        put(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El precio no puede ser negativo"))
+                () -> assertEquals(400, responseEntity.getStatusCode().value()),
+                () -> assertTrue(responseEntity.toString().contains("El precio no puede ser negativo"))
         );
     }
 
+
     @Test
-    void updatePartialProduct() throws Exception {
+    void updatePartialProduct() {
         // Arrange
         String id = producto2.getId().toString();
-        String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, null, 80.99, null, null, null);
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto2);
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        patch(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonProductoUpdateDto.write(productoUpdateDto).getJson())
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updatePartialProduct(id, productoUpdateDto);
 
         // Assert
         assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto2, result)
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(producto2, responseEntity.getBody())
         );
 
         // Verify
@@ -643,45 +526,34 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void deleteProducById() throws Exception {
+    void deleteProducById()  {
         // Arrange
         UUID uuid = producto2.getId();
-        String myLocalEndpoint = myEndpoint + "/" + uuid.toString();
-
         doNothing().when(productoService).deleteById(uuid.toString());
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        delete(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Void> responseEntity = productoController.deleteProduct(uuid.toString());
 
         // Assert
-        assertAll(() -> assertEquals(204, response.getStatus()));
+        assertAll(() -> assertEquals(204, responseEntity.getStatusCode().value()));
 
         // Verify
         verify(productoService, times(1)).deleteById(uuid.toString());
     }
 
     @Test
-    void deleteProductById_IdNotExist() throws Exception {
+    void deleteProductById_IdNotExist() {
         // Arrange
         UUID uuid = UUID.randomUUID();
-        String myLocalEndpoint = myEndpoint + "/" + uuid.toString();
 
         doThrow(new ProductoNotFound(uuid)).when(productoService).deleteById(uuid.toString());
 
-        // Consulto el endpoint
-        MockHttpServletResponse response = mockMvc.perform(
-                        delete(myLocalEndpoint)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        // Act
+        ResponseEntity<Void> responseEntity = productoController.deleteProduct(uuid.toString());
 
         // Assert
         assertAll(
-                () -> assertEquals(404, response.getStatus())
+                () -> assertEquals(404, responseEntity.getStatusCode().value())
         );
 
         // Verify
@@ -689,41 +561,44 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void updateFunkoImage() throws Exception {
-        UUID uuid = producto1.getId();
-        var myLocalEndpoint = myEndpoint + "/imagen/" + uuid.toString();
+    void updateImage() {
+        // Arrange
+        String id = producto2.getId().toString();
 
-        when(productoService.updateImg(anyString(), any(MultipartFile.class))).thenReturn(producto1);
-
-        MockMultipartFile file = new MockMultipartFile(
+        MultipartFile file = new MockMultipartFile(
                 "file",
                 "filename.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
+                "image/jpeg",
                 "contenido del archivo".getBytes()
         );
 
-        MockHttpServletResponse response = mockMvc.perform(
-                multipart(myLocalEndpoint)
-                        .file(file)
-                        .with(req -> {
-                            req.setMethod("PATCH");
-                            return req;
-                        })
-        ).andReturn().getResponse();
+        when(productoService.updateImg(id, file)).thenReturn(producto2);
 
-
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        // Act
+        ResponseEntity<Producto> responseEntity = productoController.updateImage(id, file);
 
         // Assert
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
-        );
+        assertEquals(200, responseEntity.getStatusCode().value());
+        assertEquals(producto2, responseEntity.getBody());
 
         // Verify
-        verify(productoService, times(1)).updateImg(anyString(), any(MultipartFile.class));
+        verify(productoService, times(1)).updateImg(id, file);
+    }
+
+    @Test
+    void updateImage_InvalidFile() {
+        // Arrange
+        String id = producto1.getId().toString();
+
+        MultipartFile invalidFile = new MockMultipartFile(
+                "file",
+                "filename.jpg",
+                "image/jpeg",
+                new byte[0]
+        );
+
+        var exception = assertThrows(ResponseStatusException.class, () -> productoController.updateImage(id, invalidFile));
+
+        assertEquals(400, exception.getStatusCode().value());
     }
 }
-
-
-

@@ -10,6 +10,7 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
+import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotSaved;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
@@ -84,7 +85,7 @@ class ProductoServiceTest {
     @Mock
     private WebSocketConfig webSocketConfig;
     @Mock
-    private NotificacionMapper<Producto> funkoNotificationMapper;
+    private NotificacionMapper<Producto> productoNotificationMapper;
 
     @BeforeEach
     void setUp(){
@@ -377,6 +378,22 @@ class ProductoServiceTest {
         verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
         verify(productoMapper, times(1)).toProducto(any(UUID.class), eq(productoCreateDto), eq(categoriaProducto), eq(proveedor));
     }
+
+    @Test
+    void save_ProductNameAlreadyExist()  {
+        // Arrange
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("TEST-1",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+
+        when(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre())).thenReturn(Optional.of(producto1));
+
+        // Act
+        var res = assertThrows(ProductoNotSaved.class, () -> productoService.save(productoCreateDto));
+        assertEquals("El producto " + productoCreateDto.nombre() + " ya existe en la BD", res.getMessage());
+
+        // Verify
+        verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase(productoCreateDto.nombre());
+    }
+
 
     @Test
     void save_categoryNotExist(){
