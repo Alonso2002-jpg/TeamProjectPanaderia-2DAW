@@ -45,18 +45,18 @@ public class PersonalServiceImpl implements PersonalService {
         }
         if ( (seccion ==null || seccion.isEmpty())){
             log.info("Buscando todas las secciones por personal");
-            return personalRepository.findAllByIsActiveIgnereCase(isActive);
+            return personalRepository.findByIsActive(isActive);
         }
         log.info("Buscando todo todos los perosnales por seccion: "+ seccion+" y si esta activo o no: "+isActive);
-        return  personalRepository.findAllByIsActiveIgnorecaseCategoryIgnoreCase( seccion ,isActive);
+        return  personalRepository.findByCategoriaContainingIgnoreCaseAndIsActive( seccion ,isActive);
     }
 
     @Override
     public Personal findById(String id) {
         log.info("Buscando por id");
         try {
-            var uudi = UUID.fromString(id);
-            return personalRepository.findByUUID(uudi).orElseThrow(() -> new PersonalNotFoundException("No se ha encontrado el personal con id: " + uudi) {
+            UUID uudi = UUID.fromString(id);
+            return personalRepository.findById(uudi).orElseThrow(() -> new PersonalNotFoundException("No se ha encontrado el personal con id: " + uudi) {
             });
         } catch (IllegalArgumentException e) {
             throw new PersonalException("El id: " + id + " no es un UUID válido");
