@@ -3,10 +3,12 @@ package org.develop.TeamProjectPanaderia.cliente.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
+@AllArgsConstructor
 public class ClienteCreateDto  {
     @NotBlank( message = "El nombre no puede estar vacio")
     @Length(min = 8, message = "El nombre debe tener al menos 8 caracteres")
@@ -20,8 +22,6 @@ public class ClienteCreateDto  {
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
     private String telefono;
     private String imagen;
-    @NotBlank(message = "El producto no puede estar vacio")
-    private String producto;
     @NotBlank(message = "La categoria no puede estar vacio")
     private String categoria;
 }

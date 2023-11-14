@@ -1,9 +1,11 @@
 package org.develop.TeamProjectPanaderia.cliente.dto;
 
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+@Builder
 @Data
 public class ClienteUpdateDto {
 
@@ -14,6 +16,5 @@ public class ClienteUpdateDto {
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
     private String telefono;
     private String imagen;
-    private String producto;
     private String categoria;
 }

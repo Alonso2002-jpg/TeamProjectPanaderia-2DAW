@@ -16,6 +16,7 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
+import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotSaved;
 import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.repositories.ProductoRepository;
@@ -23,6 +24,7 @@ import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -130,6 +132,9 @@ public class ProductoServiceImpl implements ProductoService{
     @Override
     public Producto save(ProductoCreateDto productoCreateDto) {
         log.info("Guardando producto: " + productoCreateDto);
+        if(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre()).isPresent()) {
+            throw new ProductoNotSaved(productoCreateDto.nombre());
+        }
         Categoria categoria = categoriaService.findByName(productoCreateDto.categoria());
         Proveedor proveedores = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
         UUID id = UUID.randomUUID();

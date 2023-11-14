@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Component
 public class ClienteMapper {
 
-    public Cliente toCliente(ClienteCreateDto dto, Categoria categoria,Producto producto) {
+    public Cliente toCliente(ClienteCreateDto dto, Categoria categoria) {
         return Cliente.builder()
                 .id(null)
                 .nombreCompleto(dto.getNombreCompleto())
@@ -22,14 +22,13 @@ public class ClienteMapper {
                 .dni(dto.getDni())
                 .telefono(dto.getTelefono())
                 .imagen(dto.getImagen())
-                .producto(producto)
                 .categoria(categoria)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .build();
     }
 
-    public Cliente toCliente(ClienteUpdateDto dto, Cliente cliente, Categoria categoria, Producto producto) {
+    public Cliente toCliente(ClienteUpdateDto dto, Cliente cliente, Categoria categoria) {
         return Cliente.builder()
                 .id(cliente.getId())
                 .nombreCompleto(dto.getNombreCompleto() != null ? dto.getNombreCompleto() : cliente.getNombreCompleto())
@@ -39,7 +38,6 @@ public class ClienteMapper {
                 .imagen(dto.getImagen() != null ? dto.getImagen() : cliente.getImagen())
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(LocalDateTime.now())
-                .producto(producto)
                 .categoria(categoria)
                 .build();
     }
@@ -54,7 +52,6 @@ public class ClienteMapper {
                 .imagen(cliente.getImagen())
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(cliente.getFechaActualizacion())
-                .producto(cliente.getProducto().getNombre())
                 .categoria(cliente.getCategoria().getNameCategory())
                 .build();
     }

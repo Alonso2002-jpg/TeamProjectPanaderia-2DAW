@@ -14,7 +14,7 @@ import java.util.Optional;
 
 
 public interface ClienteService {
-    Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> producto, Optional<String> categoria, Pageable pageable);
+    Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> categoria, Pageable pageable);
     Cliente findById(Long id);
     Cliente findByDni(String dni);
     Cliente save(ClienteCreateDto clienteCreateDto);

@@ -2,7 +2,6 @@ package org.develop.TeamProjectPanaderia.cliente.models;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -10,13 +9,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.hibernate.validator.constraints.Length;
 
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 
 @Data
@@ -28,7 +24,7 @@ import java.util.UUID;
 public class Cliente {
     @Builder.Default
     public static final String IMAGE_DEFAULT = "https://via.placeholder.com/150";
-    @Id // Indicamos que es el ID de la tabla
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank( message = "El nombre no puede estar vacio")
@@ -37,26 +33,23 @@ public class Cliente {
     @NotBlank(message =  "El correo no puede estar vacio")
     @Pattern(regexp = ".*@.*\\..*", message = "El correo debe contener al menos un '@' y al menos un '.'")
     private String correo;
-    @NotBlank( message = "El DNI no puede estar vacia")
-    @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 números seguidos de una letra")
+    @NotBlank( message = "El DNI no puede estar vacio")
+    @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 numeros seguidos de una letra")
+    @Column(unique = true)
     private String dni;
     @Column(columnDefinition = "TEXT default ''")
-    @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
+    @Pattern(regexp = "^[679][0-9]{8,}$", message = "El telefono debe comenzar con 9, 6 o 7 y tener  9 numeros")
     @Builder.Default
     private String telefono = "";
     @Column(columnDefinition = "TEXT default '" + IMAGE_DEFAULT + "'")
     @Builder.Default
     private String imagen = IMAGE_DEFAULT;
-    @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
-    @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime fechaActualizacion;
-
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
-    private Producto producto;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

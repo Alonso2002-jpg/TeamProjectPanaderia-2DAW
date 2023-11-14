@@ -2,10 +2,12 @@ package org.develop.TeamProjectPanaderia.cliente.dto;
 
 
 import lombok.Builder;
+import lombok.Data;
 
 
 import java.time.LocalDateTime;
 
+@Data
 @Builder
 public class ClienteResponseDto {
 
@@ -17,6 +19,5 @@ public class ClienteResponseDto {
     private String imagen;
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
-    private String producto;
     private String categoria;
 }
