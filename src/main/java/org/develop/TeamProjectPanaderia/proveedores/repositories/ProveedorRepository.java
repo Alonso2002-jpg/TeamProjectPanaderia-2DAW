@@ -2,6 +2,9 @@ package org.develop.TeamProjectPanaderia.proveedores.repositories;
 
 
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,4 +21,6 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
     List<Proveedor> findAll();
     Proveedor findByNIF(String nif);
     List<Proveedor> findByNombre(String nombre);
+
+    Page<Proveedor> findAll(Specification<Proveedor> criterio, Pageable pageable);
 }
