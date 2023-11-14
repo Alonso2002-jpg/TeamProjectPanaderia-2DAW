@@ -24,7 +24,10 @@ import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,6 +40,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@CacheConfig(cacheNames = "productos")
 public class ProductoServiceImpl implements ProductoService{
     private final ProductoRepository productoRepository;
     private final CategoriaService categoriaService;
@@ -113,6 +117,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
+    @Cacheable
     public Producto findById(String id) {
         log.info("Buscando producto por id: " + id);
         try{
@@ -124,12 +129,14 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
+    @Cacheable
     public Producto findByName(String name) {
         log.info("Buscando producto por nombre: " + name);
         return productoRepository.findByNombreEqualsIgnoreCase(name).orElseThrow(() -> new ProductoNotFound(name));
     }
 
     @Override
+    @CachePut
     public Producto save(ProductoCreateDto productoCreateDto) {
         log.info("Guardando producto: " + productoCreateDto);
         if(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre()).isPresent()) {
@@ -145,6 +152,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
+    @CachePut
     public Producto update(String id, ProductoUpdateDto productoUpdateDto) {
        log.info("Actualizando producto por id: " + id);
        Producto productoActual = this.findById(id);
@@ -167,6 +175,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
+    @CachePut
     public Producto updateImg(String id, MultipartFile file){
         log.info("Actualizando imagen de producto por id: " + id);
         Producto productoActual = this.findById(id);
@@ -182,6 +191,7 @@ public class ProductoServiceImpl implements ProductoService{
     }
 
     @Override
+    @CacheEvict
     public void deleteById(String id) {
         log.debug("Borrando producto por id: " + id);
         Producto productoActual = this.findById(id);
