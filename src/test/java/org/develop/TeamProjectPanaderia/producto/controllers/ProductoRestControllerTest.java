@@ -1,15 +1,17 @@
 package org.develop.TeamProjectPanaderia.producto.controllers;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
-import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoBadUuid;
-import org.develop.TeamProjectPanaderia.producto.exceptions.ProductoNotFound;
-import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.producto.controllers.ProductoRestController;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoResponseDto;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadUuid;
+import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFound;
+import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
+import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.rest.producto.services.ProductoService;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
