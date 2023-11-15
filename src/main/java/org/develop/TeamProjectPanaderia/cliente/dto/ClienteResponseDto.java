@@ -20,4 +20,5 @@ public class ClienteResponseDto {
     private LocalDateTime fechaCreacion;
     private LocalDateTime fechaActualizacion;
     private String categoria;
+    private Boolean isActive;
 }
