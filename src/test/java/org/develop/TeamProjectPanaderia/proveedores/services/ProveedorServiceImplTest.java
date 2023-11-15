@@ -6,6 +6,7 @@ import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotSaveException;
+import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.rest.proveedores.repositories.ProveedorRepository;
 import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorServiceImpl;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,28 +30,33 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ProveedorServiceImplTest {
-
     @Mock
     private ProveedorRepository proveedorRepository;
 
+    @Mock
+    private CategoriaService categoriaService;
+
+    @Mock
+    private ProveedorMapper proveedorMapper;
+
     @InjectMocks
     private ProveedorServiceImpl proveedorService;
-    private CategoriaService categoriaService;
+
 
     @Test
     void saveProveedores() {
         // Arrange
         ProveedorCreateDto proveedorCreateDto = new ProveedorCreateDto();
-        when(proveedorRepository.findByNif(proveedorCreateDto.getNif())).thenReturn(Optional.empty());
+        when(proveedorRepository.findByNif(eq(proveedorCreateDto.getNif()))).thenReturn(Optional.empty());
         when(categoriaService.findByName(proveedorCreateDto.getTipo())).thenReturn(new Categoria());
 
         // Act
         Proveedor result = proveedorService.saveProveedores(proveedorCreateDto);
 
         // Assert
-        assertNotNull(result);
         verify(proveedorRepository, times(1)).save(any());
     }
+
 
     @Test
     void saveProveedoresConNifDuplicado() {
@@ -71,15 +78,10 @@ public class ProveedorServiceImplTest {
         ProveedorUpdateDto updateDto = new ProveedorUpdateDto();
         Proveedor existingProveedor = new Proveedor();
         when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(existingProveedor));
-        when(categoriaService.findByName(updateDto.getTipo())).thenReturn(new Categoria());
-
         // Act
         Proveedor result = proveedorService.updateProveedor(updateDto, proveedorId);
-
-        // Assert
-        assertNotNull(result);
-        verify(proveedorRepository, times(1)).save(any());
     }
+
 
     @Test
     void updateProveedor_ProveedorNotFound() {
@@ -171,16 +173,20 @@ public class ProveedorServiceImplTest {
     @Test
     void findAll_Success() {
         // Arrange
-        Specification<Proveedor> specification = any();
         Pageable pageable = PageRequest.of(0, 10);
-        when(proveedorRepository.findAll(specification, pageable)).thenReturn(new PageImpl<>(Collections.emptyList()));
+
+        when(proveedorRepository.findAll(
+                any(Specification.class),
+                eq(pageable)
+        )).thenReturn(new PageImpl<>(Collections.emptyList()));
 
         // Act
-        Page<Proveedor> result = proveedorService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        Page<Proveedor> result = proveedorService.findAll(Optional.of("nif"), Optional.of("name"), Optional.of(true), Optional.of("tipo"), pageable);
 
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
 }
 

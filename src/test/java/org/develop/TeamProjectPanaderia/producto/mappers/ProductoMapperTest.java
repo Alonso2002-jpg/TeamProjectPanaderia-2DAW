@@ -46,7 +46,7 @@ class ProductoMapperTest {
 
         // Assert
         assertAll(
-                () -> assertNull(nuevoProducto.getId()),
+                () -> assertNotNull(nuevoProducto.getId()),
                 () -> assertEquals(id, nuevoProducto.getId()),
                 () -> assertEquals(productoCreateDto.nombre(), nuevoProducto.getNombre()),
                 () -> assertEquals(productoCreateDto.proveedor(), nuevoProducto.getProveedor().getNif()),
@@ -79,7 +79,7 @@ class ProductoMapperTest {
                 () -> assertEquals(productoUpdateDto.categoria(), productoActualizado.getCategoria().getNameCategory()),
                 () -> assertEquals(productoUpdateDto.isActivo(), productoActualizado.getIsActivo()),
                 () -> assertEquals(productoExistente.getFechaCreacion(), productoActualizado.getFechaCreacion()),
-                () -> assertNotEquals(productoExistente.getFechaActualizacion(), productoActualizado.getFechaCreacion()),
+                () -> assertNotEquals(productoExistente.getFechaActualizacion(), productoActualizado.getFechaActualizacion()),
                 () -> assertNotNull(productoActualizado.getImagen())
         );
     }
