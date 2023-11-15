@@ -29,7 +29,7 @@ public class ClienteMapperTest {
     @Test
     void testToCliente_create() {
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(), true);
 
 
         // Act
@@ -44,6 +44,7 @@ public class ClienteMapperTest {
                 () -> assertEquals(clienteCreateDto.getTelefono(), nuevoCliente.getTelefono()),
                 () -> assertEquals(clienteCreateDto.getImagen(), nuevoCliente.getImagen()),
                 () -> assertEquals(clienteCreateDto.getCategoria(), nuevoCliente.getCategoria().getNameCategory()),
+                () -> assertTrue(nuevoCliente.getIsActive()),
                 () -> assertNotNull(nuevoCliente.getFechaCreacion()),
                 () -> assertNotNull(nuevoCliente.getFechaActualizacion())
         );
@@ -57,6 +58,7 @@ public class ClienteMapperTest {
                 .nombreCompleto("EvelynObando")
                 .correo("evelynobando@gmail.com")
                 .telefono("722663186")
+                .isActive(true)
                 .build();
 
         // Act
@@ -70,6 +72,7 @@ public class ClienteMapperTest {
                 () -> assertEquals(clienteUpdateDto.getTelefono(), clienteActualizado.getTelefono()),
                 () -> assertEquals(clienteExistente.getImagen(), clienteActualizado.getImagen()),
                 () -> assertEquals(clienteExistente.getCategoria(), clienteActualizado.getCategoria()),
+                () -> assertEquals(clienteExistente.getIsActive(),clienteActualizado.getIsActive()),
                 () -> assertEquals(clienteExistente.getFechaCreacion(), clienteActualizado.getFechaCreacion()),
                 () -> assertNotEquals(clienteExistente.getFechaActualizacion(), clienteActualizado.getFechaCreacion())
         );
@@ -93,7 +96,8 @@ public class ClienteMapperTest {
                 () -> assertEquals( cliente.getImagen(),  clienteResponseDto.getImagen()),
                 () -> assertEquals( cliente.getCategoria().getNameCategory(), clienteResponseDto.getCategoria()),
                 () -> assertEquals( cliente.getFechaCreacion(),  clienteResponseDto.getFechaCreacion()),
-                () -> assertEquals( cliente.getFechaActualizacion(), clienteResponseDto.getFechaActualizacion())
+                () -> assertEquals( cliente.getFechaActualizacion(), clienteResponseDto.getFechaActualizacion()),
+                () -> assertEquals(cliente.getIsActive(), clienteResponseDto.getIsActive())
         );
     }
 }

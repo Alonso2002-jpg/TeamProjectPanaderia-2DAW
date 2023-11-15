@@ -3,7 +3,6 @@ package org.develop.TeamProjectPanaderia.cliente.controllers;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.cliente.services.ClienteService;
-import org.develop.TeamProjectPanaderia.cliente.services.ClienteServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +22,7 @@ public class ClienteControllerTest {
                     .dni("03480731A")
                     .telefono("602697979")
                     .imagen("test1.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
     private final Cliente cliente2 =
@@ -33,6 +33,7 @@ public class ClienteControllerTest {
                     .dni("03480731B")
                     .telefono("602697971")
                     .imagen("test2.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
 
