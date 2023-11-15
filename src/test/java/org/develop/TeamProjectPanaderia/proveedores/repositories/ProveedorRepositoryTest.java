@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(properties = "spring.sql.init.mode = never")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @DataJpaTest
-public class ProveedorRepositoryTest {
+class ProveedorRepositoryTest {
     @Autowired
     private ProveedorRepository proveedorRepository;
     @Autowired
@@ -30,14 +30,15 @@ public class ProveedorRepositoryTest {
     void setUp(){
         proveedor1 = Proveedor.builder()
                 .id(1L)
-                .nif("11")
-                .numero("12")
+                .nif("12345678A")
+                .numero("120000000")
                 .nombre("Juan")
                 .build();
+
         proveedor2 = Proveedor.builder()
                 .id(2L)
-                .nif("22")
-                .numero("21")
+                .nif("98765432B")
+                .numero("210000000")
                 .nombre("Jose")
                 .build();
 
@@ -51,15 +52,15 @@ public class ProveedorRepositoryTest {
         // Obtener un proveedor por ID y verificar que los datos coincidan
         Optional<Proveedor> foundProveedor = proveedorRepository.findById(proveedor1.getId());
         assertTrue(foundProveedor.isPresent());
-        assertEquals("11", foundProveedor.get().getNif());
-        assertEquals("12", foundProveedor.get().getNumero());
+        assertEquals("12345678A", foundProveedor.get().getNif());
+        assertEquals("120000000", foundProveedor.get().getNumero());
         assertEquals("Juan", foundProveedor.get().getNombre());
     }
 
     @Test
     void findByNIF() {
         // Buscar por NIF y verificar que se encuentre el proveedor correcto
-        Optional<Proveedor> foundProveedor = proveedorRepository.findByNif("22");
+        Optional<Proveedor> foundProveedor = proveedorRepository.findByNif("98765432B");
 
         // Asegurarse de que se encontró un proveedor
         assertTrue(foundProveedor.isPresent());
@@ -68,8 +69,8 @@ public class ProveedorRepositoryTest {
         Proveedor proveedor = foundProveedor.get();
 
         // Verificar atributos del proveedor
-        assertEquals("22", proveedor.getNif());
-        assertEquals("21", proveedor.getNumero());
+        assertEquals("98765432B", proveedor.getNif());
+        assertEquals("210000000", proveedor.getNumero());
         assertEquals("Jose", proveedor.getNombre());
     }
 
@@ -95,8 +96,8 @@ public class ProveedorRepositoryTest {
     void save() {
         // Crear un nuevo proveedor y guardarlo en la base de datos
         Proveedor nuevoProveedor = Proveedor.builder()
-                .nif("33")
-                .numero("31")
+                .nif("98765432C")
+                .numero("310000000")
                 .nombre("Maria")
                 .build();
 
@@ -106,8 +107,8 @@ public class ProveedorRepositoryTest {
         // Obtener el proveedor por ID y verificar que los datos coincidan
         Optional<Proveedor> foundProveedor = proveedorRepository.findById(savedProveedor.getId());
         assertTrue(foundProveedor.isPresent());
-        assertEquals("33", foundProveedor.get().getNif());
-        assertEquals("31", foundProveedor.get().getNumero());
+        assertEquals("98765432C", foundProveedor.get().getNif());
+        assertEquals("310000000", foundProveedor.get().getNumero());
         assertEquals("Maria", foundProveedor.get().getNombre());
     }
 }
