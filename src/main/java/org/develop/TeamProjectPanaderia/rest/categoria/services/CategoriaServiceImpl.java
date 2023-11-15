@@ -120,7 +120,7 @@ public class CategoriaServiceImpl implements CategoriaService{
         categoriaRepository.deleteAll();
     }
 
-    void onChange(Notificacion.Tipo tipo, Categoria data){
+    public void onChange(Notificacion.Tipo tipo, Categoria data){
         log.debug("Servicio de productos onChange con tipo: " + tipo + " y datos: " + data);
 
         if (webSocketHandler == null){
