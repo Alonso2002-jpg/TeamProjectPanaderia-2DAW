@@ -2,15 +2,15 @@ package org.develop.TeamProjectPanaderia.personal.dto;
 
 import lombok.Builder;
 
+import java.util.UUID;
+
 @Builder
 public record PersonalResponseDto(
+        UUID id,
         String dni,
-        String name,
+        String nombre,
         String seccion,
         String fechaAlta,
-        String fechaBaja,
-        String fechaCreacion,
-        String fechaUpdate,
         Boolean isActive
 ) {
 }
