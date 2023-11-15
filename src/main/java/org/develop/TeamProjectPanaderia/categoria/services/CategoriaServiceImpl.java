@@ -18,6 +18,10 @@ import org.develop.TeamProjectPanaderia.categoria.repositories.CategoriaReposito
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,6 +34,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "categorias")
 public class CategoriaServiceImpl implements CategoriaService{
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
@@ -68,11 +73,13 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    @Cacheable
     public Categoria findById(Long id) {
         return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException("id " + id));
     }
 
     @Override
+    @CachePut
     public Categoria save(CategoriaCreateDto categoria) {
         if (categoriaRepository.findByNameCategoryIgnoreCase(categoria.nameCategory()).isPresent()){
             throw new CategoriaNotSaveException("Category already exists");
@@ -83,6 +90,7 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    @CachePut
     public Categoria update(Long id,CategoriaUpdateDto categoria) {
         var categoriaUpd = findById(id);
         var category = categoriaMapper.toCategoria(categoria,categoriaUpd);
@@ -101,6 +109,7 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    @CacheEvict
     public void deleteById(Long id) {
         var category = findById(id);
         onChange(Notificacion.Tipo.DELETE, category);
