@@ -21,6 +21,7 @@ import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -112,9 +113,8 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteUpdated;
     }
 
-
-
     @Override
+    @CachePut
     public Cliente updateImg(Long id, MultipartFile file){
         log.info("Actualizando imagen de client por id: " + id);
         Cliente clienteActual = this.findById(id);

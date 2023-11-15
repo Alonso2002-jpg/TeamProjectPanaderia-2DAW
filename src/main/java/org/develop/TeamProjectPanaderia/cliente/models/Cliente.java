@@ -39,11 +39,9 @@ public class Cliente {
     private String dni;
     @Column(columnDefinition = "TEXT default ''")
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El telefono debe comenzar con 9, 6 o 7 y tener  9 numeros")
-    @Builder.Default
-    private String telefono = "";
+    private String telefono;
     @Column(columnDefinition = "TEXT default '" + IMAGE_DEFAULT + "'")
-    @Builder.Default
-    private String imagen = IMAGE_DEFAULT;
+    private String imagen;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
