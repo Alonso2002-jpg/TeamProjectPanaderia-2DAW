@@ -3,8 +3,9 @@ package org.develop.TeamProjectPanaderia.producto.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
+import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +28,15 @@ import java.util.*;
 @RequestMapping("/producto")
 public class ProductoRestController {
     private final ProductoService productoService;
+    private final ProductoMapper productoMapper;
     @Autowired
-    public ProductoRestController(ProductoService productoService) {
+    public ProductoRestController(ProductoService productoService, ProductoMapper productoMapper) {
         this.productoService = productoService;
+        this.productoMapper = productoMapper;
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<Producto>> getAllProductos(
+    public ResponseEntity<PageResponse<ProductoResponseDto>> getAllProductos(
             @RequestParam(required = false) Optional <String> nombre,
             @RequestParam(required = false) Optional <Integer> stockMin,
             @RequestParam(required = false) Optional <Double> precioMax,
@@ -48,31 +51,31 @@ public class ProductoRestController {
         log.info("Buscando todos los productos con las siguientes opciones: " + nombre + " " + stockMin + " " + precioMax + " " + isActivo + " " + categoria + " " + proveedor );
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(PageResponse.of(productoService.findAll(nombre, stockMin, precioMax, isActivo, categoria, proveedor, pageable), sortBy, direction));
+        return ResponseEntity.ok(PageResponse.of(productoMapper.toPageResponse(productoService.findAll(nombre, stockMin, precioMax, isActivo, categoria, proveedor, pageable)), sortBy, direction));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> getProductoById(@PathVariable String id){
+    public ResponseEntity<ProductoResponseDto> getProductoById(@PathVariable String id){
         log.info("Buscando producto por id: " + id);
-        return ResponseEntity.ok(productoService.findById(id));
+        return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.findById(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Producto> createProduct(@Valid @RequestBody ProductoCreateDto productoCreateDto){
+    public ResponseEntity<ProductoResponseDto> createProduct(@Valid @RequestBody ProductoCreateDto productoCreateDto){
         log.info("Creando producto: " + productoCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(productoService.save(productoCreateDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(productoMapper.toProductoResponseDto(productoService.save(productoCreateDto)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> updateProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
+    public ResponseEntity<ProductoResponseDto> updateProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando producto por id: " + id + " con producto: " + productoUpdateDto);
-        return ResponseEntity.ok(productoService.update(id, productoUpdateDto));
+        return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Producto> updatePartialProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
+    public ResponseEntity<ProductoResponseDto> updatePartialProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando parcialmente producto con id: " + id + " con producto: " + productoUpdateDto);
-        return ResponseEntity.ok(productoService.update(id, productoUpdateDto));
+        return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
     @DeleteMapping("/{id}")
@@ -83,9 +86,9 @@ public class ProductoRestController {
     }
 
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Producto> updateImage(@PathVariable String id, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<ProductoResponseDto> updateImage(@PathVariable String id, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()){
-            return ResponseEntity.ok(productoService.updateImg(id,file));
+            return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.updateImg(id,file)));
         }else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La Imagen no puede estar vacia");
         }
