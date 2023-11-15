@@ -5,5 +5,5 @@ public record CategoriaResponseDto(
         String createdAt,
         String updatedAt,
         Boolean isActive
-) {
+)  {
 }

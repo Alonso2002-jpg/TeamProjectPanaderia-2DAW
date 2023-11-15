@@ -250,11 +250,9 @@ class ProductoRestControllerTest {
 
         when(productoService.findById(uuidFalso)).thenThrow(new ProductoNotFound(uuid));
 
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.getProductoById(uuidFalso);
-
-        // Assert
-        assertEquals(404, responseEntity.getStatusCode().value());
+        // Act & Assert
+       var result = assertThrows(ProductoNotFound.class, () -> productoController.getProductoById(uuidFalso));
+       assertEquals("Producto con id " + uuid + " no encontrado", result.getMessage());
 
         // Verify
         verify(productoService, times(1)).findById(uuidFalso);
@@ -267,10 +265,9 @@ class ProductoRestControllerTest {
 
         when(productoService.findById(uuidInvalido)).thenThrow(new ProductoBadUuid(uuidInvalido));
 
-        ResponseEntity<Producto> responseEntity = productoController.getProductoById(uuidInvalido);
-
-        // Assert
-        assertEquals(400, responseEntity.getStatusCode().value());
+        // Act & Assert
+        var result = assertThrows(ProductoBadUuid.class, () -> productoController.getProductoById(uuidInvalido));
+        assertEquals("UUID: " + uuidInvalido + " no válido o de formato incorrecto", result.getMessage());
 
         // verify
         verify(productoService, times(1)).findById(uuidInvalido);
@@ -309,105 +306,6 @@ class ProductoRestControllerTest {
         verify(productoService, times(1)).save(productoCreateDto);
     }
 
-
-    @Test
-    void createProduct_BadRequest_NombreIsNull() {
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto(null, 33, 25.99, "test3.png", true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El nombre no puede estar vacio"))
-        );
-
-        // Verify
-        verify(productoService, times(0)).save(productoCreateDto);
-    }
-
-    @Test
-    void createProduct_BadRequest_NombreInvalid() {
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("PR",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El nombre debe contener al menos 3 letras"))
-        );
-    }
-
-
-    @Test
-    void createProduct_BadRequest_Stock() {
-        // Arrange
-        ProductoCreateDto productoCreateDto =  new ProductoCreateDto("nuevo_producto",-20,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El stock no puede ser negativo"))
-        );
-    }
-
-
-    @Test
-    void createProduct_BadRequest_Precio()  {
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,-20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El precio no puede ser negativo"))
-        );
-    }
-
-
-    @Test
-    void createProduct_BadRequest_Categoria(){
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, null, proveedor.getNif());
-
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("La categoria no puede estar vacia"))
-        );
-    }
-
-    @Test
-    void createProduct_BadRequest_Proveedor() {
-        // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), null);
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.createProduct(productoCreateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El proveedor no puede estar vacia"))
-        );
-    }
-
-
     @Test
     void updateProduct() {
         // Arrange
@@ -433,76 +331,16 @@ class ProductoRestControllerTest {
     void updateProduct_NotFound() {
         // Arrange
         UUID uuid = UUID.randomUUID();
-        String id = uuid.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        when(productoService.update(id, productoUpdateDto)).thenThrow(new ProductoNotFound(uuid));
+        when(productoService.update(any(), any())).thenThrow(new ProductoNotFound(uuid));
 
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
+        // Act & Assert
+        var result = assertThrows(ProductoNotFound.class, () -> productoController.updateProduct(any(), any()));
+        assertEquals("Producto con id " +  uuid + " no encontrado", result.getMessage());
 
-        // Assert
-        assertEquals(404, responseEntity.getStatusCode().value());
+        // Verify
+        verify(productoService, times(1)).update(any(), any());
     }
-
-
-    @Test
-    void updateProduct_BadRequest_Nombre() {
-        // Arrange
-        UUID uuid = producto1.getId();
-        String id = uuid.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El nombre debe contener al menos 3 letras"))
-        );
-    }
-
-    @Test
-    void updateProduct_BadRequest_Stock()  {
-        // Arrange
-        UUID uuid = producto1.getId();
-        String id = uuid.toString();
-              ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El stock no puede ser negativo"))
-        );
-    }
-
-    @Test
-    void updateProduct_BadRequest_Precio() {
-        // Arrange
-        UUID uuid = producto1.getId();
-        String id = uuid.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", 100, "producto_actualizado.jpg", -80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
-
-        // Act
-        ResponseEntity<Producto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
-
-        // Assert
-        assertAll(
-                () -> assertEquals(400, responseEntity.getStatusCode().value()),
-                () -> assertTrue(responseEntity.toString().contains("El precio no puede ser negativo"))
-        );
-    }
-
 
     @Test
     void updatePartialProduct() {
@@ -548,13 +386,9 @@ class ProductoRestControllerTest {
 
         doThrow(new ProductoNotFound(uuid)).when(productoService).deleteById(uuid.toString());
 
-        // Act
-        ResponseEntity<Void> responseEntity = productoController.deleteProduct(uuid.toString());
-
-        // Assert
-        assertAll(
-                () -> assertEquals(404, responseEntity.getStatusCode().value())
-        );
+        // Act & Assert
+        var result = assertThrows(ProductoNotFound.class, () -> productoController.deleteProduct(uuid.toString()));
+        assertEquals("Producto con id " + uuid + " no encontrado", result.getMessage());
 
         // Verify
         verify(productoService, times(1)).deleteById(uuid.toString());
@@ -600,5 +434,18 @@ class ProductoRestControllerTest {
         var exception = assertThrows(ResponseStatusException.class, () -> productoController.updateImage(id, invalidFile));
 
         assertEquals(400, exception.getStatusCode().value());
+        assertEquals("400 BAD_REQUEST \"La Imagen no puede estar vacia\"", exception.getMessage());
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

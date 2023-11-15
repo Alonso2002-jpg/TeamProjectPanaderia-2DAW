@@ -14,12 +14,20 @@ import java.util.UUID;
 @Repository
 public interface PersonalRepository extends JpaRepository<Personal, Long> {
 
-    Optional<Personal> findByUUID(UUID aLong);
-    List<Personal> findByIsActive(boolean isActive);
+    Optional<Personal> findById(UUID uudi);
+
+    List<Personal> findByIsActive(Boolean isActive);
+    Optional<Personal> findByDni(String dni);
+
     @Query("SELECT p FROM Personal p WHERE LOWER(p.seccion.nameCategory) LIKE LOWER(:categoria)")
     List<Personal> findAllByCategoriaContainsIgnoreCase(String categoria);
-    @Query("SELECT p FROM Personal p WHERE LOWER(p.isActive) LIKE LOWER(:isActive)")
-    List<Personal> findAllByIsActiveIgnereCase(boolean isActive);
-    @Query("SELECT p FROM Personal p WHERE LOWER(p.seccion.nameCategory) LIKE LOWER(:categoria) AND LOWER(P.isActive) LIKE LOWER(:isActive) ")
-    List<Personal> findAllByIsActiveIgnorecaseCategoryIgnoreCase(String categoria,boolean isActive);
+
+   // @Query("SELECT p FROM Personal p WHERE LOWER(p.isActive) LIKE LOWER(:isActive)")
+ //   List<Personal> findAllByIsActiveIgnereCase(Boolean isActive);
+
+    @Query("SELECT p FROM Personal p WHERE LOWER(p.seccion.nameCategory) LIKE LOWER(CONCAT('%',:categoria,'%')) AND p.isActive = :isActive")
+    List<Personal> findByCategoriaContainingIgnoreCaseAndIsActive(String categoria, Boolean isActive);
+
 }
+
+
