@@ -47,6 +47,7 @@ public class ClienteServiceImplTest {
                     .dni("03480731A")
                     .telefono("602697979")
                     .imagen("test1.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
     private final Cliente cliente2 =
@@ -57,6 +58,7 @@ public class ClienteServiceImplTest {
                     .dni("03480731B")
                     .telefono("602697971")
                     .imagen("test2.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
 
@@ -125,6 +127,31 @@ public class ClienteServiceImplTest {
         // Verify
         verify(clienteRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
+
+    @Test
+    void findAll_ByIsActive(){
+        // Arrange
+        Optional <Boolean> isActive = Optional.of(true);
+        List<Cliente> expectedProducts = List.of(cliente1, cliente2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Cliente> expectedPage = new PageImpl<>(expectedProducts);
+
+        when(clienteRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
+
+        // Act
+        Page<Cliente> actualPage = clienteService.findAll(Optional.empty(), Optional.empty(), pageable);
+
+        // Assert
+        assertAll(
+                () -> assertNotNull(actualPage),
+                () -> assertFalse(actualPage.isEmpty()),
+                () -> assertEquals(expectedPage, actualPage)
+        );
+
+        // Verify
+        verify(clienteRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
+
 
     @Test
     void findAll_ByCategoria() {
@@ -218,7 +245,7 @@ public class ClienteServiceImplTest {
     void save() throws IOException {
         // Arrange
         Long id = 1L;
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg",categoriaCliente.getNameCategory(),true);
         Cliente expecCliente = Cliente.builder()
                 .id(1L)
                 .nombreCompleto("nuevo_cliente")
@@ -229,6 +256,7 @@ public class ClienteServiceImplTest {
                 .telefono("602697985")
                 .imagen("test3.jpg")
                 .categoria(categoriaCliente)
+                .isActive(true)
                 .build();
 
         when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
@@ -253,7 +281,7 @@ public class ClienteServiceImplTest {
     @Test
     void save_categoryNotExist(){
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(),true);
 
         when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenThrow(new CategoriaNotFoundException(clienteCreateDto.getCategoria()));

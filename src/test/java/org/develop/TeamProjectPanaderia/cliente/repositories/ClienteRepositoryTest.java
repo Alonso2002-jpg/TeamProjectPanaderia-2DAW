@@ -32,6 +32,7 @@ class ClienteRepositoryTest {
             .imagen("prueba.jpg")
             .fechaActualizacion(LocalDateTime.now())
             .fechaActualizacion(LocalDateTime.now())
+            .isActive(true)
             .categoria(categoriaCliente)
             .build();
     @Autowired
@@ -127,6 +128,7 @@ class ClienteRepositoryTest {
                 .imagen("nuevocliente.jpg")
                 .fechaActualizacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
+                .isActive(true)
                 .categoria(categoriaCliente)
                 .build();
 

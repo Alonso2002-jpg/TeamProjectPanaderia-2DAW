@@ -29,6 +29,7 @@ public class FileSystemStorageService implements StorageService{
     private final Path rootLocation;
 
     public FileSystemStorageService(@Value("${upload.root-location}") String rootLocation){
+
         this.rootLocation = Paths.get(rootLocation);
     }
     @Override

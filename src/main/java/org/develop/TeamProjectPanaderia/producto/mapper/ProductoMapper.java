@@ -9,6 +9,7 @@ import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,12 +21,12 @@ public class ProductoMapper {
         return Producto.builder()
                 .id(id)
                 .nombre(dto.nombre())
-                .stock(dto.stock())
+                .stock(dto.stock() != null ? dto.stock() : 0)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
-                .imagen(dto.imagen())
-                .precio(dto.precio())
-                .isActivo(dto.isActivo())
+                .imagen(Producto.IMAGE_DEFAULT)
+                .precio(dto.precio() != null ? dto.precio() : 0.0)
+                .isActivo(dto.isActivo() != null ? dto.isActivo() : true)
                 .categoria(categoria)
                 .proveedor(proveedor)
                 .build();
@@ -38,7 +39,6 @@ public class ProductoMapper {
                 .stock(dto.stock() != null ? dto.stock() : producto.getStock())
                 .fechaCreacion(producto.getFechaCreacion())
                 .fechaActualizacion(LocalDateTime.now())
-                .imagen(dto.imagen() != null ? dto.imagen() : producto.getImagen())
                 .precio(dto.precio() != null ? dto.precio() : producto.getPrecio())
                 .isActivo(dto.isActivo() != null ? dto.isActivo() : producto.getIsActivo())
                 .categoria(categoria)
@@ -50,15 +50,17 @@ public class ProductoMapper {
         return new ProductoResponseDto(
                 producto.getId(),
                 producto.getNombre(),
-                producto.getStock(),
-                producto.getFechaCreacion(),
-                producto.getFechaActualizacion(),
-                producto.getImagen(),
                 producto.getPrecio(),
-                producto.getIsActivo(),
-                producto.getCategoria().getNameCategory(),
-                producto.getProveedor().getNif()
+                producto.getStock(),
+                producto.getImagen(),
+                producto.getCategoria(),
+                producto.getProveedor(),
+                producto.getIsActivo()
         );
+    }
+
+    public Page<ProductoResponseDto> toPageResponse(Page<Producto> productPages){
+        return productPages.map(this::toProductoResponseDto);
     }
 }
 

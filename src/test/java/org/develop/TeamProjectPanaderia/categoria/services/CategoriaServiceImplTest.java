@@ -17,7 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.matchers.Any;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,23 +58,84 @@ class CategoriaServiceImplTest {
     }
 
     @Test
-    void findAll() {
-        List<Categoria> categorias = List.of(categoria, categoria1);
+    void findAllWithoutNotParameter() {
+        List<Categoria> categoriasList =List.of(categoria1,categoria);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
 
-        when(categoriaRepository.findAll()).thenReturn(categorias);
-        var result = categoriaService.findAll(null);
+        when(categoriaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(responsePage);
+
+        var result = categoriaService.findAll(Optional.empty(),Optional.empty(),pageable);
 
         assertAll(
                 () -> assertNotNull(result),
                 () -> assertFalse(result.isEmpty()),
-                () -> assertEquals(2, result.size()),
-                () -> assertEquals("Chucherias", result.get(1).getNameCategory()),
-                () -> assertEquals("Bebidas", result.get(0).getNameCategory())
+                () -> assertEquals(responsePage, result)
         );
 
-        verify(categoriaRepository, times(1)).findAll();
+        verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
 
+    @Test
+    void findAllWithIsActive(){
+        Optional<Boolean> isActive = Optional.of(true);
+        List<Categoria> expectedCategoria = List.of(categoria1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Categoria> expectedPage = new PageImpl<>(expectedCategoria);
+
+        when(categoriaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
+
+        var result = categoriaService.findAll(isActive, Optional.empty(), pageable);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(expectedPage, result)
+        );
+
+        verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void findAllWithName() {
+        Optional<String> name = Optional.of("Chucherias");
+        List<Categoria> expectedCategoria = List.of(categoria1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Categoria> expectedPage = new PageImpl<>(expectedCategoria);
+
+        when(categoriaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
+
+        var result = categoriaService.findAll(Optional.empty(), name, pageable);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(expectedPage, result)
+        );
+
+        verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void findAllWithNameAndIsActive(){
+        Optional<String> name = Optional.of("Chucherias");
+        Optional<Boolean> isActive = Optional.of(true);
+        List<Categoria> expectedCategoria = List.of(categoria1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Categoria> expectedPage = new PageImpl<>(expectedCategoria);
+
+        when(categoriaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
+
+        var result = categoriaService.findAll(isActive, name, pageable);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(expectedPage, result)
+        );
+
+        verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
     @Test
     void findById() {
         when(categoriaRepository.findById(1L)).thenReturn(java.util.Optional.of(categoria1));
