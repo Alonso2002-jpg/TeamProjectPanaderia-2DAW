@@ -122,7 +122,7 @@ class CategoriaRestControllerTest {
 
     @Test
     void getAllName() throws Exception {
-        var localEndPoint= initEndPoint + "?nameCategory=Panaderia";
+        var localEndPoint= initEndPoint + "?name=Panaderia";
         List<Categoria> categoriasList =List.of(categoria1,categoria2);
         List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
         Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
@@ -145,7 +145,7 @@ class CategoriaRestControllerTest {
                 () -> assertEquals(2, res.content().size())
         );
 
-        verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.empty(),pageable);
+        verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.of("Panaderia"),pageable);
         verify(categoriaMapper,times(1)).toPageResponse(responsePageCat);
     }
     @Test
@@ -178,7 +178,7 @@ class CategoriaRestControllerTest {
 
     @Test
     void getAllIsActiveAndName() throws Exception {
-        var localEndPoint = initEndPoint + "?isActive=true&nameCategory=Panaderia";
+        var localEndPoint = initEndPoint + "?isActive=true&name=Panaderia";
         List<Categoria> categoriasList = List.of(categoria1,categoria2);
         List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
         Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
