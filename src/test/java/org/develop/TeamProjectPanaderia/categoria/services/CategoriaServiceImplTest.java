@@ -115,6 +115,27 @@ class CategoriaServiceImplTest {
 
         verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
     }
+
+    @Test
+    void findAllWithNameAndIsActive(){
+        Optional<String> name = Optional.of("Chucherias");
+        Optional<Boolean> isActive = Optional.of(true);
+        List<Categoria> expectedCategoria = List.of(categoria1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page<Categoria> expectedPage = new PageImpl<>(expectedCategoria);
+
+        when(categoriaRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(expectedPage);
+
+        var result = categoriaService.findAll(isActive, name, pageable);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertFalse(result.isEmpty()),
+                () -> assertEquals(expectedPage, result)
+        );
+
+        verify(categoriaRepository, times(1)).findAll(any(Specification.class), any(Pageable.class));
+    }
     @Test
     void findById() {
         when(categoriaRepository.findById(1L)).thenReturn(java.util.Optional.of(categoria1));
