@@ -3,19 +3,18 @@ package org.develop.TeamProjectPanaderia.personal.services;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.personal.models.Personal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 public interface PersonalService {
-    List<Personal>findAll(Boolean isActive, String seccion);
+    Page<Personal> findAll(Optional<String> nombre, Optional <String> dni, Optional<String> seccion, Optional<Boolean> isActivo, Pageable pageable);
     Personal findById(String id);
+    Personal findPersonalByDni(String dni);
     Personal save(PersonalCreateDto personal);
     Personal update(String id, PersonalUpdateDto personal);
-    Optional<Personal> findPersonalByDni(String dni);
     void deleteById(String id);
     List<Personal> findByActiveIs(Boolean isActive);
-
 
 }
