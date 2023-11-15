@@ -37,7 +37,7 @@ public class CategoriaRestController {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<Categoria>> findAll(@RequestParam(required = false) Optional<Boolean> isActive,
+    public ResponseEntity<PageResponse<CategoriaResponseDto>> findAll(@RequestParam(required = false) Optional<Boolean> isActive,
                                                            @RequestParam(required = false) Optional<String> name,
                                                            @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size,
@@ -45,7 +45,7 @@ public class CategoriaRestController {
                                                            @RequestParam(defaultValue = "asc") String direction){
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(PageResponse.of(categoriaService.findAll(isActive, name,pageable), sortBy, direction));
+        return ResponseEntity.ok(PageResponse.of(categoriaMapper.toPageResponse(categoriaService.findAll(isActive, name,pageable)), sortBy, direction));
     }
 
 

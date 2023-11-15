@@ -4,6 +4,7 @@ import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -60,5 +61,9 @@ public class CategoriaMapper {
         return categorias.stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public Page<CategoriaResponseDto> toPageResponse(Page<Categoria> pageCategoria){
+        return pageCategoria.map(this::toResponse);
     }
 }
