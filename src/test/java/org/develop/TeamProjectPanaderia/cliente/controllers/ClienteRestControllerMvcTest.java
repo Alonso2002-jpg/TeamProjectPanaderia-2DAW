@@ -61,6 +61,7 @@ public class ClienteRestControllerMvcTest {
                     .dni("03480731A")
                     .telefono("602697979")
                     .imagen("test1.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
     private final Cliente cliente2 =
@@ -71,6 +72,7 @@ public class ClienteRestControllerMvcTest {
                     .dni("03480731B")
                     .telefono("602697971")
                     .imagen("test2.jpg")
+                    .isActive(true)
                     .categoria(categoriaCliente)
                     .build();
 
@@ -219,7 +221,7 @@ public class ClienteRestControllerMvcTest {
     void createCliente() throws Exception{
         // Arrange
         Long id = 1L;
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("TEST3_MARIA","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("TEST3_MARIA","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
         Cliente expecCliente = Cliente.builder()
                 .id(id)
                 .nombreCompleto("TEST3_MARIA")
@@ -228,6 +230,7 @@ public class ClienteRestControllerMvcTest {
                 .telefono("602697979")
                 .imagen("test3.jpg")
                 .categoria(categoriaCliente)
+                .isActive(true)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .build();
@@ -256,7 +259,7 @@ public class ClienteRestControllerMvcTest {
     @Test
     void createCliente_BadRequest_NombreCompletoIsNull() throws Exception {
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto(null,"test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto(null,"test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -275,7 +278,7 @@ public class ClienteRestControllerMvcTest {
     @Test
     void createCliente_BadRequest_NombreCompletoInvalid() throws Exception {
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("cl","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory());
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("cl","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -294,7 +297,7 @@ public class ClienteRestControllerMvcTest {
     @Test
     void createCliente_BadRequest_Categoria() throws Exception {
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("EvelynObando","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg", null);
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("EvelynObando","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg", null, true);
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -396,7 +399,7 @@ public class ClienteRestControllerMvcTest {
     void deleteClienteById_IdNotExist() throws Exception {
         // Arrange
         Long id = 99L;
-        String myLocalEndpoint = myEndpoint + "/" + id.toString();
+        String myLocalEndpoint = myEndpoint + "/" + id;
 
         doThrow(new ClienteNotFoundException(id)).when(clienteService).deleteById(id);
 
