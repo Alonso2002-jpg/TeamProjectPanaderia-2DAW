@@ -112,9 +112,6 @@ public class CategoriaServiceImpl implements CategoriaService{
         categoriaRepository.deleteAll();
     }
 
-    void initWBHandler(WebSocketConfig webSocketConfig){
-        webSocketHandler = webSocketConfig.webSocketHandler();
-    }
     void onChange(Notificacion.Tipo tipo, Categoria data){
         log.debug("Servicio de productos onChange con tipo: " + tipo + " y datos: " + data);
 
