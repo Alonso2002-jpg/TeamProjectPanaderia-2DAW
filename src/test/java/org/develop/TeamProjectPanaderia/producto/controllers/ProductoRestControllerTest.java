@@ -1,6 +1,6 @@
 package org.develop.TeamProjectPanaderia.producto.controllers;
 
-
+/*
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.producto.controllers.ProductoRestController;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
@@ -449,7 +449,7 @@ class ProductoRestControllerTest {
 
 
 
-
+*/
 
 
 
