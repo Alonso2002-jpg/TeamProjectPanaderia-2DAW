@@ -42,7 +42,7 @@ import static org.mockito.Mockito.*;
 class ProductoServiceTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
-    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
+    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
     private final Producto producto1 =
             Producto.builder()
                     .id(UUID.randomUUID())
@@ -344,7 +344,7 @@ class ProductoServiceTest {
     void save_() throws IOException {
         // Arrange
         UUID uuid = UUID.randomUUID();
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
         Producto expectedProduct = Producto.builder()
                         .id(uuid)
                         .nombre("nuevo_producto")
@@ -382,7 +382,7 @@ class ProductoServiceTest {
     @Test
     void save_ProductNameAlreadyExist()  {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("TEST-1",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("TEST-1",33,25.99 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre())).thenReturn(Optional.of(producto1));
 
@@ -398,7 +398,7 @@ class ProductoServiceTest {
     @Test
     void save_categoryNotExist(){
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(categoriaService.findByName(productoCreateDto.categoria())).thenThrow(new CategoriaNotFoundException(productoCreateDto.categoria()));
@@ -435,7 +435,7 @@ class ProductoServiceTest {
     void update() throws IOException {
         // Arrange
         UUID id = producto1.getId();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto1));
         when(productoRepository.save(producto1)).thenReturn(producto1);
@@ -464,7 +464,7 @@ class ProductoServiceTest {
     void update_WithNotCategoryAndNotProveedor() throws IOException {
         // Arrange
         UUID id = producto1.getId();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, "", "");
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, "", "");
 
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto1));
         when(productoRepository.save(producto1)).thenReturn(producto1);
@@ -490,7 +490,7 @@ class ProductoServiceTest {
         // Arrange
         UUID id = producto1.getId();
         String uuid = id.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -508,7 +508,7 @@ class ProductoServiceTest {
         String category = "Categoria_Falsa";
         UUID id = producto1.getId();
         String uuid = id.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, "Categoria_Falsa", proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, "Categoria_Falsa", proveedor.getNif());
 
         when(productoRepository.findById(any(UUID.class))).thenReturn(Optional.of(producto1));
         when(categoriaService.findByName(category)).thenThrow(new CategoriaNotFoundException(category));
