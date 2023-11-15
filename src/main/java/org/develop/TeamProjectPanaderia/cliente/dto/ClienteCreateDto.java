@@ -24,4 +24,5 @@ public class ClienteCreateDto  {
     private String imagen;
     @NotBlank(message = "La categoria no puede estar vacio")
     private String categoria;
+    private Boolean isActive;
 }

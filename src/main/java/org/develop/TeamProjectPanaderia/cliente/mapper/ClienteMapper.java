@@ -25,6 +25,7 @@ public class ClienteMapper {
                 .categoria(categoria)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
+                .isActive(dto.getIsActive() != null ? dto.getIsActive() : true)
                 .build();
     }
 
@@ -39,6 +40,7 @@ public class ClienteMapper {
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(LocalDateTime.now())
                 .categoria(categoria)
+                .isActive(dto.getIsActive() != null ? dto.getIsActive() : cliente.getIsActive())
                 .build();
     }
 
@@ -53,6 +55,7 @@ public class ClienteMapper {
                 .fechaCreacion(cliente.getFechaCreacion())
                 .fechaActualizacion(cliente.getFechaActualizacion())
                 .categoria(cliente.getCategoria().getNameCategory())
+                .isActive(cliente.getIsActive())
                 .build();
     }
 }

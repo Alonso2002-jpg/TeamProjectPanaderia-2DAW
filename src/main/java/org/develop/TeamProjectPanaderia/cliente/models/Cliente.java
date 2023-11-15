@@ -48,6 +48,9 @@ public class Cliente {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime fechaActualizacion;
+    @Column(name = "Boolean default true")
+    private Boolean isActive;
+
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

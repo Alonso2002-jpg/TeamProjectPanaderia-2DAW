@@ -17,4 +17,5 @@ public class ClienteUpdateDto {
     private String telefono;
     private String imagen;
     private String categoria;
+    private Boolean isActive;
 }
