@@ -21,7 +21,7 @@ public class ProveedorMapperTest {
     void setup() throws Exception {
         proveedorMapper = new ProveedorMapper();
         proveedor = Proveedor.builder()
-                .id(1L)
+                .nif("1L")
                 .numero("12")
                 .nombre("Juan")
                 .build();
@@ -33,21 +33,21 @@ public class ProveedorMapperTest {
 
     @Test
     void toCreate() {
-        assertEquals(proveedor.getId(), createDto.getId());
+        assertEquals(proveedor.getNif(), createDto.getNif());
         assertEquals(proveedor.getNumero(), createDto.getNumero());
         assertEquals(proveedor.getNombre(), createDto.getNombre());
     }
 
     @Test
     void toUpdate() {
-        assertEquals(proveedor.getId(), updateDto.getId());
+        assertEquals(proveedor.getNif(), updateDto.getNif());
         assertEquals(proveedor.getNumero(), updateDto.getNumero());
         assertEquals(proveedor.getNombre(), updateDto.getNombre());
     }
 
     @Test
     void toResponse() {
-        assertEquals(proveedor.getId(), responseDto.getId());
+        assertEquals(proveedor.getNif(), responseDto.getNif());
         assertEquals(proveedor.getNumero(), responseDto.getNumero());
         assertEquals(proveedor.getNombre(), responseDto.getNombre());
 
