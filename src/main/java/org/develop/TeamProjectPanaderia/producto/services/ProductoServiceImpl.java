@@ -158,6 +158,9 @@ public class ProductoServiceImpl implements ProductoService{
        Producto productoActual = this.findById(id);
        Categoria categoria = null;
        Proveedor proveedor = null;
+       if(productoUpdateDto.nombre() != null && !productoUpdateDto.nombre().isEmpty() && productoRepository.findByNombreEqualsIgnoreCase(productoUpdateDto.nombre()).isPresent()) {
+            throw new ProductoNotSaved(productoUpdateDto.nombre());
+       }
        if(productoUpdateDto.categoria() != null && !productoUpdateDto.categoria().isEmpty()){
            categoria = categoriaService.findByName(productoUpdateDto.categoria());
        } else {
