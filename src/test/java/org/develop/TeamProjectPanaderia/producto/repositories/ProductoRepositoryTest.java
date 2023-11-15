@@ -10,8 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,26 +21,25 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-@TestPropertySource(properties = "spring.sql.init.mode = never")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+
 @DataJpaTest
 class ProductoRepositoryTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
-    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
+    private final Proveedor proveedor = new Proveedor(1L, "12345678D", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
     private final Producto producto1 =
-                Producto.builder()
-                        .id(UUID.randomUUID())
-                        .nombre("TEST-1")
-                        .stock(10)
-                        .fechaCreacion(LocalDateTime.now())
-                        .fechaActualizacion(LocalDateTime.now())
-                        .imagen("test1.png")
-                        .precio(49.99)
-                        .isActivo(true)
-                        .categoria(categoriaProducto)
-                        .proveedor(proveedor)
-                        .build();
+            Producto.builder()
+                    .id(UUID.randomUUID())
+                    .nombre("TEST-1")
+                    .stock(10)
+                    .fechaCreacion(LocalDateTime.now())
+                    .fechaActualizacion(LocalDateTime.now())
+                    .imagen("test1.png")
+                    .precio(49.99)
+                    .isActivo(true)
+                    .categoria(categoriaProducto)
+                    .proveedor(proveedor)
+                    .build();
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -113,7 +110,8 @@ class ProductoRepositoryTest {
         // Assert
         assertAll(
                 () -> assertNotNull(foundProduct),
-                () -> assertTrue(foundProduct.isEmpty())
+                () -> assertFalse(foundProduct.isEmpty()),
+                () -> assertEquals(producto1.getNombre(), foundProduct.get().getNombre())
         );
     }
 
@@ -127,8 +125,7 @@ class ProductoRepositoryTest {
         // Assert
         assertAll(
                 () -> assertNotNull(foundProduct),
-                () -> assertTrue(foundProduct.isPresent()),
-                () -> assertEquals(producto1.getNombre(), foundProduct.get().getNombre())
+                () -> assertTrue(foundProduct.isEmpty())
         );
     }
 
@@ -213,6 +210,4 @@ class ProductoRepositoryTest {
                 () -> assertEquals(1, productoList.size())
         );
     }
-
-
 }

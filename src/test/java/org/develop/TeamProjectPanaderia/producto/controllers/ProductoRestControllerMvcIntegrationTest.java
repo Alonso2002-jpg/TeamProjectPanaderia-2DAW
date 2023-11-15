@@ -59,7 +59,7 @@ class ProductoRestControllerMvcIntegrationTest {
     private JacksonTester <ProductoUpdateDto> jsonProductoUpdateDto;
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
-    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", LocalDate.now(), LocalDate.now());
+    private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
     private final Producto producto1 =
             Producto.builder()
                     .id(UUID.randomUUID())
@@ -377,7 +377,7 @@ class ProductoRestControllerMvcIntegrationTest {
     void createProduct() throws Exception{
         // Arrange
         UUID uuid = UUID.randomUUID();
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
         Producto expectedProduct = Producto.builder()
                 .id(uuid)
                 .nombre("nuevo_producto")
@@ -415,7 +415,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_NombreIsNull() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto(null,33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto(null,33,25.99,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -434,7 +434,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_NombreInvalid() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("PR",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("PR",33,25.99,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -454,7 +454,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_Stock() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto =  new ProductoCreateDto("nuevo_producto",-20,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto =  new ProductoCreateDto("nuevo_producto",-20,25.99 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -474,7 +474,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_Precio() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,-20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,-20.0 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -494,7 +494,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_Categoria() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, null, proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0 ,  true, null, proveedor.getNif());
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -513,7 +513,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void createProduct_BadRequest_Proveedor() throws Exception {
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0, "test3.png" ,  true, categoriaProducto.getNameCategory(), null);
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,20.0 ,  true, categoriaProducto.getNameCategory(), null);
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -534,7 +534,7 @@ class ProductoRestControllerMvcIntegrationTest {
         // Arrange
         String id = producto1.getId().toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
@@ -563,7 +563,7 @@ class ProductoRestControllerMvcIntegrationTest {
         UUID uuid = UUID.randomUUID();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         // Arrange
         when(productoService.update(id, productoUpdateDto)).thenThrow(new ProductoNotFound(uuid));
@@ -587,7 +587,7 @@ class ProductoRestControllerMvcIntegrationTest {
         UUID uuid = producto1.getId();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         // Arrange
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
@@ -613,7 +613,7 @@ class ProductoRestControllerMvcIntegrationTest {
         UUID uuid = producto1.getId();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, "producto_actualizado.jpg", 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         // Arrange
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
@@ -639,7 +639,7 @@ class ProductoRestControllerMvcIntegrationTest {
         UUID uuid = producto1.getId();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", 100, "producto_actualizado.jpg", -80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", 100, -80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         // Arrange
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
@@ -664,7 +664,7 @@ class ProductoRestControllerMvcIntegrationTest {
         // Arrange
         String id = producto2.getId().toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, null, 80.99, null, null, null);
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, null, null, null);
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto2);
 

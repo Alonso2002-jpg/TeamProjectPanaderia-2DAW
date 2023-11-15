@@ -39,6 +39,7 @@ public class ProductoMapper {
                 .stock(dto.stock() != null ? dto.stock() : producto.getStock())
                 .fechaCreacion(producto.getFechaCreacion())
                 .fechaActualizacion(LocalDateTime.now())
+                .imagen(producto.getImagen())
                 .precio(dto.precio() != null ? dto.precio() : producto.getPrecio())
                 .isActivo(dto.isActivo() != null ? dto.isActivo() : producto.getIsActivo())
                 .categoria(categoria)
