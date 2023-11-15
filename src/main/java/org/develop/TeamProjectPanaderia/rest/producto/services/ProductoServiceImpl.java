@@ -206,7 +206,7 @@ public class ProductoServiceImpl implements ProductoService{
         onChange(Notificacion.Tipo.DELETE, productoActual);
     }
 
-    void onChange(Notificacion.Tipo tipo, Producto data) {
+    public void onChange(Notificacion.Tipo tipo, Producto data) {
         log.debug("Servicio de Productos onChange con tipo: " + tipo + " y datos: " + data);
 
         if (webSocketService == null) {
