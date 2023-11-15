@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;

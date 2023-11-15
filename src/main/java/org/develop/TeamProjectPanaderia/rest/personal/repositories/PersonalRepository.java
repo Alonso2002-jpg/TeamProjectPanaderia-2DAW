@@ -1,8 +1,8 @@
 package org.develop.TeamProjectPanaderia.rest.personal.repositories;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.personal.models.Personal;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.personal.models.Personal;
+import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;

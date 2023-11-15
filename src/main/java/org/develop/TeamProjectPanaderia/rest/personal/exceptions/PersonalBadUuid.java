@@ -1,4 +1,4 @@
-package org.develop.TeamProjectPanaderia.personal.exceptions;
+package org.develop.TeamProjectPanaderia.rest.personal.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

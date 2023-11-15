@@ -1,8 +1,8 @@
 package org.develop.TeamProjectPanaderia.rest.personal.services;
 
-import org.develop.TeamProjectPanaderia.personal.dto.PersonalCreateDto;
-import org.develop.TeamProjectPanaderia.personal.dto.PersonalUpdateDto;
-import org.develop.TeamProjectPanaderia.personal.models.Personal;
+import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
+import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.personal.models.Personal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
