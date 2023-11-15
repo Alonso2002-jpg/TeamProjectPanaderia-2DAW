@@ -21,6 +21,10 @@ import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,6 +37,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@CacheConfig(cacheNames = "clientes")
 public class ClienteServiceImpl implements ClienteService{
 
     private final ClienteRepository clienteRepository;
@@ -79,12 +84,14 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     @Override
+    @Cacheable
     public Cliente findById(Long id) {
         log.info("Buscando cliente por id: " + id);
         return clienteRepository.findById(id).orElseThrow(() -> new ClienteNotFoundException(id));
     }
 
     @Override
+    @CachePut
     public Cliente save(ClienteCreateDto clienteCreateDto) {
         log.info("Guardando cliente: " + clienteCreateDto);
         if(clienteRepository.findClienteByDniEqualsIgnoreCase(clienteCreateDto.getDni()).isPresent()){
@@ -97,6 +104,7 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     @Override
+    @CachePut
     public Cliente update(Long id, ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando cliente por id: " + id);
         Cliente clienteActual = this.findById(id);
@@ -112,9 +120,8 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteUpdated;
     }
 
-
-
     @Override
+    @CachePut
     public Cliente updateImg(Long id, MultipartFile file){
         log.info("Actualizando imagen de client por id: " + id);
         Cliente clienteActual = this.findById(id);
@@ -130,12 +137,14 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     @Override
+    @Cacheable
     public Cliente findByDni(String dni) {
         log.info("Buscando cliente por dni: " + dni);
         return clienteRepository.findClienteByDniEqualsIgnoreCase(dni).orElseThrow(() -> new ClienteNotFoundException(dni));
     }
 
     @Override
+    @CacheEvict
     public void deleteById(Long id) {
         log.debug("Borrando cliente por id: " + id);
         Cliente clienteActual = this.findById(id);
