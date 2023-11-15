@@ -14,22 +14,13 @@ import java.util.UUID;
 
 @Component
 public class PersonalMapper {
-    public Personal toPersonal(PersonalCreateDto dto) {
+    public Personal toPersonal(UUID id, Categoria categoria, PersonalCreateDto dto) {
         return Personal.builder()
                 .dni(dto.dni())
                 .isActive(dto.isActive())
                 .build();
     }
-    public PersonalCreateDto toCreate(Personal personal){
-        return new PersonalCreateDto(
-                personal.getDni(),
-                personal.getNombre(),
-                personal.getSeccion().getNameCategory(),
-                personal.getFechaAlta().toString(),
-                personal.getFechaBaja().toString(),
-                personal.isActive()
-        );
-    }
+
     public PersonalResponseDto toResponse(Personal personal) {
         return  new PersonalResponseDto(
                 personal.getDni(),
@@ -43,16 +34,16 @@ public class PersonalMapper {
 
         );
     }
+    public  Personal toPersonalCreate(PersonalCreateDto personalDto, Categoria categoria){
+        return Personal.builder()
+                .dni(personalDto.dni())
+                .nombre(personalDto.name())
+                .seccion(categoria)
+                .isActive(personalDto.isActive())
+                .build();
+    }
 
 
-        public Personal toUpdate(PersonalUpdateDto dto, Personal personal, Categoria categoria) {
-            return Personal.builder()
-                    .nombre(dto.nombre())
-                    .seccion(categoria == null ? personal.getSeccion() : categoria)
-                    .fechaBaja(dto.fechaBaja() )
-                    .isActive(dto.isActive())
-                    .build();
-        }
 
 
 
@@ -62,7 +53,7 @@ public class PersonalMapper {
                 .toList();
     }
 
-    public Personal toPersonal(PersonalUpdateDto personalDto, Personal personalUpd, Categoria categoria) {
+    public Personal toPersonalUdate(PersonalUpdateDto personalDto, Personal personalUpd, Categoria categoria) {
         return Personal.builder()
                 .dni(personalUpd.getDni())
                 .nombre(personalDto.nombre() == null ? personalUpd.getNombre() : personalDto.nombre())
@@ -72,16 +63,5 @@ public class PersonalMapper {
                 .isActive(personalDto.isActive() == null ? personalUpd.isActive() : personalDto.isActive())
                 .build();
     }
-    public Personal toPersonal(UUID id, PersonalCreateDto createDto,Categoria categoria, Personal personal) {
-        return  Personal.builder()
-                .id(id)
-                .nombre(createDto.name())
-                .dni(createDto.dni())
-                .seccion(categoria)
-                .fechaCreacion(LocalDate.from(LocalDateTime.now()))
-                .fechaUpdate(LocalDate.from(LocalDateTime.now()))
-                .isActive(true)
-                .build();
 
-    }
 }

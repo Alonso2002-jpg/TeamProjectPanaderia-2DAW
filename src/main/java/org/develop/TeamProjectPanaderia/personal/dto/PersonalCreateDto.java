@@ -1,4 +1,5 @@
 package org.develop.TeamProjectPanaderia.personal.dto;
+import lombok.Builder;
 
 import lombok.Builder;
 
@@ -9,7 +10,7 @@ public record PersonalCreateDto(
         String seccion,
         String fechaAlta,
         String fechaBaja,
-        boolean isActive
+        Boolean isActive
 ) {
 }
 

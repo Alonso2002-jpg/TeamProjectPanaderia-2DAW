@@ -29,18 +29,18 @@ public class Personal {
     @Builder.Default
     private Categoria seccion= Categoria.builder().nameCategory("EMPLEADO").build();
     @Builder.Default
-    @Column(name = "fecha_alta", nullable = false, columnDefinition = "Fecha de alta del personal")
+    @Column(name = "fecha_alta")
     private LocalDate fechaAlta = LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_baja", nullable = false, columnDefinition = "Fecha de baja del personal")
+    @Column(name = "fecha_baja")
     private LocalDate fechaBaja= LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_creacion", nullable = false, columnDefinition = "Fecha de creacion del personal")
+    @Column(name = "fecha_creacion")
     private LocalDate fechaCreacion = LocalDate.now();
     @Builder.Default
-    @Column(name = "fecha_actualizacion", nullable = false, columnDefinition = "Fecha de actualizacion del personal")
+    @Column(name = "fecha_actualizacion")
     private LocalDate fechaUpdate=LocalDate.now();
-    @Column(name = "active", nullable = false, columnDefinition = "avtivado por defecto true")
+    @Column(name = "active")
     @Builder.Default
     private boolean isActive=true;
 

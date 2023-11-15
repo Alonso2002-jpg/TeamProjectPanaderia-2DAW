@@ -9,7 +9,7 @@ public class ClienteNotFoundException extends CategoriaException {
     public ClienteNotFoundException(Long id) {
         super("Cliente not found with id " + id);
     }
-    public ClienteNotFoundException(String nombre) {
-        super("Cliente con nombre " + nombre + " no encontrado");
+    public ClienteNotFoundException(String dni) {
+        super("Cliente con dni " + dni + " no encontrado");
     }
 }

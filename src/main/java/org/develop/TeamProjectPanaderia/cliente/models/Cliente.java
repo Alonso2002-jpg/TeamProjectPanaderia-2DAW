@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.hibernate.validator.constraints.Length;
 
 
@@ -23,7 +22,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "CLIENTES")
 public class Cliente {
-    @Id // Indicamos que es el ID de la tabla
+    @Builder.Default
+    public static final String IMAGE_DEFAULT = "https://via.placeholder.com/150";
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank( message = "El nombre no puede estar vacio")
@@ -32,24 +33,28 @@ public class Cliente {
     @NotBlank(message =  "El correo no puede estar vacio")
     @Pattern(regexp = ".*@.*\\..*", message = "El correo debe contener al menos un '@' y al menos un '.'")
     private String correo;
-    @NotBlank( message = "El DNI no puede estar vacia")
-    @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 números seguidos de una letra")
+    @NotBlank( message = "El DNI no puede estar vacio")
+    @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 numeros seguidos de una letra")
+    @Column(unique = true)
     private String dni;
-    @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
+    @Column(columnDefinition = "TEXT default ''")
+    @Pattern(regexp = "^[679][0-9]{8,}$", message = "El telefono debe comenzar con 9, 6 o 7 y tener  9 numeros")
     private String telefono;
-    @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
-    @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(columnDefinition = "TEXT default '" + IMAGE_DEFAULT + "'")
+    private String imagen;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(updatable = false, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime fechaCreacion;
-    @Temporal(TemporalType.TIMESTAMP) // Indicamos que es un campo de tipo fecha y hora
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = true, nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime fechaActualizacion;
+    @Column(name = "Boolean default true")
+    private Boolean isActive;
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
-    private Producto producto;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
 }
+

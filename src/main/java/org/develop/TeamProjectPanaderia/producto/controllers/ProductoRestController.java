@@ -3,7 +3,6 @@ package org.develop.TeamProjectPanaderia.producto.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.producto.services.ProductoService;

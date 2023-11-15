@@ -25,12 +25,12 @@ import java.util.UUID;
 @RequestMapping("/personal")
 public class PersonalControllers {
     private final PersonalService personalService;
-    private final PersonalMapper personalMapper;
+
 
     @Autowired
-    public PersonalControllers(PersonalService personalService, PersonalMapper personalMapper) {
+    public PersonalControllers(PersonalService personalService) {
         this.personalService = personalService;
-        this.personalMapper = personalMapper;
+
     }
     @GetMapping
     public ResponseEntity<List<Personal>> getAllPersonal(
@@ -40,7 +40,7 @@ public class PersonalControllers {
         return ResponseEntity.ok(personalService.findAll(isActive, categoria));
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Personal> getPresonalfindById(@PathVariable UUID id){
+    public ResponseEntity<Personal> getPresonalfindById(@PathVariable String id){
         log.info("buscando por id");
         return ResponseEntity.ok(personalService.findById(id));
 
@@ -51,21 +51,22 @@ public class PersonalControllers {
         return ResponseEntity.status(HttpStatus.CREATED).body(personalService.save(productoCreatedto));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Personal> updatePersonal(@PathVariable UUID id, @Valid @RequestBody PersonalUpdateDto personalUpdateteDto){
+    public ResponseEntity<Personal> updatePersonal(@PathVariable String id, @Valid @RequestBody PersonalUpdateDto personalUpdateteDto){
         log.info("update personal: "+ id+" producto: "+personalUpdateteDto);
         return ResponseEntity.ok(personalService.update(id,personalUpdateteDto));
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<Personal> updatePartialPersonal(@PathVariable UUID id,@Valid @RequestBody PersonalUpdateDto personalUpdateteDto){
+    public ResponseEntity<Personal> updatePartialPersonal(@PathVariable String id,@Valid @RequestBody PersonalUpdateDto personalUpdateteDto){
         log.info("actualizando partialmente personal: "+ id+" product");
         return ResponseEntity.ok(personalService.update(id,personalUpdateteDto));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Personal> deletePersonal(@PathVariable UUID id){
+    public ResponseEntity<Personal> deletePersonal(@PathVariable String id){
         log.info("Borrando persosonal por id: "+ id );
         personalService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(

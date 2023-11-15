@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(name = "nombre", unique = true, nullable = false)
+    @Length(min = 3, message = "El nombre debe contener al menos 3 letras")
     @NotBlank(message = "El nombre no puede estar vacio")
     private String nombre;
     @Column(name = "stock", columnDefinition = "integer default 0")
@@ -43,6 +45,7 @@ public class Producto {
     private String imagen = IMAGE_DEFAULT;
     @Column(name = "precio", columnDefinition = "double default 0.0")
     @Min(value = 0, message = "El precio no puede ser negativo")
+    @Builder.Default
     private Double precio = 0.0;
     @Column(columnDefinition = "boolean default true")
     @Builder.Default
