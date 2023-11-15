@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -192,5 +193,10 @@ public class ClienteServiceImpl implements ClienteService{
 
     public void setWebSocketService(WebSocketHandler webSocketHandlerMock) {
         this.webSocketService = webSocketHandlerMock;
+    }
+
+    @Override
+    public List<Cliente> findByActiveIs(Boolean isActive) {
+        return clienteRepository.findByIsActive(isActive);
     }
 }

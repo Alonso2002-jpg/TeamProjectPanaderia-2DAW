@@ -736,7 +736,7 @@ class ProductoRestControllerMvcIntegrationTest {
     }
 
     @Test
-    void updateFunkoImage() throws Exception {
+    void updateProductImage() throws Exception {
         UUID uuid = producto1.getId();
         var myLocalEndpoint = myEndpoint + "/imagen/" + uuid.toString();
 

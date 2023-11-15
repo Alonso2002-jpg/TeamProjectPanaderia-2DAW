@@ -1,5 +1,11 @@
 package org.develop.TeamProjectPanaderia.proveedores.services;
 
+import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotFoundException;
+import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotSaveException;
 import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,8 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,106 +34,153 @@ public class ProveedorServiceImplTest {
 
     @InjectMocks
     private ProveedorServiceImpl proveedorService;
-
-    private Proveedor proveedor1, proveedor;
-
-    @BeforeEach
-    void setUp() {
-        proveedor1 = Proveedor.builder()
-                .id(1L)
-                .nif("11")
-                .numero("12")
-                .nombre("Juan")
-                .build();
-        proveedor = Proveedor.builder()
-                .id(2L)
-                .nif("22")
-                .numero("21")
-                .nombre("Jose")
-                .build();
-    }
+    private CategoriaService categoriaService;
 
     @Test
-    void saveProveedor() {
-        when(proveedorRepository.save(proveedor)).thenReturn(proveedor);
+    void saveProveedores() {
+        // Arrange
+        ProveedorCreateDto proveedorCreateDto = new ProveedorCreateDto();
+        when(proveedorRepository.findByNif(proveedorCreateDto.getNif())).thenReturn(Optional.empty());
+        when(categoriaService.findByName(proveedorCreateDto.getTipo())).thenReturn(new Categoria());
 
-        Proveedor result = proveedorService.saveProveedores(proveedor);
+        // Act
+        Proveedor result = proveedorService.saveProveedores(proveedorCreateDto);
 
+        // Assert
         assertNotNull(result);
-        verify(proveedorRepository, times(1)).save(proveedor);
+        verify(proveedorRepository, times(1)).save(any());
     }
 
     @Test
-    void getProveedorById() {
-        Long proveedorId = 1L;
-        proveedor.setId(proveedorId);
-        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(proveedor));
+    void saveProveedoresConNifDuplicado() {
+        // Arrange
+        ProveedorCreateDto proveedorCreateDto = new ProveedorCreateDto();
+        when(proveedorRepository.findByNif(proveedorCreateDto.getNif())).thenReturn(Optional.of(new Proveedor()));
 
-        Optional<Proveedor> result = proveedorService.getProveedoresById(proveedorId);
-
-        assertTrue(result.isPresent());
-        assertEquals(proveedorId, result.get().getId());
-        verify(proveedorRepository, times(1)).findById(proveedorId);
+        // Act & Assert
+        assertThrows(ProveedorNotSaveException.class, () ->
+                proveedorService.saveProveedores(proveedorCreateDto)
+        );
+        verify(proveedorRepository, never()).save(any());
     }
 
     @Test
-    void deleteProveedorById() {
+    void updateProveedor() {
+        // Arrange
         Long proveedorId = 1L;
+        ProveedorUpdateDto updateDto = new ProveedorUpdateDto();
+        Proveedor existingProveedor = new Proveedor();
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(existingProveedor));
+        when(categoriaService.findByName(updateDto.getTipo())).thenReturn(new Categoria());
 
+        // Act
+        Proveedor result = proveedorService.updateProveedor(updateDto, proveedorId);
+
+        // Assert
+        assertNotNull(result);
+        verify(proveedorRepository, times(1)).save(any());
+    }
+
+    @Test
+    void updateProveedor_ProveedorNotFound() {
+        // Arrange
+        Long proveedorId = 1L;
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ProveedorNotFoundException.class, () ->
+                proveedorService.updateProveedor(new ProveedorUpdateDto(), proveedorId)
+        );
+        verify(proveedorRepository, never()).save(any());
+    }
+
+    @Test
+    void getProveedoresById() {
+        // Arrange
+        Long proveedorId = 1L;
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(new Proveedor()));
+
+        // Act
+        Proveedor result = proveedorService.getProveedoresById(proveedorId);
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    void getProveedoresById_ProveedorNotFound() {
+        // Arrange
+        Long proveedorId = 1L;
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(ProveedorNotFoundException.class, () ->
+                proveedorService.getProveedoresById(proveedorId)
+        );
+    }
+
+    @Test
+    void deleteProveedoresById() {
+        // Arrange
+        Long proveedorId = 1L;
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.of(new Proveedor()));
+
+        // Act & Assert
         assertDoesNotThrow(() -> proveedorService.deleteProveedoresById(proveedorId));
-
         verify(proveedorRepository, times(1)).deleteById(proveedorId);
     }
 
     @Test
-    void getAllProveedores() {
-        when(proveedorRepository.findAll()).thenReturn(List.of(proveedor, proveedor1));
+    void deleteProveedoresById_ProveedorNotFound() {
+        // Arrange
+        Long proveedorId = 1L;
+        when(proveedorRepository.findById(proveedorId)).thenReturn(Optional.empty());
 
-        List<Proveedor> result = proveedorService.getAllProveedores();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        verify(proveedorRepository, times(1)).findAll();
+        // Act & Assert
+        assertThrows(ProveedorNotFoundException.class, () ->
+                proveedorService.deleteProveedoresById(proveedorId)
+        );
+        verify(proveedorRepository, never()).deleteById(any());
     }
 
     @Test
-    void findProveedorByNIF() {
-        String nif = "11";
-        when(proveedorRepository.findByNIF(nif)).thenReturn(proveedor1);
+    void findProveedoresByNIF() {
+        // Arrange
+        String nif = "123";
+        when(proveedorRepository.findByNif(nif)).thenReturn(Optional.of(new Proveedor()));
 
+        // Act
         Proveedor result = proveedorService.findProveedoresByNIF(nif);
 
+        // Assert
         assertNotNull(result);
-        verify(proveedorRepository, times(1)).findByNIF(nif);
     }
 
     @Test
-    void findProveedoresByNombre() {
-        String nombre = "Juan";
-        when(proveedorRepository.findByNombre(nombre)).thenReturn(List.of(proveedor1));
+    void findProveedoresByNIF_ProveedorNotFound() {
+        // Arrange
+        String nif = "123";
+        when(proveedorRepository.findByNif(nif)).thenReturn(Optional.empty());
 
-        List<Proveedor> result = proveedorService.findProveedoresByNombre(nombre);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(proveedorRepository, times(1)).findByNombre(nombre);
+        // Act & Assert
+        assertThrows(ProveedorNotFoundException.class, () ->
+                proveedorService.findProveedoresByNIF(nif)
+        );
     }
+
     @Test
-    void updateProveedores() {
-        // Configuración
-        long proveedorId = 1L;
-        Proveedor proveedorToUpdate = Proveedor.builder()
-                .id(proveedorId)
-                .nif("11")
-                .numero("12")
-                .nombre("Juan")
-                .build();
+    void findAll_Success() {
+        // Arrange
+        Specification<Proveedor> specification = any();
+        Pageable pageable = PageRequest.of(0, 10);
+        when(proveedorRepository.findAll(specification, pageable)).thenReturn(new PageImpl<>(Collections.emptyList()));
 
-        // Llamada al método
-        Proveedor updatedProveedor = proveedorService.updateProveedores(proveedorId, proveedorToUpdate);
+        // Act
+        Page<Proveedor> result = proveedorService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
 
-        // Verificación
-        assertEquals(proveedorToUpdate, updatedProveedor);
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 }
 
