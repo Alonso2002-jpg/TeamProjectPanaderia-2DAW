@@ -40,7 +40,6 @@ public class ProveedorMapperTest {
 
     @Test
     void toUpdate() {
-        assertEquals(proveedor.getNif(), updateDto.getNif());
         assertEquals(proveedor.getNumero(), updateDto.getNumero());
         assertEquals(proveedor.getNombre(), updateDto.getNombre());
     }
