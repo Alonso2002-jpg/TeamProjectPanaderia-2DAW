@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.proveedores.repositories;
 
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.proveedores.repositories.ProveedorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

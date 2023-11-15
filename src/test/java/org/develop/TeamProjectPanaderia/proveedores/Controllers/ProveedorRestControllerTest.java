@@ -1,12 +1,12 @@
 package org.develop.TeamProjectPanaderia.proveedores.Controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorResponseDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
-import org.develop.TeamProjectPanaderia.proveedores.mapper.ProveedorMapper;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
-import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorServiceImpl;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorResponseDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;

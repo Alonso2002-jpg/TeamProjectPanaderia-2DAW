@@ -1,12 +1,12 @@
 package org.develop.TeamProjectPanaderia.producto.mappers;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoCreateDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoResponseDto;
-import org.develop.TeamProjectPanaderia.producto.dto.ProductoUpdateDto;
-import org.develop.TeamProjectPanaderia.producto.mapper.ProductoMapper;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoResponseDto;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
+import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
