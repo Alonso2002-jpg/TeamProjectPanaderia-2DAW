@@ -1,10 +1,10 @@
 package org.develop.TeamProjectPanaderia.categoria.mappers;
 
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
-import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.mapper.CategoriaMapper;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
