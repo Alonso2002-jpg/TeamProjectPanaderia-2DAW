@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class ProveedorNotFoundException extends ProveedorException {
-    public ProveedorNotFoundException(Long id){
-        super("Proveedor con id:"+id+"No encontrado");
+    public ProveedorNotFoundException(String id){
+        super("Proveedor : "+id+" no encontrado");
     }
 }

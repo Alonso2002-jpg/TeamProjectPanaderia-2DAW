@@ -58,23 +58,20 @@ public class ProveedorRepositoryTest {
     @Test
     void findByNIF() {
         // Buscar por NIF y verificar que se encuentre el proveedor correcto
-        Proveedor foundProveedor = proveedorRepository.findByNIF("22");
-        assertNotNull(foundProveedor);
-        assertEquals("22", foundProveedor.getNif());
-        assertEquals("21", foundProveedor.getNumero());
-        assertEquals("Jose", foundProveedor.getNombre());
+        Optional<Proveedor> foundProveedor = proveedorRepository.findByNif("22");
+
+        // Asegurarse de que se encontró un proveedor
+        assertTrue(foundProveedor.isPresent());
+
+        // Obtener el proveedor del Optional
+        Proveedor proveedor = foundProveedor.get();
+
+        // Verificar atributos del proveedor
+        assertEquals("22", proveedor.getNif());
+        assertEquals("21", proveedor.getNumero());
+        assertEquals("Jose", proveedor.getNombre());
     }
 
-    @Test
-    void findByNombre() {
-        // Buscar por nombre y verificar que se encuentren los proveedores correctos
-        List<Proveedor> foundProveedores = proveedorRepository.findByNombre("Juan");
-        assertNotNull(foundProveedores);
-        assertEquals(1, foundProveedores.size());
-        assertEquals("11", foundProveedores.get(0).getNif());
-        assertEquals("12", foundProveedores.get(0).getNumero());
-        assertEquals("Juan", foundProveedores.get(0).getNombre());
-    }
 
     @Test
     void findAll() {

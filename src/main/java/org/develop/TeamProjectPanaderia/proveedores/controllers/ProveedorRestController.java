@@ -1,9 +1,10 @@
 package org.develop.TeamProjectPanaderia.proveedores.controllers;
 
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotFoundException;
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotSaveException;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
-import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
+import jakarta.validation.Valid;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorResponseDto;
+import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.proveedores.mapper.ProveedorMapper;
 import org.develop.TeamProjectPanaderia.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.springframework.data.domain.PageRequest;
@@ -22,55 +23,54 @@ import java.util.Map;
 @RestController
 @RequestMapping("/proveedores")
 public class ProveedorRestController {
-    private final ProveedorRepository proveedoresRepository;
+    private final ProveedorMapper proveedorMapper;
     private final ProveedorService proveedorService;
 
-    public ProveedorRestController(ProveedorRepository proveedoresRepository, ProveedorService proveedorService) {
-        this.proveedoresRepository = proveedoresRepository;
+    public ProveedorRestController(ProveedorMapper proveedorMapper,
+                                   ProveedorService proveedorService) {
         this.proveedorService = proveedorService;
+        this.proveedorMapper = proveedorMapper;
     }
 
     // Endpoint para obtener todos los proveedores
     @GetMapping
-    public ResponseEntity<PageResponse<Proveedor>> findAll(@RequestParam(required = false) Optional<String> nif,
-                                                           @RequestParam(required = false) Optional<String> name,
-                                                           @RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size,
-                                                           @RequestParam(defaultValue = "id") String sortBy,
-                                                           @RequestParam(defaultValue = "asc") String direction){
+    public ResponseEntity<PageResponse<ProveedorResponseDto>> findAll(@RequestParam(required = false) Optional<String> nif,
+                                                                      @RequestParam(required = false) Optional<String> name,
+                                                                      @RequestParam(required = false) Optional<Boolean> isActive,
+                                                                      @RequestParam(required = false) Optional<String> tipo,
+                                                                      @RequestParam(defaultValue = "0") int page,
+                                                                      @RequestParam(defaultValue = "10") int size,
+                                                                      @RequestParam(defaultValue = "id") String sortBy,
+                                                                      @RequestParam(defaultValue = "asc") String direction){
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(PageResponse.of(proveedorService.findAll(nif, name,pageable), sortBy, direction));
+        return ResponseEntity.ok(PageResponse.of(proveedorMapper.toPageResponse(proveedorService.findAll(nif, name,isActive,tipo,pageable)), sortBy, direction));
     }
 
     // Endpoint para obtener un proveedor por su ID
     @GetMapping("/{id}")
-    public Proveedor getProveedorById(@PathVariable Long id) {
-        return proveedoresRepository.findById(id)
-                .orElseThrow(() -> new ProveedorNotFoundException(id));
+    public ResponseEntity<ProveedorResponseDto> getProveedorById(@PathVariable Long id) {
+        var proveedor = proveedorService.getProveedoresById(id);
+        return ResponseEntity.ok(proveedorMapper.toResponse(proveedor));
     }
 
     // Endpoint para crear un nuevo proveedor
     @PostMapping
-    public Proveedor createProveedor(@RequestBody Proveedor proveedor) {
-        Proveedor ProveedorGuardado = proveedoresRepository.save(proveedor);
-        if (ProveedorGuardado == null) {
-            throw new ProveedorNotSaveException("No se pudo guardar el proveedor");
-        }
-        return ProveedorGuardado;
+    public ResponseEntity<ProveedorResponseDto> createProveedor(@Valid @RequestBody ProveedorCreateDto proveedor) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(proveedorMapper.toResponse(proveedorService.saveProveedores(proveedor)));
     }
 
     // Endpoint para actualizar un proveedor existente
     @PutMapping("/{id}")
-    public Proveedor updateProveedor(@PathVariable Long id, @RequestBody Proveedor proveedor) {
-        proveedor.setId(id);
-        return proveedoresRepository.save(proveedor);
+    public ResponseEntity<ProveedorResponseDto> updateProveedor(@PathVariable Long id, @Valid @RequestBody ProveedorUpdateDto proveedor) {
+        return ResponseEntity.ok(proveedorMapper.toResponse(proveedorService.updateProveedor(proveedor,id)));
     }
 
     // Endpoint para eliminar un proveedor por su ID
     @DeleteMapping("/{id}")
-    public void deleteProveedor(@PathVariable Long id) {
-        proveedoresRepository.deleteById(id);
+    public ResponseEntity<String> deleteProveedor(@PathVariable Long id) {
+        proveedorService.deleteProveedoresById(id);
+        return ResponseEntity.noContent().build();
     }
 
     //Para mostrar los errores.
@@ -87,4 +87,3 @@ public class ProveedorRestController {
         return errors;
     }
 }
-
