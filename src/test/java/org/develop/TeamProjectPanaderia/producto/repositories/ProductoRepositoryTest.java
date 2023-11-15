@@ -1,8 +1,9 @@
 package org.develop.TeamProjectPanaderia.producto.repositories;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.producto.models.Producto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

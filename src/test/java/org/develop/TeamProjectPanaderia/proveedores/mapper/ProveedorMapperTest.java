@@ -1,9 +1,10 @@
 package org.develop.TeamProjectPanaderia.proveedores.mapper;
 
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorResponseDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorResponseDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

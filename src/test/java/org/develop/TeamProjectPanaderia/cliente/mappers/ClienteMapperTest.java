@@ -1,11 +1,11 @@
 package org.develop.TeamProjectPanaderia.cliente.mappers;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.cliente.dto.ClienteCreateDto;
-import org.develop.TeamProjectPanaderia.cliente.dto.ClienteResponseDto;
-import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
-import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
-import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteResponseDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

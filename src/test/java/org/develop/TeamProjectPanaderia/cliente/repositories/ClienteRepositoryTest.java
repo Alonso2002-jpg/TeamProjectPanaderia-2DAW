@@ -1,7 +1,8 @@
 package org.develop.TeamProjectPanaderia.cliente.repositories;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

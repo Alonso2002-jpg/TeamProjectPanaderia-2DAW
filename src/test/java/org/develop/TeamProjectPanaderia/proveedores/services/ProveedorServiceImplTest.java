@@ -1,14 +1,14 @@
 package org.develop.TeamProjectPanaderia.proveedores.services;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorCreateDto;
-import org.develop.TeamProjectPanaderia.proveedores.dto.ProveedorUpdateDto;
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotFoundException;
-import org.develop.TeamProjectPanaderia.proveedores.exceptions.ProveedorNotSaveException;
-import org.develop.TeamProjectPanaderia.proveedores.models.Proveedor;
-import org.develop.TeamProjectPanaderia.proveedores.repositories.ProveedorRepository;
-import org.junit.jupiter.api.BeforeEach;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotSaveException;
+import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
+import org.develop.TeamProjectPanaderia.rest.proveedores.repositories.ProveedorRepository;
+import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
