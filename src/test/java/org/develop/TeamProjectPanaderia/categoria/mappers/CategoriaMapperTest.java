@@ -1,12 +1,14 @@
 package org.develop.TeamProjectPanaderia.categoria.mappers;
 
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaCreateDto;
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaResponseDto;
-import org.develop.TeamProjectPanaderia.categoria.dto.CategoriaUpdateDto;
-import org.develop.TeamProjectPanaderia.categoria.mapper.CategoriaMapper;
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.mapper.CategoriaMapper;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -114,6 +116,18 @@ class CategoriaMapperTest {
                 () -> assertEquals(2, responseDtoList.size()),
                 () -> assertEquals("Panaderia", responseDtoList.get(0).nameCategory()),
                 () -> assertEquals("Electricidad", responseDtoList.get(1).nameCategory())
+        );
+    }
+
+    @Test
+    void toPageResponse(){
+        Page<CategoriaResponseDto> pageResponse = categoriaMapper.toPageResponse(new PageImpl<>(List.of(categoria)));
+
+        assertAll(
+                () -> assertNotNull(pageResponse),
+                () -> assertFalse(pageResponse.getContent().isEmpty()),
+                () -> assertEquals(1, pageResponse.getContent().size()),
+                () -> assertEquals("Panaderia", pageResponse.getContent().get(0).nameCategory())
         );
     }
 }

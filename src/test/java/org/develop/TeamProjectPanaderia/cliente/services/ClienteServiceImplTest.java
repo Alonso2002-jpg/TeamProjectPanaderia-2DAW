@@ -1,17 +1,18 @@
 package org.develop.TeamProjectPanaderia.cliente.services;
 
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
-import org.develop.TeamProjectPanaderia.categoria.exceptions.CategoriaNotFoundException;
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.categoria.services.CategoriaService;
-import org.develop.TeamProjectPanaderia.cliente.dto.ClienteCreateDto;
-import org.develop.TeamProjectPanaderia.cliente.dto.ClienteUpdateDto;
-import org.develop.TeamProjectPanaderia.cliente.exceptions.ClienteNotFoundException;
-import org.develop.TeamProjectPanaderia.cliente.mapper.ClienteMapper;
-import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
-import org.develop.TeamProjectPanaderia.cliente.repositories.ClienteRepository;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
+import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteServiceImpl;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ public class ClienteServiceImplTest {
     @Mock
     private ClienteMapper clienteMapper;
     @Mock
-    private  ClienteServiceImpl clienteService;
+    private ClienteServiceImpl clienteService;
     @Mock
     private WebSocketConfig webSocketConfig;
     @Mock

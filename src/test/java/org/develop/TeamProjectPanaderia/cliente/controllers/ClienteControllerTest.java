@@ -1,8 +1,9 @@
 package org.develop.TeamProjectPanaderia.cliente.controllers;
 
-import org.develop.TeamProjectPanaderia.categoria.models.Categoria;
-import org.develop.TeamProjectPanaderia.cliente.models.Cliente;
-import org.develop.TeamProjectPanaderia.cliente.services.ClienteService;
+import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.cliente.controllers.ClienteRestController;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
