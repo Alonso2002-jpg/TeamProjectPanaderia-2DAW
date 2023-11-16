@@ -1,10 +1,12 @@
 package org.develop.TeamProjectPanaderia.rest.proveedores.services;
 
 import jakarta.persistence.criteria.Join;
+import jakarta.transaction.Transactional;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotDeletedException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
@@ -60,9 +62,14 @@ public class ProveedorServiceImpl implements ProveedorService {
     }
 
     @Override
+    @Transactional
     public void deleteProveedoresById(Long id) {
-        getProveedoresById(id);
-        proveedoresRepository.deleteById(id);
+        Proveedor proveedor = getProveedoresById(id);
+        if(proveedoresRepository.existsProductById(id)) {
+            throw new ProveedorNotDeletedException(id);
+        } else {
+            proveedoresRepository.deleteById(id);
+        }
     }
 
     @Override

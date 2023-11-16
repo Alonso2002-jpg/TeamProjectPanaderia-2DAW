@@ -1,11 +1,10 @@
 package org.develop.TeamProjectPanaderia.categoria.controllers;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.develop.TeamProjectPanaderia.rest.categoria.controllers.CategoriaRestController;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotDeleteException;
 import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.categoria.mapper.CategoriaMapper;
@@ -15,105 +14,77 @@ import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
 class CategoriaRestControllerTest {
 
-    private final String initEndPoint = "/categoria";
     private Categoria categoria1, categoria2;
-    private CategoriaResponseDto categoriaResponseDto, categoriaResponseDto2;
-    private final ObjectMapper mapper = new ObjectMapper();
+    private CategoriaResponseDto categoriaResponseDto1, categoriaResponseDto2;
 
-     @Autowired
-     MockMvc mockMvc;
-     @MockBean
-     private CategoriaService categoriaService;
-     @MockBean
-     private CategoriaMapper categoriaMapper;
-     @Autowired
-     private JacksonTester<CategoriaCreateDto> jsonCreateDto;
-     @Autowired
-     private JacksonTester<CategoriaUpdateDto> jsonUpdateDto;
-
-     @Autowired
-    public CategoriaRestControllerTest(CategoriaService categoriaService, CategoriaMapper categoriaMapper) {
-        this.categoriaService = categoriaService;
-        this.categoriaMapper = categoriaMapper;
-
-        mapper.registerModule(new JavaTimeModule());
-    }
+    @Mock
+    private CategoriaMapper categoriaMapper;
+    @Mock
+    private CategoriaService categoriaService;
+    @InjectMocks
+    private CategoriaRestController categoriaRestController;
 
     @BeforeEach
-    void setup(){
-         categoria1 = Categoria.builder()
-                 .nameCategory("Panaderia")
-                 .isActive(true)
-                 .build();
-         categoria2 = Categoria.builder()
-                 .nameCategory("Charcuteria")
-                 .isActive(false)
-                 .build();
+    void setup() {
+        categoria1 = Categoria.builder()
+                .id(1L)
+                .nameCategory("TestCategory")
+                .isActive(true)
+                .build();
+        categoria2 = Categoria.builder()
+                .id(2L)
+                .nameCategory("TestCategory2")
+                .isActive(false)
+                .build();
 
-         categoriaResponseDto = new CategoriaResponseDto(
-                 "Panaderia",
-                 LocalDate.now().toString(),
-                 LocalDate.now().toString(),
-                 true
-         );
-         categoriaResponseDto2 = new CategoriaResponseDto(
-                 "Charcuteria",
-                 LocalDate.now().toString(),
-                 LocalDate.now().toString(),
-                 false
-         );
+        categoriaResponseDto1 = new CategoriaResponseDto(
+                "TestCategory",
+                LocalDate.now().toString(),
+                LocalDate.now().toString(),
+                true
+        );
+        categoriaResponseDto2 = new CategoriaResponseDto(
+                "TestCategory2",
+                LocalDate.now().toString(),
+                LocalDate.now().toString(),
+                false
+        );
     }
-
     @Test
-    void getAll() throws Exception {
+    void findAll() {
         List<Categoria> categoriasList =List.of(categoria1,categoria2);
-        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto1,categoriaResponseDto2);
         Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
         Page<Categoria> responsePage = new PageImpl<>(categoriasList);
         Page<CategoriaResponseDto> responseDtos = new PageImpl<>(categoriaResponseList);
 
-        when(categoriaService.findAll(Optional.empty(),Optional.empty(),pageable)).thenReturn(responsePage);
+        when(categoriaService.findAll(Optional.empty(), Optional.empty(),pageable)).thenReturn(responsePage);
         when(categoriaMapper.toPageResponse(responsePage)).thenReturn(responseDtos);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                get(initEndPoint)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        PageResponse<CategoriaResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
+        ResponseEntity<PageResponse<CategoriaResponseDto>> res = categoriaRestController.findAll(Optional.empty(), Optional.empty(),0 , 10, "id", "asc");
 
         // Assert
         assertAll("findall",
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
+                () -> assertNotNull(res.getBody()),
+                () -> assertEquals(200, res.getStatusCode().value()),
+                () -> assertEquals(2, res.getBody().content().size())
         );
 
         verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.empty(),pageable);
@@ -121,240 +92,192 @@ class CategoriaRestControllerTest {
     }
 
     @Test
-    void getAllName() throws Exception {
-        var localEndPoint= initEndPoint + "?name=Panaderia";
-        List<Categoria> categoriasList =List.of(categoria1,categoria2);
-        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
+    void findAllByIsActive(){
+        List<Categoria> categoriasList =List.of(categoria1);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto1);
         Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
-        Page<Categoria> responsePageCat = new PageImpl<>(categoriasList);
-        Page<CategoriaResponseDto> responsePageDto = new PageImpl<>(categoriaResponseList);
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
+        Page<CategoriaResponseDto> responseDtos = new PageImpl<>(categoriaResponseList);
 
-        when(categoriaService.findAll(Optional.empty(),Optional.of("Panaderia"),pageable)).thenReturn(responsePageCat);
-        when(categoriaMapper.toPageResponse(responsePageCat)).thenReturn(responsePageDto);
+        when(categoriaService.findAll(Optional.of(true), Optional.empty(),pageable)).thenReturn(responsePage);
+        when(categoriaMapper.toPageResponse(responsePage)).thenReturn(responseDtos);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                get(localEndPoint)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        ResponseEntity<PageResponse<CategoriaResponseDto>> res = categoriaRestController.findAll(Optional.of(true), Optional.empty(),0 , 10, "id", "asc");
 
-        PageResponse<CategoriaResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
-        );
-
-        verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.of("Panaderia"),pageable);
-        verify(categoriaMapper,times(1)).toPageResponse(responsePageCat);
-    }
-    @Test
-    void getAllisActive() throws Exception {
-        var localEndPoint= initEndPoint + "?isActive=true";
-        List<Categoria> categoriaList = List.of(categoria1,categoria2);
-        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
-        Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
-        Page<Categoria> responsePageCat = new PageImpl<>(categoriaList);
-        Page<CategoriaResponseDto> responsePage = new PageImpl<>(categoriaResponseList);
-
-        when(categoriaService.findAll(Optional.of(true),Optional.empty(),pageable)).thenReturn(responsePageCat);
-        when(categoriaMapper.toPageResponse(responsePageCat)).thenReturn(responsePage);
-
-        MockHttpServletResponse response = mockMvc.perform(
-                get(localEndPoint)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-        PageResponse<CategoriaResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
+        // Assert
+        assertAll("findall",
+                () -> assertNotNull(res.getBody()),
+                () -> assertEquals(200, res.getStatusCode().value()),
+                () -> assertEquals(1, res.getBody().content().size())
         );
 
         verify(categoriaService,times(1)).findAll(Optional.of(true),Optional.empty(),pageable);
-        verify(categoriaMapper,times(1)).toPageResponse(responsePageCat);
+        verify(categoriaMapper,times(1)).toPageResponse(responsePage);
     }
 
     @Test
-    void getAllIsActiveAndName() throws Exception {
-        var localEndPoint = initEndPoint + "?isActive=true&name=Panaderia";
-        List<Categoria> categoriasList = List.of(categoria1,categoria2);
-        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto,categoriaResponseDto2);
+    void findAllByName(){
+        List<Categoria> categoriasList =List.of(categoria2);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto2);
         Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
-        Page<Categoria> responsePageCat = new PageImpl<>(categoriasList);
-        Page<CategoriaResponseDto> responsePageDto = new PageImpl<>(categoriaResponseList);
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
+        Page<CategoriaResponseDto> responseDtos = new PageImpl<>(categoriaResponseList);
 
-        when(categoriaService.findAll(Optional.of(true),Optional.of("Panaderia"),pageable)).thenReturn(responsePageCat);
-        when(categoriaMapper.toPageResponse(responsePageCat)).thenReturn(responsePageDto);
+        when(categoriaService.findAll(Optional.empty(), Optional.of("TestCategory2"),pageable)).thenReturn(responsePage);
+        when(categoriaMapper.toPageResponse(responsePage)).thenReturn(responseDtos);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                get(localEndPoint)
-                .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        ResponseEntity<PageResponse<CategoriaResponseDto>> res = categoriaRestController.findAll(Optional.empty(), Optional.of("TestCategory2"),0 , 10, "id", "asc");
 
-        PageResponse<CategoriaResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
-
-        assertAll(
-                () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(2, res.content().size())
+        // Assert
+        assertAll("findall",
+                () -> assertNotNull(res.getBody()),
+                () -> assertEquals(200, res.getStatusCode().value()),
+                () -> assertEquals(1, res.getBody().content().size())
         );
 
-        verify(categoriaService,times(1)).findAll(Optional.of(true),Optional.of("Panaderia"),pageable);
-        verify(categoriaMapper,times(1)).toPageResponse(responsePageCat);
+        verify(categoriaService,times(1)).findAll(Optional.empty(),Optional.of("TestCategory2"),pageable);
+        verify(categoriaMapper,times(1)).toPageResponse(responsePage);
+    }
+
+    @Test
+    void findAllByIsActiveAndName(){
+        List<Categoria> categoriasList =List.of(categoria1,categoria2);
+        List<CategoriaResponseDto> categoriaResponseList = List.of(categoriaResponseDto1,categoriaResponseDto2);
+        Pageable pageable = PageRequest.of(0,10, Sort.by("id").ascending());
+        Page<Categoria> responsePage = new PageImpl<>(categoriasList);
+        Page<CategoriaResponseDto> responseDtos = new PageImpl<>(categoriaResponseList);
+
+        when(categoriaService.findAll(Optional.of(true), Optional.of("TestCategory"),pageable)).thenReturn(responsePage);
+        when(categoriaMapper.toPageResponse(responsePage)).thenReturn(responseDtos);
+
+        ResponseEntity<PageResponse<CategoriaResponseDto>> res = categoriaRestController.findAll(Optional.of(true), Optional.of("TestCategory"),0 , 10, "id", "asc");
+
+        // Assert
+        assertAll("findall",
+                () -> assertNotNull(res.getBody()),
+                () -> assertEquals(200, res.getStatusCode().value()),
+                () -> assertEquals(2, res.getBody().content().size())
+        );
+
+        verify(categoriaService,times(1)).findAll(Optional.of(true), Optional.of("TestCategory"),pageable);
+        verify(categoriaMapper,times(1)).toPageResponse(responsePage);
     }
     @Test
-    void findById() throws Exception {
-         var localEndPoint = initEndPoint + "/1";
+    void findById() {
         when(categoriaService.findById(1L)).thenReturn(categoria1);
-        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto);
+        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto1);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                get(localEndPoint)
-                        .accept(MediaType.APPLICATION_JSON)).andReturn().getResponse();
-
-        CategoriaResponseDto responseDto = mapper.readValue(response.getContentAsString(),
-                mapper.getTypeFactory().constructType(CategoriaResponseDto.class));
+        ResponseEntity<CategoriaResponseDto> res = categoriaRestController.findById(1L);
 
         assertAll(
-                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
-                () -> assertEquals(categoria1.getNameCategory(), responseDto.nameCategory())
+                () -> assertEquals(HttpStatus.OK.value(), res.getStatusCode().value()),
+                () -> assertEquals(categoria1.getNameCategory(), res.getBody().nameCategory())
         );
 
         verify(categoriaService,times(1)).findById(1L);
     }
 
     @Test
-    void findByIdError() throws Exception {
-        var localEndPoint = initEndPoint + "/100";
+    void findByIdError(){
 
         when(categoriaService.findById(100L)).thenThrow(new CategoriaNotFoundException("id " + 100L));
 
-        MockHttpServletResponse response = mockMvc.perform(
-                get(localEndPoint)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        var res = assertThrows(CategoriaNotFoundException.class, () -> categoriaRestController.findById(100L));
 
-        assertEquals(404,response.getStatus());
+        assertEquals("Categoria not found with id 100", res.getMessage());
 
         verify(categoriaService,times(1)).findById(100L);
     }
 
     @Test
-    void postCategoria() throws Exception {
-         CategoriaCreateDto categoria = new CategoriaCreateDto("Panaderia",true);
+    void postCategoria() {
+        CategoriaCreateDto categoria = new CategoriaCreateDto("Panaderia",true);
 
         when(categoriaService.save(categoria)).thenReturn(categoria1);
-        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto);
+        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto1);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                post(initEndPoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(categoria))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
 
-        CategoriaResponseDto responseDto = mapper.readValue(response.getContentAsString(),
-                mapper.getTypeFactory().constructType(CategoriaResponseDto.class));
+        ResponseEntity<CategoriaResponseDto> res = categoriaRestController.postCategoria(categoria);
 
         assertAll(
-                () -> assertEquals(HttpStatus.CREATED.value(), response.getStatus()),
-                () -> assertEquals(categoria1.getNameCategory(), responseDto.nameCategory())
+                () -> assertEquals(HttpStatus.CREATED.value(), res.getStatusCode().value()),
+                () -> assertEquals(categoria1.getNameCategory(), res.getBody().nameCategory())
         );
 
         verify(categoriaService,times(1)).save(categoria);
     }
 
     @Test
-    void postCategoriaError() throws Exception {
+    void postCategoriaError(){
         CategoriaCreateDto categoria = new CategoriaCreateDto("Panaderia",true);
-        when(categoriaService.save(categoria)).thenThrow(new CategoriaNotSaveException("Category already exists"));
 
-        MockHttpServletResponse response = mockMvc.perform(
-                post(initEndPoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(categoria))
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        when(categoriaService.save(categoria)).thenThrow(new CategoriaNotSaveException("Category with name Panaderia already exists"));
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(),response.getStatus());
+        var res = assertThrows(CategoriaNotSaveException.class, () -> categoriaRestController.postCategoria(categoria));
+
+        assertEquals("Category with name Panaderia already exists", res.getMessage());
 
         verify(categoriaService,times(1)).save(categoria);
     }
 
     @Test
-    void putCategoria() throws Exception {
-        var localEndPoint = initEndPoint + "/1";
+    void putCategoria() {
         CategoriaUpdateDto categoria = new CategoriaUpdateDto(categoria1.getNameCategory(),true);
         when(categoriaService.update(1L,categoria)).thenReturn(categoria1);
-        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto);
+        when(categoriaMapper.toResponse(categoria1)).thenReturn(categoriaResponseDto1);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                put(localEndPoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonUpdateDto.write(categoria).getJson())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
-
-        CategoriaResponseDto responseDto = mapper.readValue(response.getContentAsString(),
-                mapper.getTypeFactory().constructType(CategoriaResponseDto.class));
+        ResponseEntity<CategoriaResponseDto> res = categoriaRestController.putCategoria(1L,categoria);
 
         assertAll(
-                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
-                () -> assertEquals(categoria1.getNameCategory(), responseDto.nameCategory())
+                () -> assertEquals(HttpStatus.OK.value(), res.getStatusCode().value()),
+                () -> assertEquals(categoria1.getNameCategory(), res.getBody().nameCategory())
         );
 
         verify(categoriaService,times(1)).update(1L,categoria);
     }
 
     @Test
-    void putCategoriaError() throws Exception {
-        var localEndPoint = initEndPoint + "/1";
+    void putCategoriaError(){
         CategoriaUpdateDto categoria = new CategoriaUpdateDto(categoria1.getNameCategory(),true);
-        when(categoriaService.update(1L,categoria)).thenThrow(new CategoriaNotFoundException("id " + 1L));
+        when(categoriaService.update(100L,categoria)).thenThrow(new CategoriaNotFoundException("id " + 100L));
 
-        MockHttpServletResponse response = mockMvc.perform(
-                put(localEndPoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonUpdateDto.write(categoria).getJson())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        var res = assertThrows(CategoriaNotFoundException.class, () -> categoriaRestController.putCategoria(100L,categoria));
 
-        assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
+        assertEquals("Categoria not found with id 100", res.getMessage());
 
-        verify(categoriaService,times(1)).update(1L,categoria);
+        verify(categoriaService,times(1)).update(100L,categoria);
     }
 
     @Test
-    void deleteById() throws Exception {
-        var localEndPoint = initEndPoint + "/1";
+    void deleteById() {
         doNothing().when(categoriaService).deleteById(1L);
 
-        MockHttpServletResponse response = mockMvc.perform(
-            delete(localEndPoint)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        var res = categoriaRestController.deleteById(1L);
 
-        assertEquals(204,response.getStatus());
+        assertEquals(204,res.getStatusCode().value());
 
         verify(categoriaService,times(1)).deleteById(1L);
     }
 
     @Test
-    void deleteNotFound() throws Exception {
-        var localEndPoint = initEndPoint + "/100";
+    void deleteByIdErrorNotFound(){
         doThrow(new CategoriaNotFoundException("id " + 100L)).when(categoriaService).deleteById(100L);
 
-        MockHttpServletResponse response = mockMvc.perform(
-                delete(localEndPoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andReturn().getResponse();
+        var res = assertThrows(CategoriaNotFoundException.class, () -> categoriaRestController.deleteById(100L));
 
-        assertEquals(404, response.getStatus());
+        assertEquals("Categoria not found with id 100", res.getMessage());
 
-        verify(categoriaService, times(1)).deleteById(100L);
+        verify(categoriaService,times(1)).deleteById(100L);
+    }
+
+    @Test
+    void deleteByIdErrorCategoryExists(){
+        doThrow(new CategoriaNotDeleteException("Category cant be deleted because has something")).when(categoriaService).deleteById(100L);
+
+        var res = assertThrows(CategoriaNotDeleteException.class, () -> categoriaRestController.deleteById(100L));
+
+        assertEquals("Category cant be deleted because has something", res.getMessage());
+
+        verify(categoriaService,times(1)).deleteById(100L);
     }
 }

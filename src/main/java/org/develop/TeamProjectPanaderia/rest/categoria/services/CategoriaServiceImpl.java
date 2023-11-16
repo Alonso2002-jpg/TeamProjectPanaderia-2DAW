@@ -9,6 +9,7 @@ import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotDeleteException;
 import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.categoria.mapper.CategoriaMapper;
@@ -16,6 +17,10 @@ import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.repositories.CategoriaRepository;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
+import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
+import org.develop.TeamProjectPanaderia.rest.personal.repositories.PersonalRepository;
+import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
+import org.develop.TeamProjectPanaderia.rest.proveedores.repositories.ProveedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,12 +35,18 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "categorias")
 public class CategoriaServiceImpl implements CategoriaService{
     private final CategoriaRepository categoriaRepository;
+    private final ClienteRepository clienteRepository;
+    private final PersonalRepository personalRepository;
+    private final ProductoRepository productoRepository;
+    private final ProveedorRepository proveedorRepository;
     private final CategoriaMapper categoriaMapper;
     private final WebSocketConfig webSocketConfig;
     private WebSocketHandler webSocketHandler;
@@ -44,15 +55,25 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Autowired
     public CategoriaServiceImpl(CategoriaRepository categoriaRepository,
+                                ClienteRepository clienteRepository,
+                                PersonalRepository personalRepository,
+                                ProductoRepository productoRepository,
+                                ProveedorRepository proveedorRepository,
                                 CategoriaMapper categoriaMapper,
                                 WebSocketConfig webSocketConfig,
-                                WebSocketHandler webSocketHandler,
                                 ObjectMapper objMapper,
                                 NotificacionMapper notificacionMapper) {
         this.categoriaRepository = categoriaRepository;
+        this.personalRepository = personalRepository;
+        this.proveedorRepository = proveedorRepository;
+        this.productoRepository = productoRepository;
+        this.clienteRepository = clienteRepository;
         this.categoriaMapper = categoriaMapper;
+
+        //Notificaciones
         this.webSocketConfig = webSocketConfig;
-        this.webSocketHandler = webSocketHandler;
+        webSocketConfig.setUrlAndEntity("categoria","Categoria");
+        this.webSocketHandler = webSocketConfig.webSocketHandler();
         this.objMapper = objMapper;
         this.notificacionMapper = notificacionMapper;
     }
@@ -92,6 +113,9 @@ public class CategoriaServiceImpl implements CategoriaService{
     @CachePut
     public Categoria update(Long id, CategoriaUpdateDto categoria) {
         var categoriaUpd = findById(id);
+        if (!categoriaUpd.getNameCategory().equalsIgnoreCase(categoria.nameCategory()) && categoriaRepository.findByNameCategoryIgnoreCase(categoria.nameCategory()).isPresent()){
+            throw new CategoriaNotSaveException("Category with this name already exists");
+        }
         var category = categoriaMapper.toCategoria(categoria,categoriaUpd);
         onChange(Notificacion.Tipo.UPDATE, category);
         return categoriaRepository.save(category);
@@ -108,9 +132,23 @@ public class CategoriaServiceImpl implements CategoriaService{
     }
 
     @Override
+    public void categoryExistsSomewhere(Long id) {
+        if (categoriaRepository.existsProveedorByID(id)){
+            throw new CategoriaNotDeleteException("Categoria cant be deleted because it has Proveedores");
+        } else if (categoriaRepository.existsProductoById(id)) {
+            throw new CategoriaNotDeleteException("Categoria cant be deleted because it has Productos");
+        }else if (categoriaRepository.existsClienteById(id)){
+            throw new CategoriaNotDeleteException("Categoria cant be deleted because it has Clientes");
+        } else if (categoriaRepository.existsPersonalById(id)) {
+            throw new CategoriaNotDeleteException("Categoria cant be deleted because it has Personals");
+        }
+    }
+
+    @Override
     @CacheEvict
     public void deleteById(Long id) {
         var category = findById(id);
+        categoryExistsSomewhere(id);
         onChange(Notificacion.Tipo.DELETE, category);
         categoriaRepository.deleteById(id);
     }

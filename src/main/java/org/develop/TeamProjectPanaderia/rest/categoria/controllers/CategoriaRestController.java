@@ -27,7 +27,6 @@ public class CategoriaRestController {
     private final CategoriaService categoriaService;
     private final CategoriaMapper categoriaMapper;
 
-    @Autowired
     public CategoriaRestController(CategoriaService categoriaService, CategoriaMapper categoriaMapper) {
         this.categoriaService = categoriaService;
         this.categoriaMapper = categoriaMapper;

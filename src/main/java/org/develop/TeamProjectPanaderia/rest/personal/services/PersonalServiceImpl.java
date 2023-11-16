@@ -115,12 +115,13 @@ public class PersonalServiceImpl implements PersonalService {
         var personalUpd = this.findById(id);
         Categoria categoria = null;
         if (personalDto.seccion() != null && !personalDto.seccion().isEmpty()) {
-            categoria = categoriaService.findByName(personalDto.seccion());
+            categoria= categoriaService.findByName(personalDto.seccion());
         } else {
             categoria = personalUpd.getSeccion();
         }
         return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd, categoria));
     }
+
 
     @Override
     @Cacheable
