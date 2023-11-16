@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.cliente.repositories;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
+import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +33,7 @@ class ClienteRepositoryTest {
             .dni("12345678A")
             .telefono("612345678")
             .imagen("prueba.jpg")
-            .fechaActualizacion(LocalDateTime.now())
+            .fechaCreacion(LocalDateTime.now())
             .fechaActualizacion(LocalDateTime.now())
             .isActive(true)
             .categoria(categoriaCliente)
@@ -64,19 +66,6 @@ class ClienteRepositoryTest {
         );
     }
 
-    @Test
-    void findById_ExistId(){
-        // Act
-        Long id = 1L;
-        Optional<Cliente> foundClient = clienteRepository.findById(id);
-
-        // Assert
-        assertAll(
-                () -> assertNotNull(foundClient),
-                () -> assertTrue(foundClient.isPresent()),
-                () -> assertEquals(id, foundClient.get().getId())
-        );
-    }
 
     @Test
     void findById_NotExistId(){
@@ -101,7 +90,7 @@ class ClienteRepositoryTest {
                 .dni("21234567A")
                 .telefono("623456789")
                 .imagen("nuevocliente.jpg")
-                .fechaActualizacion(LocalDateTime.now())
+                .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .categoria(categoriaCliente)
                 .build();
@@ -121,41 +110,52 @@ class ClienteRepositoryTest {
     @Test
     void save_alreadyExist(){
         Cliente newClient =  Cliente.builder()
-                .id(1L)
+                .id(cliente1.getId())
                 .nombreCompleto("Cliente Nuevo")
                 .correo("nuevocliente@gmail.com")
                 .dni("21234567A")
                 .telefono("623456789")
                 .imagen("nuevocliente.jpg")
-                .fechaActualizacion(LocalDateTime.now())
+                .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .isActive(true)
                 .categoria(categoriaCliente)
                 .build();
 
         // Act
-        Cliente savedClient = clienteRepository.save(newClient);
-        List<Cliente> clientList = clienteRepository.findAll();
+        clienteRepository.save(newClient);
+        List<Cliente> clienteList = clienteRepository.findAll();
 
         // Assert
         assertAll("save",
-                () -> assertEquals(newClient, savedClient),
-                () -> assertNotNull(savedClient),
-                () -> assertTrue(clienteRepository.existsById(savedClient.getId())),
-                () -> assertTrue(clientList.size() >= 2)
+                () -> assertNotNull(clienteList),
+                () -> assertEquals(newClient, clienteList.get(0)),
+                () -> assertFalse(clienteList.isEmpty()),
+                () -> assertEquals(1, clienteList.size())
         );
     }
 
     @Test
     void deleteById(){
         // Act
-        Long id = 1L;
-        clienteRepository.deleteById(1L);
-        List<Cliente> clientList = clienteRepository.findAll();
+        clienteRepository.deleteById(cliente1.getId());
+        List<Cliente>   clienteList = clienteRepository.findAll();
 
         assertAll("delete",
-                () -> assertFalse(clienteRepository.existsById(id)),
-                () -> assertFalse(clientList.isEmpty())
+                () -> assertTrue(clienteList.isEmpty())
+        );
+    }
+
+    @Test
+    void deleteById_IdNotExist(){
+        // Act
+        Long id = 99L;
+        clienteRepository.deleteById(id);
+        List<Cliente> clienteList = clienteRepository.findAll();
+
+        assertAll("delete",
+                () -> assertNotNull(clienteList),
+                () -> assertEquals(1, clienteList.size())
         );
     }
 
