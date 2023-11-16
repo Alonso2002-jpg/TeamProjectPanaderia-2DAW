@@ -103,9 +103,9 @@ public class ProductoServiceImpl implements ProductoService{
 
         // Criterio de busqueda por proveedor
         Specification<Producto> specProveedorProducto = (root, query, criteriaBuilder) ->
-                categoria.map(c ->{
+                proveedor.map(c ->{
                     Join<Producto, Proveedor> proveedorJoin = root.join("proveedor");
-                    return criteriaBuilder.like(criteriaBuilder.lower(proveedorJoin.get("NIF")), "%" + c.toLowerCase() + "%");
+                    return criteriaBuilder.like(criteriaBuilder.lower(proveedorJoin.get("nif")), "%" + c.toLowerCase() + "%");
                 }).orElseGet(() -> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
 
         Specification<Producto> criterio = Specification.where(specNombreProducto)
