@@ -66,6 +66,7 @@ public class ProductoServiceImpl implements ProductoService{
         this.productoMapper = productoMapper;
         this.storageService = storageService;
         this.webSocketConfig = webSocketConfig;
+        webSocketConfig.setUrlAndEntity("producto", "Producto");
         webSocketService = webSocketConfig.webSocketHandler();
         this.mapper = mapper;
         this.productoNotificacionMapper = productoNotificacionMapper;

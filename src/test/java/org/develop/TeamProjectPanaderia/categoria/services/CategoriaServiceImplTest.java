@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.categoria.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
+import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
@@ -33,6 +34,8 @@ class CategoriaServiceImplTest {
 
     private WebSocketHandler webSocketHandler = mock(WebSocketHandler.class);
     private ObjectMapper objectMapper = mock(ObjectMapper.class);
+    @Mock
+    private WebSocketConfig webSocketConfig;
     @Mock
     private CategoriaRepository categoriaRepository;
     @Mock
