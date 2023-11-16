@@ -56,17 +56,17 @@ INSERT INTO Personal (id, dni, nombre, seccion, active)
 VALUES (UUID(),'56789123E', 'Carlos Martínez', 7, true);
 
 --INSERTS CLIENTES
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, imagen, categoria_id, is_active)
-VALUES ('Laura González', 'laura@example.com', '12345678A', '612345678', 'imagen1.jpg', 9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
+VALUES ('Laura González', 'laura@example.com', '12345678A', '612345678',9, true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, imagen, categoria_id, is_active)
-VALUES ('Pablo Pérez', 'pablo@example.com', '23456789B', '655432167', 'imagen2.jpg', 9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
+VALUES ('Pablo Pérez', 'pablo@example.com', '23456789B', '655432167', 9, true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, imagen, categoria_id, is_active)
-VALUES ('María Rodríguez', 'maria@example.com', '34567891C', '699876543', 'imagen3.jpg', 8, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
+VALUES ('María Rodríguez', 'maria@example.com', '34567891C', '699876543', 8, true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, imagen, categoria_id, is_active)
-VALUES ('Carlos Martínez', 'carlos@example.com', '45678912D', '666123456', 'imagen4.jpg', 9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, is_active)
+VALUES ('Carlos Martínez', 'carlos@example.com', '45678912D', '666123456', 9, true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, imagen, categoria_id, is_active)
-VALUES ('Lucía Sánchez', 'lucia@example.com', '56789123E', '677654321', 'imagen5.jpg', 8, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, is_active)
+VALUES ('Lucía Sánchez', 'lucia@example.com', '56789123E', '677654321',  8, true);
