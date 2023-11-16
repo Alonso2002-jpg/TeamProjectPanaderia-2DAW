@@ -28,7 +28,7 @@ public class WebSocketHandler extends TextWebSocketHandler implements SubProtoco
         log.info("Conexión establecida con el servidor");
         log.info("Sesión: " + session);
         sessions.add(session);
-        TextMessage message = new TextMessage("Updates Web socket: " + entity + " - Funkos Spring JPA");
+        TextMessage message = new TextMessage("Updates Web socket: Panaderia Pepitos");
         log.info("Servidor envía: {}", message);
         session.sendMessage(message);
     }

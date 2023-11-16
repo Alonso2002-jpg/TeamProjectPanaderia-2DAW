@@ -43,10 +43,6 @@ import java.util.stream.Stream;
 @CacheConfig(cacheNames = "categorias")
 public class CategoriaServiceImpl implements CategoriaService{
     private final CategoriaRepository categoriaRepository;
-    private final ClienteRepository clienteRepository;
-    private final PersonalRepository personalRepository;
-    private final ProductoRepository productoRepository;
-    private final ProveedorRepository proveedorRepository;
     private final CategoriaMapper categoriaMapper;
     private final WebSocketConfig webSocketConfig;
     private WebSocketHandler webSocketHandler;
@@ -55,19 +51,11 @@ public class CategoriaServiceImpl implements CategoriaService{
 
     @Autowired
     public CategoriaServiceImpl(CategoriaRepository categoriaRepository,
-                                ClienteRepository clienteRepository,
-                                PersonalRepository personalRepository,
-                                ProductoRepository productoRepository,
-                                ProveedorRepository proveedorRepository,
                                 CategoriaMapper categoriaMapper,
                                 WebSocketConfig webSocketConfig,
                                 ObjectMapper objMapper,
                                 NotificacionMapper notificacionMapper) {
         this.categoriaRepository = categoriaRepository;
-        this.personalRepository = personalRepository;
-        this.proveedorRepository = proveedorRepository;
-        this.productoRepository = productoRepository;
-        this.clienteRepository = clienteRepository;
         this.categoriaMapper = categoriaMapper;
 
         //Notificaciones
