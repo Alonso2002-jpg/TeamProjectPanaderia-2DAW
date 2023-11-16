@@ -9,6 +9,7 @@ import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
@@ -202,7 +203,7 @@ public class ClienteServiceTest{
         verify(clienteRepository, times(1)).findById(id);
     }
 
-   /** @Test
+    @Test
     void findById_IdFalse() { //Error
         // Arrange
         Long id = 99L;
@@ -211,10 +212,10 @@ public class ClienteServiceTest{
 
         // Act
         var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.findById(id));
-        assertEquals("Cliente con id " + id +" no encontrado", res.getMessage());
+        assertEquals("Cliente not found with id " + id, res.getMessage());
 
         verify(clienteRepository, times(1)).findById(id);
-    }*/
+    }
 
     @Test
     void findByDni(){
@@ -234,7 +235,7 @@ public class ClienteServiceTest{
     }
 
 
-   /** @Test
+   @Test
     void findByDniNotExist(){
         // Arrange
         String dniNoExiste = "dni_falso";
@@ -243,11 +244,11 @@ public class ClienteServiceTest{
 
         // Act & Assert
         var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.findByDni(dniNoExiste));
-        assertEquals("Cliente con DNI " + dniNoExiste + " no encontrado", res.getMessage());
+        assertEquals("Cliente con dni " + dniNoExiste + " no encontrado", res.getMessage());
 
         // Verify
         verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase(dniNoExiste);
-    }*/
+    }
 
    @Test
    void save() throws IOException {
@@ -304,7 +305,7 @@ public class ClienteServiceTest{
     }
 
 
-    /**@Test
+    @Test
     void update() throws IOException {
         // Arrange
         Long id = cliente1.getId();
@@ -319,7 +320,6 @@ public class ClienteServiceTest{
         when(clienteRepository.findById(id)).thenReturn(Optional.of(cliente1));
         when(clienteRepository.save(cliente1)).thenReturn(cliente1);
         when(clienteMapper.toCliente(clienteUpdateDto, cliente1, categoriaCliente)).thenReturn(cliente1);
-        when(categoriaService.findByName(clienteUpdateDto.getCategoria())).thenReturn(categoriaCliente);
         doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
@@ -333,12 +333,11 @@ public class ClienteServiceTest{
 
         verify(clienteRepository, times(1)).findById(id);
         verify(clienteRepository, times(1)).save(cliente1);
-        verify(categoriaService, times(1)).findByName(clienteUpdateDto.getCategoria());
         verify(clienteMapper, times(1)).toCliente(clienteUpdateDto, cliente1, categoriaCliente);
-    }*/
+    }
 
 
-   /** @Test
+    @Test
     void update_IdNotExist() {
         // Arrange
         Long id = cliente1.getId();
@@ -352,10 +351,10 @@ public class ClienteServiceTest{
 
         // Act & Assert
         var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.update(id,clienteUpdateDto));
-        assertEquals("Cliente con id " + id + " no encontrado", res.getMessage());
+        assertEquals("Cliente not found with id " + id, res.getMessage());
 
         verify(clienteRepository, times(1)).findById(id);
-    }*/
+    }
 
    @Test
    void update_CategoryNotExist() {
@@ -395,7 +394,7 @@ public class ClienteServiceTest{
         verify(clienteRepository, times(1)).deleteById(id);
     }
 
-    /**@Test
+    @Test
     void deleteById_idNotExist(){
 
         // Arrange
@@ -405,11 +404,11 @@ public class ClienteServiceTest{
 
         // Act
         var res = assertThrows(ClienteNotFoundException.class, () -> clienteService.deleteById(id));
-        assertEquals("Cliente con id " + id +" no encontrado", res.getMessage());
+        assertEquals("Cliente not found with id " + id, res.getMessage());
 
         verify(clienteRepository, times(1)).findById(id);
         verify(clienteRepository, times(0)).deleteById(id);
-    }*/
+    }
 
 
     @Test
@@ -436,8 +435,4 @@ public class ClienteServiceTest{
         verify(storageService, times(1)).delete(cliente1.getImagen());
         verify(storageService, times(1)).store(multipartFile);
     }
-
-
-
-
 }

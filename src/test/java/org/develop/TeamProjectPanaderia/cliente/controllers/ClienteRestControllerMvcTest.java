@@ -23,8 +23,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -279,7 +282,7 @@ public class ClienteRestControllerMvcTest {
         verify(clienteService, times(1)).save(clienteDto);
     }
 
-   /** @Test
+   @Test
     void createCliente_BadRequest_NombreCompleto() throws Exception {
         // Arrange
         ClienteCreateDto clienteDto = new ClienteCreateDto(null,"test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
@@ -295,11 +298,11 @@ public class ClienteRestControllerMvcTest {
         // Assert
         assertAll(
                 () -> assertEquals(400, response.getStatus()),
-                () -> assertTrue(response.getContentAsString().contains("El nombre debe tener al menos 8 caracteres"))
+                () -> assertTrue(response.getContentAsString().contains("El nombre no puede estar vacio"))
         );
-    }*/
+    }
 
-  /** @Test
+  @Test
    void createCliente_BadRequest_Categoria() throws Exception {
        // Arrange
        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("EvelynObando","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg", null, true);
@@ -314,9 +317,9 @@ public class ClienteRestControllerMvcTest {
        // Assert
        assertAll(
                () -> assertEquals(400, response.getStatus()),
-               () -> assertTrue(response.getContentAsString().contains("La categoria no puede estar vacia"))
+               () -> assertTrue(response.getContentAsString().contains("La categoria no puede estar vacio"))
        );
-   }*/
+   }
 
 
   @Test
@@ -427,12 +430,10 @@ public class ClienteRestControllerMvcTest {
     }
 
 
-    /**@Test
+    @Test
     void updateClienteImage() throws Exception {
         Long id = cliente1.getId();
-        var myLocalEndpoint = myEndpoint + "/imagen/" + id.toString();
-
-        when(clienteService.updateImg(id,any(MultipartFile.class))).thenReturn(cliente1);
+        var myLocalEndpoint = myEndpoint + "/image/" + id;
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -440,6 +441,9 @@ public class ClienteRestControllerMvcTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 "contenido del archivo".getBytes()
         );
+
+        when(clienteService.updateImg(id, file)).thenReturn(cliente1);
+
 
         MockHttpServletResponse response = mockMvc.perform(
                 multipart(myLocalEndpoint)
@@ -460,8 +464,6 @@ public class ClienteRestControllerMvcTest {
         );
 
         // Verify
-        verify(clienteService, times(1)).updateImg(id, any(MultipartFile.class));
-    }*/
-
-
+        verify(clienteService, times(1)).updateImg(id, file);
+    }
 }
