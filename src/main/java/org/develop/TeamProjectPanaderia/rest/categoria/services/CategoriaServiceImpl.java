@@ -111,6 +111,9 @@ public class CategoriaServiceImpl implements CategoriaService{
     @CachePut
     public Categoria update(Long id, CategoriaUpdateDto categoria) {
         var categoriaUpd = findById(id);
+        if (!categoriaUpd.getNameCategory().equalsIgnoreCase(categoria.nameCategory()) && categoriaRepository.findByNameCategoryIgnoreCase(categoria.nameCategory()).isPresent()){
+            throw new CategoriaNotSaveException("Category with this name already exists");
+        }
         var category = categoriaMapper.toCategoria(categoria,categoriaUpd);
         onChange(Notificacion.Tipo.UPDATE, category);
         return categoriaRepository.save(category);

@@ -140,4 +140,40 @@ class CategoriaRepositoryTest {
                 () -> assertEquals(categoria1.getNameCategory(), categorias.get(0).getNameCategory())
         );
     }
+
+    @Test
+    void existsProductById(){
+        var result = categoriaRepository.existsProductoById(2L);
+
+        assertAll(
+                () -> assertFalse(result)
+        );
+    }
+
+    @Test
+    void existsClienteById(){
+        var result = categoriaRepository.existsClienteById(2L);
+
+        assertAll(
+                () -> assertFalse(result)
+        );
+    }
+
+    @Test
+    void existsProveedorById(){
+        var result = categoriaRepository.existsProveedorByID(2L);
+
+        assertAll(
+                () -> assertFalse(result)
+        );
+    }
+
+    @Test
+    void existsPersonalById(){
+        var result = categoriaRepository.existsPersonalById(2L);
+
+        assertAll(
+                () -> assertFalse(result)
+        );
+    }
 }

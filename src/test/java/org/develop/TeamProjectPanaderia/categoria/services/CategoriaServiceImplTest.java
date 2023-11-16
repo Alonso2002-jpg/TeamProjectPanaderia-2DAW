@@ -6,6 +6,7 @@ import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaCreateDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaResponseDto;
 import org.develop.TeamProjectPanaderia.rest.categoria.dto.CategoriaUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotDeleteException;
 import org.develop.TeamProjectPanaderia.rest.categoria.mapper.CategoriaMapper;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.repositories.CategoriaRepository;
@@ -261,11 +262,52 @@ class CategoriaServiceImplTest {
         doNothing().when(categoriaRepository).deleteById(1L);
         categoriaService.deleteById(1L);
         when(objectMapper.writeValueAsString(anyString())).thenReturn(categoria1.toString());
-        doNothing().when(webSocketHandler).sendMessage(any());
+        doNothing().when(webSocketHandler).sendMessage(any(String.class));
 
         verify(categoriaRepository, times(1)).findById(1L);
     }
 
+    @Test
+    void categoryExistsProveedor() {
+        when(categoriaRepository.existsProveedorByID(1L)).thenReturn(true);
+
+        var res = assertThrows(CategoriaNotDeleteException.class, () -> categoriaService.categoryExistsSomewhere(1L));
+
+        assertEquals("Categoria cant be deleted because it has Proveedores", res.getMessage());
+
+        verify(categoriaRepository, times(1)).existsProveedorByID(1L);
+    }
+    @Test
+    void categoryExistsProducto(){
+        when(categoriaRepository.existsProductoById(1L)).thenReturn(true);
+        var res = assertThrows(CategoriaNotDeleteException.class, () -> categoriaService.categoryExistsSomewhere(1L));
+
+        assertEquals("Categoria cant be deleted because it has Productos", res.getMessage());
+
+        verify(categoriaRepository, times(1)).existsProductoById(1L);
+    }
+
+    @Test
+    void categoryExistsCliente(){
+        when(categoriaRepository.existsClienteById(1L)).thenReturn(true);
+
+        var res = assertThrows(CategoriaNotDeleteException.class, () -> categoriaService.categoryExistsSomewhere(1L));
+
+        assertEquals("Categoria cant be deleted because it has Clientes", res.getMessage());
+
+        verify(categoriaRepository, times(1)).existsClienteById(1L);
+    }
+
+    @Test
+    void categoryExistsPersonal(){
+        when(categoriaRepository.existsPersonalById(1L)).thenReturn(true);
+
+        var res = assertThrows(CategoriaNotDeleteException.class, () -> categoriaService.categoryExistsSomewhere(1L));
+
+        assertEquals("Categoria cant be deleted because it has Personals", res.getMessage());
+
+        verify(categoriaRepository, times(1)).existsPersonalById(1L);
+    }
     @Test
     void deleteAll() {
         doNothing().when(categoriaRepository).deleteAll();
