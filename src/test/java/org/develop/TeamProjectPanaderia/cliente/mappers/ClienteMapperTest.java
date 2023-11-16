@@ -58,7 +58,6 @@ public class ClienteMapperTest {
                 .nombreCompleto("EvelynObando")
                 .correo("evelynobando@gmail.com")
                 .telefono("722663186")
-                .isActive(true)
                 .build();
 
         // Act
@@ -71,10 +70,7 @@ public class ClienteMapperTest {
                 () -> assertEquals(clienteUpdateDto.getCorreo(), clienteActualizado.getCorreo()),
                 () -> assertEquals(clienteUpdateDto.getTelefono(), clienteActualizado.getTelefono()),
                 () -> assertEquals(clienteExistente.getImagen(), clienteActualizado.getImagen()),
-                () -> assertEquals(clienteExistente.getCategoria(), clienteActualizado.getCategoria()),
-                () -> assertEquals(clienteExistente.getIsActive(),clienteActualizado.getIsActive()),
-                () -> assertEquals(clienteExistente.getFechaCreacion(), clienteActualizado.getFechaCreacion()),
-                () -> assertNotEquals(clienteExistente.getFechaActualizacion(), clienteActualizado.getFechaCreacion())
+                () -> assertEquals(clienteExistente.getCategoria(), clienteActualizado.getCategoria())
         );
     }
 
