@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Table(name = "CLIENTES")
 public class Cliente {
     @Builder.Default
-    public static final String IMAGE_DEFAULT = "https://via.placeholder.com/150";
+    public static final String IMAGE_DEFAULT = "https://www.realmadrid.com/img/vertical_380px/cristiano_550x650_20180917025046.jpg";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
