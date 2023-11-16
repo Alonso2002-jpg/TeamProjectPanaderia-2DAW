@@ -61,7 +61,6 @@ public class CategoriaServiceImpl implements CategoriaService{
                                 ProveedorRepository proveedorRepository,
                                 CategoriaMapper categoriaMapper,
                                 WebSocketConfig webSocketConfig,
-                                WebSocketHandler webSocketHandler,
                                 ObjectMapper objMapper,
                                 NotificacionMapper notificacionMapper) {
         this.categoriaRepository = categoriaRepository;
@@ -70,8 +69,11 @@ public class CategoriaServiceImpl implements CategoriaService{
         this.productoRepository = productoRepository;
         this.clienteRepository = clienteRepository;
         this.categoriaMapper = categoriaMapper;
+
+        //Notificaciones
         this.webSocketConfig = webSocketConfig;
-        this.webSocketHandler = webSocketHandler;
+        webSocketConfig.setUrlAndEntity("categoria","Categoria");
+        this.webSocketHandler = webSocketConfig.webSocketHandler();
         this.objMapper = objMapper;
         this.notificacionMapper = notificacionMapper;
     }
