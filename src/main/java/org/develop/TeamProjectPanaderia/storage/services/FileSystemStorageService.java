@@ -21,12 +21,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class FileSystemStorageService implements StorageService{
     private final Path rootLocation;
+    private final List<String> allowedExtensions = List.of("png", "jpg", "jpeg", "gif");
 
     public FileSystemStorageService(@Value("${upload.root-location}") String rootLocation){
 
@@ -46,6 +48,10 @@ public class FileSystemStorageService implements StorageService{
     public String store(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         String extension = StringUtils.getFilenameExtension(filename);
+        allowedExtensions.stream()
+                .filter(ex -> extension.contains(ex))
+                .findAny()
+                .orElseThrow(()-> new StorageBadRequestException("Extension no permitida"));
         String justFilename = filename.replace("." + extension, "");
         String storedFilename = System.currentTimeMillis() + "_" + justFilename + "." + extension;
 
