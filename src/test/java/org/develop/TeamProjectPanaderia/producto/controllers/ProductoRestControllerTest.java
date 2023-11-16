@@ -18,9 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,38 +32,17 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
 class ProductoRestControllerTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
-    private final Producto producto1 =
-            Producto.builder()
-                    .id(UUID.randomUUID())
-                    .nombre("TEST-1")
-                    .stock(10)
-                    .fechaCreacion(LocalDateTime.now())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .imagen("test1.png")
-                    .precio(49.99)
-                    .isActivo(true)
-                    .categoria(categoriaProducto)
-                    .proveedor(proveedor)
-                    .build();
-    private final Producto producto2 =
-            Producto.builder()
-                    .id(UUID.randomUUID())
-                    .nombre("TEST-2")
-                    .stock(50)
-                    .fechaCreacion(LocalDateTime.now())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .imagen("test2.png")
-                    .precio(15.99)
-                    .isActivo(true)
-                    .categoria(categoriaProducto)
-                    .proveedor(proveedor)
-                    .build();
+    private final Producto producto1 = new Producto(UUID.randomUUID(), "TEST-1", 10, LocalDateTime.now(), LocalDateTime.now(), "test1.png", 49.99, true, categoriaProducto, proveedor);
+    private final Producto producto2 = new Producto(UUID.randomUUID(), "TEST-2", 50, LocalDateTime.now(), LocalDateTime.now(), "test2.png", 15.99, true, categoriaProducto, proveedor);
+    private final ProductoResponseDto responseDtoProduct1 = new ProductoResponseDto(producto1.getId(), "TEST-1", 49.99, 10, "test1.png", categoriaProducto, proveedor, true);
+    private final ProductoResponseDto responseDtoProduct2 = new ProductoResponseDto(producto2.getId(), "TEST-2", 15.99, 50, "test2.png", categoriaProducto, proveedor, true);
     @Mock
     private ProductoMapper productoMapper;
     @Mock
@@ -75,13 +52,15 @@ class ProductoRestControllerTest {
 
     @Test
     void getAllProducts() {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
-
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  =  productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
@@ -96,135 +75,162 @@ class ProductoRestControllerTest {
 
     @Test
     void getAllProducts_ByNombre() {
-        Optional<String> nombre = Optional.of("TEST-2");
-        List<Producto> expectedProducts = List.of(producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        Optional<String> nombre = Optional.of("TEST-1");
+        List <Producto> productoList = List.of(producto1);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
-
+        when(productoService.findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
+
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(1, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(1, responseEntity.getBody().content().size()),
+                () -> assertEquals(responseDtoProduct1, responseEntity.getBody().content().get(0))
+        );
 
         // Verify
         verify(productoService, times(1)).findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByStockMin() {
-        Optional<Integer> stockMin = Optional.of(40);
-        List<Producto> expectedProducts = List.of(producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        Optional<Integer> stockMin = Optional.of(45);
+        List <Producto> productoList = List.of(producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
-
+        when(productoService.findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(1, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(1, responseEntity.getBody().content().size()),
+                () -> assertEquals(responseDtoProduct2, responseEntity.getBody().content().get(0))
+        );
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
 
     @Test
     void getAllProducts_ByPrecioMax() {
         Optional<Double> precioMax = Optional.of(60.00);
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
-
-        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
+        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(),Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(2, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(2, responseEntity.getBody().content().size())
+        );
 
         // Verify
-        verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoService, times(1)).findAll(Optional.empty(),Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByIsActivo() {
         Optional<Boolean> isActivo = Optional.of(true);
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
-
-        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
+        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(),Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(2, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(2, responseEntity.getBody().content().size())
+        );
 
         // Verify
-        verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable);
+        verify(productoService, times(1)).findAll(Optional.empty(),Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByCategoria() {
         Optional<String> categoria = Optional.of("PRODUCTO_TEST");
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
-
-        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), 0 , 10, "id", "asc");
+        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(),Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), 0 , 10, "id", "asc");
 
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(2, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(2, responseEntity.getBody().content().size())
+        );
 
         // Verify
-        verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable);
+        verify(productoService, times(1)).findAll(Optional.empty(),Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByProveedor() {
         Optional<String> proveedor = Optional.of("Y7821803T");
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
-
-        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, 0 , 10, "id", "asc");
+        ResponseEntity<PageResponse<ProductoResponseDto>> responseEntity  = productoController.getAllProductos(Optional.empty(),Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, 0 , 10, "id", "asc");
 
         // Assert
-        assertEquals(200, responseEntity.getStatusCode().value());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(2, responseEntity.getBody().content().size());
+        assertAll(
+                () -> assertEquals(200, responseEntity.getStatusCode().value()),
+                () -> assertEquals(2, responseEntity.getBody().content().size())
+        );
 
         // Verify
-        verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable);
+        verify(productoService, times(1)).findAll(Optional.empty(),Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
 
@@ -234,18 +240,19 @@ class ProductoRestControllerTest {
         String uuid = producto2.getId().toString();
 
         when(productoService.findById(uuid)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         ResponseEntity<ProductoResponseDto> responseEntity = productoController.getProductoById(uuid);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, responseEntity.getStatusCode().value()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(producto1, responseEntity.getBody())
+                () -> assertEquals(responseDtoProduct2, responseEntity.getBody())
         );
 
         // verify
         verify(productoService, times(1)).findById(uuid);
+        verify(productoMapper, times(1)).toProductoResponseDto(producto2);
     }
 
     @Test
@@ -257,10 +264,10 @@ class ProductoRestControllerTest {
         when(productoService.findById(uuidFalso)).thenThrow(new ProductoNotFound(uuid));
 
         // Act & Assert
-       var result = assertThrows(ProductoNotFound.class, () -> productoController.getProductoById(uuidFalso));
-       assertEquals("Producto con id " + uuid + " no encontrado", result.getMessage());
+        var exception = assertThrows(ProductoNotFound.class, () -> productoController.getProductoById(uuidFalso));
+        assertEquals("Producto con id " + uuid + " no encontrado", exception.getMessage());
 
-        // Verify
+        // verify
         verify(productoService, times(1)).findById(uuidFalso);
     }
 
@@ -282,22 +289,10 @@ class ProductoRestControllerTest {
     @Test
     void createProduct(){
         // Arrange
-        UUID uuid = UUID.randomUUID();
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
-        Producto expectedProduct = Producto.builder()
-                .id(uuid)
-                .nombre("nuevo_producto")
-                .stock(33)
-                .fechaCreacion(LocalDateTime.now())
-                .fechaActualizacion(LocalDateTime.now())
-                .imagen("test3.png")
-                .precio(25.99)
-                .isActivo(true)
-                .categoria(categoriaProducto)
-                .proveedor(proveedor)
-                .build();
 
-        when(productoService.save(productoCreateDto)).thenReturn(expectedProduct);
+        when(productoService.save(productoCreateDto)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         // Act
         ResponseEntity<ProductoResponseDto> responseEntity = productoController.createProduct(productoCreateDto);
@@ -305,7 +300,7 @@ class ProductoRestControllerTest {
         // Assert
         assertAll(
                 () -> assertEquals(201, responseEntity.getStatusCode().value()),
-                () -> assertEquals(expectedProduct, responseEntity.getBody())
+                () -> assertEquals(responseDtoProduct2, responseEntity.getBody())
         );
 
         // Verify
@@ -319,6 +314,7 @@ class ProductoRestControllerTest {
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
+        when(productoMapper.toProductoResponseDto(producto1)).thenReturn(responseDtoProduct1);
 
         // Act
         ResponseEntity<ProductoResponseDto> responseEntity = productoController.updateProduct(id, productoUpdateDto);
@@ -326,7 +322,7 @@ class ProductoRestControllerTest {
         // Assert
         assertAll(
                 () -> assertEquals(200, responseEntity.getStatusCode().value()),
-                () -> assertEquals(producto1, responseEntity.getBody())
+                () -> assertEquals(responseDtoProduct1, responseEntity.getBody())
         );
 
         // Verify
@@ -355,6 +351,7 @@ class ProductoRestControllerTest {
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, null, null, null);
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         // Act
         ResponseEntity<ProductoResponseDto> responseEntity = productoController.updatePartialProduct(id, productoUpdateDto);
@@ -362,7 +359,7 @@ class ProductoRestControllerTest {
         // Assert
         assertAll(
                 () -> assertEquals(200, responseEntity.getStatusCode().value()),
-                () -> assertEquals(producto2, responseEntity.getBody())
+                () -> assertEquals(responseDtoProduct2, responseEntity.getBody())
         );
 
         // Verify
@@ -370,7 +367,7 @@ class ProductoRestControllerTest {
     }
 
     @Test
-    void deleteProducById()  {
+    void deleteProductById()  {
         // Arrange
         UUID uuid = producto2.getId();
         doNothing().when(productoService).deleteById(uuid.toString());
@@ -403,7 +400,7 @@ class ProductoRestControllerTest {
     @Test
     void updateImage() {
         // Arrange
-        String id = producto2.getId().toString();
+        String id = producto1.getId().toString();
 
         MultipartFile file = new MockMultipartFile(
                 "file",
@@ -412,14 +409,15 @@ class ProductoRestControllerTest {
                 "contenido del archivo".getBytes()
         );
 
-        when(productoService.updateImg(id, file)).thenReturn(producto2);
+        when(productoService.updateImg(id, file)).thenReturn(producto1);
+        when(productoMapper.toProductoResponseDto(producto1)).thenReturn(responseDtoProduct1);
 
         // Act
         ResponseEntity<ProductoResponseDto> responseEntity = productoController.updateImage(id, file);
 
         // Assert
         assertEquals(200, responseEntity.getStatusCode().value());
-        assertEquals(producto2, responseEntity.getBody());
+        assertEquals(responseDtoProduct1, responseEntity.getBody());
 
         // Verify
         verify(productoService, times(1)).updateImg(id, file);

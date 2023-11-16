@@ -61,11 +61,10 @@ class ProductoRestControllerMvcTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
-    private final ProductoResponseDto responseDtoProduct1 = new ProductoResponseDto(UUID.randomUUID(), "TEST-1", 49.99, 10, "test1.png", categoriaProducto, proveedor, true);
-    private final ProductoResponseDto responseDtoProduct2 = new ProductoResponseDto(UUID.randomUUID(), "TEST-2", 15.99, 50, "test2.png", categoriaProducto, proveedor, true);
     private final Producto producto1 = new Producto(UUID.randomUUID(), "TEST-1", 10, LocalDateTime.now(), LocalDateTime.now(), "test1.png", 49.99, true, categoriaProducto, proveedor);
     private final Producto producto2 = new Producto(UUID.randomUUID(), "TEST-2", 50, LocalDateTime.now(), LocalDateTime.now(), "test2.png", 15.99, true, categoriaProducto, proveedor);
-
+    private final ProductoResponseDto responseDtoProduct1 = new ProductoResponseDto(producto1.getId(), "TEST-1", 49.99, 10, "test1.png", categoriaProducto, proveedor, true);
+    private final ProductoResponseDto responseDtoProduct2 = new ProductoResponseDto(producto2.getId(), "TEST-2", 15.99, 50, "test2.png", categoriaProducto, proveedor, true);
     @Autowired
     public ProductoRestControllerMvcTest(ProductoMapper productoMapper, ProductoService productoService){
         this.productoMapper = productoMapper;
