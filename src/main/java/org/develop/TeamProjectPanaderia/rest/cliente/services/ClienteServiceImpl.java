@@ -57,6 +57,7 @@ public class ClienteServiceImpl implements ClienteService{
         this.clienteMapper = clienteMapper;
         this.storageService = storageService;
         this.webSocketConfig = webSocketConfig;
+        webSocketConfig.setUrlAndEntity("cliente","Cliente");
         webSocketService = webSocketConfig.webSocketHandler();
         this.mapper = mapper;
         this.clienteNotificacionMapper = clienteNotificacionMapper;
