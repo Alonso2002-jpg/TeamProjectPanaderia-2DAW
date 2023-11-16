@@ -16,6 +16,7 @@ public interface CategoriaService {
     Categoria update(Long id, CategoriaUpdateDto categoria);
     Categoria findByName(String name);
     List<Categoria> findByActiveIs(boolean isActive);
+    void categoryExistsSomewhere(Long id);
     void deleteById(Long id);
     void deleteAll();
 }
