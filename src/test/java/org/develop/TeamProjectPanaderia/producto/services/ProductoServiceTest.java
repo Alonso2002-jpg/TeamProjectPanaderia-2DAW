@@ -1,6 +1,8 @@
 package org.develop.TeamProjectPanaderia.producto.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
+import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
 import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
@@ -15,6 +17,7 @@ import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
 import org.develop.TeamProjectPanaderia.rest.producto.services.ProductoServiceImpl;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
@@ -71,6 +74,7 @@ class ProductoServiceTest {
                     .proveedor(proveedor)
                     .build();
     WebSocketHandler webSocketHandlerMock = mock (WebSocketHandler.class);
+    private ObjectMapper objectMapper = mock(ObjectMapper.class);
     @Mock
     private ProductoRepository productoRepository;
     @Mock
@@ -412,24 +416,24 @@ class ProductoServiceTest {
         verify(categoriaService, times(1)).findByName(productoCreateDto.categoria());
         verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
     }
-/*
+
     @Test
     void save_proveedorNotExist(){
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99, "test3.png" ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,   true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
-        when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenThrow(new ProveedoresNotFoundException(productoCreateDto.proveedor()));
+        when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenThrow(new ProveedorNotFoundException(productoCreateDto.proveedor()));
 
         // Act
-        var res = assertThrows(CategoriaNotFoundException.class, () -> productoService.save(productoCreateDto));
-        assertEquals("Proveedores con nombre: " + productoCreateDto.proveedor() + "No encontrado", res.getMessage());
+        var res = assertThrows(ProveedorNotFoundException.class, () -> productoService.save(productoCreateDto));
+        assertEquals("Proveedor : " + productoCreateDto.proveedor() + " no encontrado", res.getMessage());
 
         // Verify
-        verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.categoria());
+        verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.proveedor());
         verify(productoRepository, times(1)).findByNombreEqualsIgnoreCase((any(String.class)));
     }
-*/
+
 
 
     @Test
@@ -523,24 +527,24 @@ class ProductoServiceTest {
         verify(categoriaService, times(1)).findByName(category);
     }
 
-/*
+
     @Test
     void update_ProveedorNotExist() {
         // Arrange
-        String proveedor = "Proveedor_Falso";
+        String nombreProveedor = "Proveedor_Falso";
         UUID id = producto1.getId();
         String uuid = id.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, "producto_actualizado.jpg", 80.99, true, "Categoria_Falsa", proveedor.getNif());
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), nombreProveedor);
 
-        when(productoRepository.findById(any(UUID.class))).thenReturn(Optional.of(producto1));
+        when(productoRepository.findById(id)).thenReturn(Optional.of(producto1));
         when(categoriaService.findByName(categoriaProducto.getNameCategory())).thenReturn(categoriaProducto);
-        when(proveedoresService.findProveedoresByNIF(proveedor)).thenThrow(new ProveedoresNotFoundException(proveedor.getNif()));
+        when(proveedoresService.findProveedoresByNIF(anyString())).thenThrow(new ProveedorNotFoundException(proveedor.getNif()));
 
         // Act & Assert
-        var res = assertThrows(ProveedoresNotFoundException.class, () -> productoService.update(uuid, productoUpdateDto));
-        assertEquals("Proveedores con nif: " + proveedor.getNif() + " No encontrado", res.getMessage());
+        var res = assertThrows(ProveedorNotFoundException.class, () -> productoService.update(uuid, productoUpdateDto));
+        assertEquals("Proveedor : " + proveedor.getNif() + " no encontrado", res.getMessage());
     }
-    */
+
 
 
     @Test
@@ -577,16 +581,16 @@ class ProductoServiceTest {
 
 
 
-    /*
+
     @Test
     void onChange() throws IOException {
         // Arrange
-        doNothing().when(webSocketHandlerMock).sendMessage(any(String.class));
+        doNothing().when(webSocketHandlerMock).sendMessage(any());
 
         // Act
-        productoService.onChange(Notificacion.Tipo.CREATE, any(Producto.class));
+        productoService.onChange(Notificacion.Tipo.CREATE, producto1);
     }
-    */
+
 
     @Test
     void updateImage() throws IOException {

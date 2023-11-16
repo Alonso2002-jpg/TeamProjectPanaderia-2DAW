@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFound;
+import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.rest.producto.services.ProductoService;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
@@ -21,14 +23,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,9 +45,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
-class ProductoRestControllerMvcIntegrationTest {
-    private final String myEndpoint = "/v1/producto";
+class ProductoRestControllerMvcTest {
+    private final String myEndpoint = "/producto";
     private final ObjectMapper mapper = new ObjectMapper();
+    @MockBean
+    private final ProductoMapper productoMapper;
     @Autowired
     MockMvc mockMvc;
     @MockBean
@@ -60,54 +61,35 @@ class ProductoRestControllerMvcIntegrationTest {
     private final Categoria categoriaProducto = new Categoria(1L, "PRODUCTO_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Categoria categoriaProveedor = new Categoria(2L, "PROVEEDOR_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Proveedor proveedor = new Proveedor(1L, "Y7821803T", categoriaProveedor, "722663185", "Test S.L.", true, LocalDate.now(), LocalDate.now());
-    private final Producto producto1 =
-            Producto.builder()
-                    .id(UUID.randomUUID())
-                    .nombre("TEST-1")
-                    .stock(10)
-                    .fechaCreacion(LocalDateTime.now())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .imagen("test1.png")
-                    .precio(49.99)
-                    .isActivo(true)
-                    .categoria(categoriaProducto)
-                    .proveedor(proveedor)
-                    .build();
-    private final Producto producto2 =
-            Producto.builder()
-                    .id(UUID.randomUUID())
-                    .nombre("TEST-2")
-                    .stock(50)
-                    .fechaCreacion(LocalDateTime.now())
-                    .fechaActualizacion(LocalDateTime.now())
-                    .imagen("test2.png")
-                    .precio(15.99)
-                    .isActivo(true)
-                    .categoria(categoriaProducto)
-                    .proveedor(proveedor)
-                    .build();
-
+    private final Producto producto1 = new Producto(UUID.randomUUID(), "TEST-1", 10, LocalDateTime.now(), LocalDateTime.now(), "test1.png", 49.99, true, categoriaProducto, proveedor);
+    private final Producto producto2 = new Producto(UUID.randomUUID(), "TEST-2", 50, LocalDateTime.now(), LocalDateTime.now(), "test2.png", 15.99, true, categoriaProducto, proveedor);
+    private final ProductoResponseDto responseDtoProduct1 = new ProductoResponseDto(producto1.getId(), "TEST-1", 49.99, 10, "test1.png", categoriaProducto, proveedor, true);
+    private final ProductoResponseDto responseDtoProduct2 = new ProductoResponseDto(producto2.getId(), "TEST-2", 15.99, 50, "test2.png", categoriaProducto, proveedor, true);
     @Autowired
-    public ProductoRestControllerMvcIntegrationTest(ProductoService productoService){
+    public ProductoRestControllerMvcTest(ProductoMapper productoMapper, ProductoService productoService){
+        this.productoMapper = productoMapper;
         this.productoService = productoService;
         mapper.registerModule(new JavaTimeModule());
     }
 
     @Test
     void getAllProducts() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myEndpoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
 
 
@@ -119,25 +101,29 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByNombre() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1);
         String myLocalEndPoint = myEndpoint + "?nombre=TEST-1";
         Optional<String> nombre = Optional.of("TEST-1");
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct1);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
 
 
@@ -149,25 +135,29 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(nombre, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByStockMin() throws Exception {
-        List<Producto> expectedProducts = List.of(producto2);
         String myLocalEndPoint = myEndpoint + "?stockMin=45";
         Optional<Integer> stockMin = Optional.of(45);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
 
 
@@ -179,27 +169,30 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), stockMin, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByPrecioMax() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
-        String myLocalEndPoint = myEndpoint + "?precioMax=50";
-        Optional<Double> precioMax = Optional.of(45.0);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        String myLocalEndPoint = myEndpoint + "?precioMax=50.0";
+        Optional<Double> precioMax = Optional.of(50.0);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -209,27 +202,30 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), precioMax, Optional.empty(), Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByIsActivo() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
         String myLocalEndPoint = myEndpoint + "?isActivo=true";
         Optional<Boolean> isActivo = Optional.of(true);
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -239,27 +235,30 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), isActivo, Optional.empty(), Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
 
     @Test
     void getAllProducts_ByCategoria() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
         String myLocalEndPoint = myEndpoint + "?categoria=PRODUCTO_TEST";
         Optional<String> categoria = Optional.of("PRODUCTO_TEST");
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -269,27 +268,31 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), categoria, Optional.empty(), pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
+
 
     @Test
     void getAllProducts_ByProveedor() throws Exception {
-        List<Producto> expectedProducts = List.of(producto1, producto2);
         String myLocalEndPoint = myEndpoint + "?proveedor=Y7821803T";
         Optional<String> proveedor = Optional.of("Y7821803T");
-        var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
-        var page = new PageImpl<>(expectedProducts);
+        List <Producto> productoList = List.of(producto1, producto2);
+        List <ProductoResponseDto> expectedProducts = List.of(responseDtoProduct2, responseDtoProduct2);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
+        Page <Producto> responsePage = new PageImpl<>(productoList);
+        Page <ProductoResponseDto> responseDto = new PageImpl<>(expectedProducts);
 
         // Arrange
-        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable)).thenReturn(page);
+        when(productoService.findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable)).thenReturn(responsePage);
+        when(productoMapper.toPageResponse(responsePage)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myLocalEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Producto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ProductoResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -299,7 +302,9 @@ class ProductoRestControllerMvcIntegrationTest {
 
         // Verify
         verify(productoService, times(1)).findAll(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), proveedor, pageable);
+        verify(productoMapper, times(1)).toPageResponse(responsePage);
     }
+
 
 
 
@@ -310,6 +315,7 @@ class ProductoRestControllerMvcIntegrationTest {
         String myLocalEndPoint = myEndpoint + "/" + uuid;
 
         when(productoService.findById(uuid)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -317,16 +323,17 @@ class ProductoRestControllerMvcIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ProductoResponseDto result = mapper.readValue(response.getContentAsString(), ProductoResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
+                () -> assertEquals(responseDtoProduct2, result)
         );
 
         // verify
         verify(productoService, times(1)).findById(uuid);
+        verify(productoMapper, times(1)).toProductoResponseDto(producto2);
     }
 
     @Test
@@ -351,8 +358,9 @@ class ProductoRestControllerMvcIntegrationTest {
         verify(productoService, times(1)).findById(uuidFalso);
     }
 
+
     @Test
-    void getProductById_InvalidadUuid() throws Exception {
+    void getProductById_InvalidUuid() throws Exception {
         // Arrange
         String uuidInvalido = "uuid_invalido";
         String myLocalEndPoint = myEndpoint + "/" + uuidInvalido;
@@ -378,20 +386,9 @@ class ProductoRestControllerMvcIntegrationTest {
         // Arrange
         UUID uuid = UUID.randomUUID();
         ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99 ,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
-        Producto expectedProduct = Producto.builder()
-                .id(uuid)
-                .nombre("nuevo_producto")
-                .stock(33)
-                .fechaCreacion(LocalDateTime.now())
-                .fechaActualizacion(LocalDateTime.now())
-                .imagen("test3.png")
-                .precio(25.99)
-                .isActivo(true)
-                .categoria(categoriaProducto)
-                .proveedor(proveedor)
-                .build();
 
-        when(productoService.save(productoCreateDto)).thenReturn(expectedProduct);
+        when(productoService.save(productoCreateDto)).thenReturn(producto1);
+        when(productoMapper.toProductoResponseDto(producto1)).thenReturn(responseDtoProduct1);
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -400,17 +397,19 @@ class ProductoRestControllerMvcIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ProductoResponseDto result = mapper.readValue(response.getContentAsString(), ProductoResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(201, response.getStatus()),
-                () -> assertEquals(expectedProduct, result)
+                () -> assertEquals(responseDtoProduct1, result)
         );
 
         // Verify
         verify(productoService, times(1)).save(productoCreateDto);
+        verify(productoMapper, times(1)).toProductoResponseDto(producto1);
     }
+
 
     @Test
     void createProduct_BadRequest_NombreIsNull() throws Exception {
@@ -537,6 +536,7 @@ class ProductoRestControllerMvcIntegrationTest {
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
+        when(productoMapper.toProductoResponseDto(producto1)).thenReturn(responseDtoProduct1);
 
         MockHttpServletResponse response = mockMvc.perform(
                         put(myLocalEndpoint)
@@ -545,16 +545,17 @@ class ProductoRestControllerMvcIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ProductoResponseDto result = mapper.readValue(response.getContentAsString(), ProductoResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
+                () -> assertEquals(responseDtoProduct1, result)
         );
 
         // Verify
         verify(productoService, times(1)).update(id, productoUpdateDto);
+        verify(productoMapper, times(1)).toProductoResponseDto(producto1);
     }
 
     @Test
@@ -584,13 +585,10 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void updateProduct_BadRequest_Nombre() throws Exception {
         // Arrange
-        UUID uuid = producto1.getId();
+        UUID uuid = producto2.getId();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("pr", 100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Arrange
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -615,9 +613,6 @@ class ProductoRestControllerMvcIntegrationTest {
         String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", -100, 80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
 
-        // Arrange
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
-
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
                         put(myLocalEndpoint)
@@ -636,13 +631,10 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void updateProduct_BadRequest_Precio() throws Exception {
         // Arrange
-        UUID uuid = producto1.getId();
+        UUID uuid = producto2.getId();
         String id = uuid.toString();
         String myLocalEndpoint = myEndpoint + "/" + id;
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("producto_actualizado", 100, -80.99, true, categoriaProducto.getNameCategory(), proveedor.getNif());
-
-        // Arrange
-        when(productoService.update(id, productoUpdateDto)).thenReturn(producto1);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -667,6 +659,7 @@ class ProductoRestControllerMvcIntegrationTest {
         ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, null, null, null);
 
         when(productoService.update(id, productoUpdateDto)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -676,12 +669,12 @@ class ProductoRestControllerMvcIntegrationTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ProductoResponseDto result = mapper.readValue(response.getContentAsString(), ProductoResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto2, result)
+                () -> assertEquals(responseDtoProduct2, result)
         );
 
         // Verify
@@ -691,7 +684,7 @@ class ProductoRestControllerMvcIntegrationTest {
     @Test
     void deleteProducById() throws Exception {
         // Arrange
-        UUID uuid = producto2.getId();
+        UUID uuid = producto1.getId();
         String myLocalEndpoint = myEndpoint + "/" + uuid.toString();
 
         doNothing().when(productoService).deleteById(uuid.toString());
@@ -736,10 +729,8 @@ class ProductoRestControllerMvcIntegrationTest {
 
     @Test
     void updateProductImage() throws Exception {
-        UUID uuid = producto1.getId();
-        var myLocalEndpoint = myEndpoint + "/imagen/" + uuid.toString();
-
-        when(productoService.updateImg(anyString(), any(MultipartFile.class))).thenReturn(producto1);
+        String id = producto2.getId().toString();
+        var myLocalEndpoint = myEndpoint + "/image/" + id;
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",
@@ -747,6 +738,9 @@ class ProductoRestControllerMvcIntegrationTest {
                 MediaType.IMAGE_JPEG_VALUE,
                 "contenido del archivo".getBytes()
         );
+
+        when(productoService.updateImg(id, file)).thenReturn(producto2);
+        when(productoMapper.toProductoResponseDto(producto2)).thenReturn(responseDtoProduct2);
 
         MockHttpServletResponse response = mockMvc.perform(
                 multipart(myLocalEndpoint)
@@ -758,16 +752,16 @@ class ProductoRestControllerMvcIntegrationTest {
         ).andReturn().getResponse();
 
 
-        Producto result = mapper.readValue(response.getContentAsString(), Producto.class);
+        ProductoResponseDto result = mapper.readValue(response.getContentAsString(), ProductoResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(producto1, result)
+                () -> assertEquals(responseDtoProduct2, result)
         );
 
         // Verify
-        verify(productoService, times(1)).updateImg(anyString(), any(MultipartFile.class));
+        verify(productoService, times(1)).updateImg(id, file);
     }
 }
 

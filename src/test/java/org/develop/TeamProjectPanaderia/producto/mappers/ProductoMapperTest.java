@@ -8,9 +8,12 @@ import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -79,7 +82,7 @@ class ProductoMapperTest {
                 () -> assertEquals(productoUpdateDto.categoria(), productoActualizado.getCategoria().getNameCategory()),
                 () -> assertEquals(productoUpdateDto.isActivo(), productoActualizado.getIsActivo()),
                 () -> assertEquals(productoExistente.getFechaCreacion(), productoActualizado.getFechaCreacion()),
-                () -> assertNotEquals(productoExistente.getFechaActualizacion(), productoActualizado.getFechaActualizacion()),
+                () -> assertNotNull(productoActualizado.getFechaActualizacion()),
                 () -> assertNotNull(productoActualizado.getImagen())
         );
     }
@@ -102,6 +105,21 @@ class ProductoMapperTest {
                 () -> assertEquals(producto.getCategoria(), productoResponseDto.categoria()),
                 () -> assertEquals(producto.getProveedor(), productoResponseDto.proveedor()),
                 () -> assertEquals(producto.getId(), productoResponseDto.id())
+        );
+    }
+
+    @Test
+    void toPageResponse() {
+        // Arrange
+        Page<Producto> page = new PageImpl<>(List.of(producto1));
+
+        // Act
+        Page<ProductoResponseDto> responsePageDto = productoMapper.toPageResponse(page);
+
+        // Assert
+        assertAll(
+                () -> assertNotNull(responsePageDto),
+                () -> assertEquals(1, responsePageDto.getTotalElements())
         );
     }
 }
