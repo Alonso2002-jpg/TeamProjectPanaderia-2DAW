@@ -22,7 +22,7 @@ import java.util.UUID;
 @Table(name = "PRODUCTOS")
 public class Producto {
     @Builder.Default
-    public static final String IMAGE_DEFAULT = "https://via.placeholder.com/150";
+    public static final String IMAGE_DEFAULT = "https://www.realmadrid.com/img/vertical_380px/cristiano_550x650_20180917025046.jpg";
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

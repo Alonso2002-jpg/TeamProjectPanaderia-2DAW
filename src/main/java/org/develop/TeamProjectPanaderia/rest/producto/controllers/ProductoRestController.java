@@ -87,6 +87,7 @@ public class ProductoRestController {
 
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductoResponseDto> updateImage(@PathVariable String id, @RequestParam("file") MultipartFile file){
+        log.info(file.toString());
         if (!file.isEmpty()){
             return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.updateImg(id,file)));
         }else{
