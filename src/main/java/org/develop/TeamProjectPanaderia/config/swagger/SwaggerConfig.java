@@ -68,7 +68,7 @@ class SwaggerConfig {
     GroupedOpenApi httpApi() {
         return GroupedOpenApi.builder()
                 .group("https")
-                .pathsToMatch("/" + apiVersion + "/productos/**")
+                .pathsToMatch("/" + apiVersion + "/producto/**", "/" + apiVersion + "/categoria/**", "/" + apiVersion + "/auth/**", "/" + apiVersion + "/personal/**", "/" + apiVersion + "/proveedores/**", "/" + apiVersion + "/pedidos/**", "/" + apiVersion + "/cliente/**")
                 .displayName("Panaderia Pepitos Swagger")
                 .build();
     }
