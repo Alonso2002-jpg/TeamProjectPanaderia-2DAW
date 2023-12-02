@@ -39,6 +39,10 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	// Para pasar a XML los responses, negocacion de contenido
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
+
+	// Para manejar los JWT tokens
+    // JWT (Json Web Token)
+    implementation("com.auth0:java-jwt:4.4.0")
 }
 
 tasks.withType<Test> {
