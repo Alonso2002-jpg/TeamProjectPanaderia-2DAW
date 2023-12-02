@@ -4,10 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ClienteNotSaveException extends ClienteException {
-    public ClienteNotSaveException(String dni) {
-        super("El dni " + dni + " ya existe en la BD");
+public class ClienteBadRequest extends ClienteException{
+    public ClienteBadRequest(String categoria) {
+        super("La categoria con nombre " + categoria + " no existe");
     }
 }
-
-

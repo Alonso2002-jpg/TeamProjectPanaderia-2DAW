@@ -2,13 +2,12 @@ package org.develop.TeamProjectPanaderia.rest.proveedores.services;
 
 import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
-import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotDeletedException;
-import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
-import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotSaveException;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.*;
 import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.rest.proveedores.repositories.ProveedorRepository;
@@ -38,22 +37,36 @@ public class ProveedorServiceImpl implements ProveedorService {
         if (proveedoresRepository.findByNif(proveedor.getNif()).isPresent()){
             throw new ProveedorNotSaveException("Proveedores with NIF " + proveedor.getNif() + " already exists");
         }
-        return proveedoresRepository.save(proveedorMapper.toProveedor(
-                proveedor,
-                categoriaService.findByName(proveedor.getTipo())
-        ));
+        try{
+            return proveedoresRepository.save(proveedorMapper.toProveedor(
+                    proveedor,
+                    categoriaService.findByName(proveedor.getTipo())
+            ));
+        } catch (CategoriaNotFoundException e){
+            throw new ProveedorBadRequest(proveedor.getTipo());
+        }
     }
 
     @Override
     public Proveedor updateProveedor(ProveedorUpdateDto proveedorUpdateDto, Long id) {
         Proveedor proveedor = getProveedoresById(id);
-        return proveedoresRepository.save(
-                proveedorMapper.toProveedor(
-                        proveedorUpdateDto,
-                        proveedor,
-                        proveedorUpdateDto.getTipo() != null ? categoriaService.findByName(proveedorUpdateDto.getTipo()) : null
-                )
-        );
+        try{
+            if(proveedorUpdateDto.getNif() != null && !proveedorUpdateDto.getNif().isEmpty()){
+                Optional <Proveedor> proveedorSameNif = proveedoresRepository.findByNif(proveedorUpdateDto.getNif());
+                if(proveedorSameNif.isPresent() && !proveedorSameNif.get().getId().equals(proveedor.getId())){
+                    throw new ProveedorInvalidNif(proveedorUpdateDto.getNif());
+                }
+            }
+            return proveedoresRepository.save(
+                    proveedorMapper.toProveedor(
+                            proveedorUpdateDto,
+                            proveedor,
+                            proveedorUpdateDto.getTipo() != null ? categoriaService.findByName(proveedorUpdateDto.getTipo()) : null
+                    )
+            );
+        } catch (CategoriaNotFoundException e){
+            throw new ProveedorBadRequest(proveedorUpdateDto.getTipo());
+        }
     }
 
     @Override

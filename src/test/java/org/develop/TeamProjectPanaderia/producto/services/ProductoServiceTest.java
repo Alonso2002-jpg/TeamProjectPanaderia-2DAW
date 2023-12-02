@@ -10,6 +10,7 @@ import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadRequest;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotSaved;
@@ -403,14 +404,14 @@ class ProductoServiceTest {
     @Test
     void save_categoryNotExist(){
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,  true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,  true, "categoria_falsa", proveedor.getNif());
 
         when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
-        when(categoriaService.findByName(productoCreateDto.categoria())).thenThrow(new CategoriaNotFoundException(productoCreateDto.categoria()));
+        when(categoriaService.findByName(productoCreateDto.categoria())).thenThrow(new CategoriaNotFoundException(anyString()));
 
         // Act
-        var res = assertThrows(CategoriaNotFoundException.class, () -> productoService.save(productoCreateDto));
-        assertEquals("Categoria not found with " + productoCreateDto.categoria(), res.getMessage());
+        var res = assertThrows(ProductoBadRequest.class, () -> productoService.save(productoCreateDto));
+        assertEquals("La categoria con nombre " + productoCreateDto.categoria() + " no existe", res.getMessage());
 
         // Verift
         verify(categoriaService, times(1)).findByName(productoCreateDto.categoria());
@@ -420,14 +421,14 @@ class ProductoServiceTest {
     @Test
     void save_proveedorNotExist(){
         // Arrange
-        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,   true, categoriaProducto.getNameCategory(), proveedor.getNif());
+        ProductoCreateDto productoCreateDto = new ProductoCreateDto("nuevo_producto",33,25.99,   true, categoriaProducto.getNameCategory(), "nif_falso");
 
         when(productoRepository.findByNombreEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
-        when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenThrow(new ProveedorNotFoundException(productoCreateDto.proveedor()));
+        when(proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor())).thenThrow(new ProveedorNotFoundException(anyString()));
 
         // Act
-        var res = assertThrows(ProveedorNotFoundException.class, () -> productoService.save(productoCreateDto));
-        assertEquals("Proveedor : " + productoCreateDto.proveedor() + " no encontrado", res.getMessage());
+        var res = assertThrows(ProductoBadRequest.class, () -> productoService.save(productoCreateDto));
+        assertEquals("El proveedor con nif " + productoCreateDto.proveedor() + " no existe", res.getMessage());
 
         // Verify
         verify(proveedoresService, times(1)).findProveedoresByNIF(productoCreateDto.proveedor());
@@ -519,8 +520,8 @@ class ProductoServiceTest {
         when(categoriaService.findByName(category)).thenThrow(new CategoriaNotFoundException(category));
 
         // Act & Assert
-        var res = assertThrows(CategoriaNotFoundException.class, () -> productoService.update(uuid, productoUpdateDto));
-        assertEquals("Categoria not found with " + category, res.getMessage());
+        var res = assertThrows(ProductoBadRequest.class, () -> productoService.update(uuid, productoUpdateDto));
+        assertEquals("La categoria con nombre " + category + " no existe" , res.getMessage());
 
         // Verify
         verify(productoRepository, times(1)).findById(id);
@@ -531,18 +532,18 @@ class ProductoServiceTest {
     @Test
     void update_ProveedorNotExist() {
         // Arrange
-        String nombreProveedor = "Proveedor_Falso";
+        String nif = "nif_falso";
         UUID id = producto1.getId();
         String uuid = id.toString();
-        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), nombreProveedor);
+        ProductoUpdateDto productoUpdateDto = new ProductoUpdateDto("ProductoActualizado", 100, 80.99, true, categoriaProducto.getNameCategory(), "nif_falso");
 
         when(productoRepository.findById(id)).thenReturn(Optional.of(producto1));
         when(categoriaService.findByName(categoriaProducto.getNameCategory())).thenReturn(categoriaProducto);
-        when(proveedoresService.findProveedoresByNIF(anyString())).thenThrow(new ProveedorNotFoundException(proveedor.getNif()));
+        when(proveedoresService.findProveedoresByNIF(anyString())).thenThrow(new ProveedorNotFoundException(nif));
 
         // Act & Assert
-        var res = assertThrows(ProveedorNotFoundException.class, () -> productoService.update(uuid, productoUpdateDto));
-        assertEquals("Proveedor : " + proveedor.getNif() + " no encontrado", res.getMessage());
+        var res = assertThrows(ProductoBadRequest.class, () -> productoService.update(uuid, productoUpdateDto));
+        assertEquals("El proveedor con nif " + nif + " no existe", res.getMessage());
     }
 
 
