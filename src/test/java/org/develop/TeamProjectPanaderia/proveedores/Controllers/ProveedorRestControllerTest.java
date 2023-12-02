@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -32,9 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class ProveedorRestControllerTest {
 
-    private final String initEndPoint = "/proveedores";  // Ajustado el endpoint para seguir el estándar RESTful
+    private final String initEndPoint = "/v1/proveedores";  // Ajustado el endpoint para seguir el estándar RESTful
     private Proveedor proveedor1, proveedor2;
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -87,7 +89,7 @@ public class ProveedorRestControllerTest {
         when(proveedorService.getProveedoresById(1L)).thenReturn(proveedor1);
         when(proveedorMapper.toResponse(proveedor1)).thenReturn(new ProveedorResponseDto());
 
-        mockMvc.perform(get("/proveedores/1"))
+        mockMvc.perform(get("/v1/proveedores/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").exists());
     }
@@ -98,7 +100,7 @@ public class ProveedorRestControllerTest {
         when(proveedorService.saveProveedores(createDto)).thenReturn(proveedor1);
         when(proveedorMapper.toResponse(proveedor1)).thenReturn(new ProveedorResponseDto());
 
-        ResultActions result = mockMvc.perform(post("/proveedores")
+        ResultActions result = mockMvc.perform(post("/v1/proveedores")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonCreateDto.write(createDto).getJson()));
     }
@@ -109,7 +111,7 @@ public class ProveedorRestControllerTest {
         when(proveedorService.updateProveedor(updateDto, 1L)).thenReturn(proveedor1);
         when(proveedorMapper.toResponse(proveedor1)).thenReturn(new ProveedorResponseDto());
 
-        ResultActions result = mockMvc.perform(put("/proveedores/1")
+        ResultActions result = mockMvc.perform(put("/v1/proveedores/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonUpdateDto.write(updateDto).getJson()));
 
@@ -119,7 +121,7 @@ public class ProveedorRestControllerTest {
 
     @Test
     void deleteProveedor() throws Exception {
-        mockMvc.perform(delete("/proveedores/1"))
+        mockMvc.perform(delete("/v1/proveedores/1"))
                 .andExpect(status().isNoContent());
 
         verify(proveedorService, times(1)).deleteProveedoresById(1L);

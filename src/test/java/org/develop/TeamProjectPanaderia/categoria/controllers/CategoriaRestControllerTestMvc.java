@@ -28,6 +28,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -41,9 +42,10 @@ import static org.mockito.Mockito.*;
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 class CategoriaRestControllerTestMvc {
 
-    private final String initEndPoint = "/categoria";
+    private final String initEndPoint = "/v1/categoria";
     private Categoria categoria1, categoria2;
     private CategoriaResponseDto categoriaResponseDto, categoriaResponseDto2;
     private final ObjectMapper mapper = new ObjectMapper();
