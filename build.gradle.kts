@@ -27,6 +27,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-cache:2.4.0")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 	//Nogociacion de Contenido
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 	//Websockets
