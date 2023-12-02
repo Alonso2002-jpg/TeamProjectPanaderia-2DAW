@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/categoria")
+@RequestMapping("${api.version}/categoria")
+@PreAuthorize("hasRole('USER')")
 public class CategoriaRestController {
     private final CategoriaService categoriaService;
     private final CategoriaMapper categoriaMapper;
@@ -52,16 +54,19 @@ public class CategoriaRestController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDto> postCategoria(@Valid @RequestBody CategoriaCreateDto categoria){
         return ResponseEntity.status(HttpStatus.CREATED).body(categoriaMapper.toResponse(categoriaService.save(categoria)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDto> putCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaUpdateDto categoria){
         return ResponseEntity.ok(categoriaMapper.toResponse(categoriaService.update(id,categoria)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteById(@PathVariable Long id){
         categoriaService.deleteById(id);
         return ResponseEntity.noContent().build();

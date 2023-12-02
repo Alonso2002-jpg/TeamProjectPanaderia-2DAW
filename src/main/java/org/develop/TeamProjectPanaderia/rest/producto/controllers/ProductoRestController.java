@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ import java.util.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/producto")
+@RequestMapping("${api.version}/producto")
 public class ProductoRestController {
     private final ProductoService productoService;
     private final ProductoMapper productoMapper;
@@ -59,7 +60,7 @@ public class ProductoRestController {
         log.info("Buscando producto por id: " + id);
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.findById(id)));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProductoResponseDto> createProduct(@Valid @RequestBody ProductoCreateDto productoCreateDto){
         log.info("Creando producto: " + productoCreateDto);
@@ -67,18 +68,21 @@ public class ProductoRestController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoResponseDto> updateProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando producto por id: " + id + " con producto: " + productoUpdateDto);
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoResponseDto> updatePartialProduct(@PathVariable String id, @Valid @RequestBody ProductoUpdateDto productoUpdateDto){
         log.info("Actualizando parcialmente producto con id: " + id + " con producto: " + productoUpdateDto);
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id){
         log.info("Borrando producto por id: " + id);
         productoService.deleteById(id);
@@ -86,6 +90,7 @@ public class ProductoRestController {
     }
 
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductoResponseDto> updateImage(@PathVariable String id, @RequestParam("file") MultipartFile file){
         log.info(file.toString());
         if (!file.isEmpty()){
