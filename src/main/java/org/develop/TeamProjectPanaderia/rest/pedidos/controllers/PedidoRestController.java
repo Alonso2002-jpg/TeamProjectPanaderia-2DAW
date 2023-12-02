@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,8 @@ import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("pedidos")
+@RequestMapping("/${api.version}/pedidos")
+@PreAuthorize("hasRole('ADMIN')")
 public class PedidoRestController {
     private final PedidoService pedidoService;
 
