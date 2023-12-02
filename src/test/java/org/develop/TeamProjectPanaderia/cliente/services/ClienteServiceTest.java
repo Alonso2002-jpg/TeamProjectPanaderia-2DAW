@@ -9,6 +9,7 @@ import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteBadRequest;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
@@ -296,8 +297,8 @@ public class ClienteServiceTest{
         when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenThrow(new CategoriaNotFoundException(clienteCreateDto.getCategoria()));
 
         // Act
-        var res = assertThrows(CategoriaNotFoundException.class, () -> clienteService.save(clienteCreateDto));
-        assertEquals("Categoria not found with " + clienteCreateDto.getCategoria(), res.getMessage());
+        var res = assertThrows(ClienteBadRequest.class, () -> clienteService.save(clienteCreateDto));
+        assertEquals("La categoria con nombre " + clienteCreateDto.getCategoria() + " no existe", res.getMessage());
 
         // Verift
         verify(categoriaService, times(1)).findByName(clienteCreateDto.getCategoria());
@@ -371,8 +372,8 @@ public class ClienteServiceTest{
        when(categoriaService.findByName(category)).thenThrow(new CategoriaNotFoundException(category));
 
        // Act & Assert
-       var res = assertThrows(CategoriaNotFoundException.class, () -> clienteService.update(id, clienteUpdateDto));
-       assertEquals("Categoria not found with " + category, res.getMessage());
+       var res = assertThrows(ClienteBadRequest.class, () -> clienteService.update(id, clienteUpdateDto));
+       assertEquals("La categoria con nombre " + clienteUpdateDto.getCategoria() + " no existe", res.getMessage());
 
        // Verify
        verify(clienteRepository, times(1)).findById(id);

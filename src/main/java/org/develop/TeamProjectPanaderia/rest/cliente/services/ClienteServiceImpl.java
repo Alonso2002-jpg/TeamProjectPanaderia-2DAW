@@ -8,10 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.WebSockets.dto.NotificacionResponseDto;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteBadRequest;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
@@ -96,30 +98,38 @@ public class ClienteServiceImpl implements ClienteService{
     @CachePut
     public Cliente save(ClienteCreateDto clienteCreateDto) {
         log.info("Guardando cliente: " + clienteCreateDto);
-        if(clienteRepository.findClienteByDniEqualsIgnoreCase(clienteCreateDto.getDni()).isPresent()){
-            throw new ClienteNotSaveException(clienteCreateDto.getDni());
+        try{
+            if(clienteRepository.findClienteByDniEqualsIgnoreCase(clienteCreateDto.getDni()).isPresent()){
+                throw new ClienteNotSaveException(clienteCreateDto.getDni());
+            }
+            Categoria categoria = categoriaService.findByName(clienteCreateDto.getCategoria());
+            Cliente clienteSaved = clienteRepository.save(clienteMapper.toCliente(clienteCreateDto, categoria));
+            onChange(Notificacion.Tipo.CREATE, clienteSaved);
+            return clienteSaved;
+        } catch (CategoriaNotFoundException e){
+            throw new ClienteBadRequest(clienteCreateDto.getCategoria());
         }
-        Categoria categoria = categoriaService.findByName(clienteCreateDto.getCategoria());
-        Cliente clienteSaved = clienteRepository.save(clienteMapper.toCliente(clienteCreateDto, categoria));
-        onChange(Notificacion.Tipo.CREATE, clienteSaved);
-        return clienteSaved;
     }
 
     @Override
     @CachePut
     public Cliente update(Long id, ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando cliente por id: " + id);
-        Cliente clienteActual = this.findById(id);
-        Categoria categoria = null;
-        if(clienteUpdateDto.getCategoria() != null && !clienteUpdateDto.getCategoria().isEmpty()){
-            categoria = categoriaService.findByName(clienteUpdateDto.getCategoria());
-        } else {
-            categoria = clienteActual.getCategoria();
+        try{
+            Cliente clienteActual = this.findById(id);
+            Categoria categoria = null;
+            if(clienteUpdateDto.getCategoria() != null && !clienteUpdateDto.getCategoria().isEmpty()){
+                categoria = categoriaService.findByName(clienteUpdateDto.getCategoria());
+            } else {
+                categoria = clienteActual.getCategoria();
+            }
+            Cliente clienteMapped = clienteMapper.toCliente(clienteUpdateDto, clienteActual, categoria);
+            Cliente clienteUpdated = clienteRepository.save(clienteMapped);
+            onChange(Notificacion.Tipo.UPDATE, clienteUpdated);
+            return clienteUpdated;
+        } catch (CategoriaNotFoundException e){
+            throw new ClienteBadRequest(clienteUpdateDto.getCategoria());
         }
-        Cliente clienteMapped = clienteMapper.toCliente(clienteUpdateDto, clienteActual, categoria);
-        Cliente clienteUpdated = clienteRepository.save(clienteMapped);
-        onChange(Notificacion.Tipo.UPDATE, clienteUpdated);
-        return clienteUpdated;
     }
 
     @Override

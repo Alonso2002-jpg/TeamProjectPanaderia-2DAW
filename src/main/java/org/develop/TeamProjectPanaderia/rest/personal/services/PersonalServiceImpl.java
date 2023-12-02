@@ -3,6 +3,8 @@ package org.develop.TeamProjectPanaderia.rest.personal.services;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.personal.exceptions.PersonalBadRequest;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
 import org.springframework.cache.annotation.Cacheable;
 import jakarta.persistence.criteria.Join;
@@ -94,34 +96,39 @@ public class PersonalServiceImpl implements PersonalService {
         }
     }
 
-
-
     @Override
     @CachePut
     public Personal save(PersonalCreateDto personalCreateDto) {
         log.info("Guardando Personal");
-        if (personalRepository.findByDniEqualsIgnoreCase(personalCreateDto.dni()).isPresent()) {
-            throw new PersonalNotSaved(personalCreateDto.dni());
+        try{
+            if (personalRepository.findByDniEqualsIgnoreCase(personalCreateDto.dni()).isPresent()) {
+                throw new PersonalNotSaved(personalCreateDto.dni());
+            }
+            Categoria categoria = categoriaService.findByName(personalCreateDto.seccion());
+            UUID id = UUID.randomUUID();
+            return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto));
+        } catch (CategoriaNotFoundException e){
+            throw new PersonalBadRequest(personalCreateDto.seccion());
         }
-        Categoria categoria = categoriaService.findByName(personalCreateDto.seccion());
-        UUID id = UUID.randomUUID();
-        return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto));
     }
 
     @Override
     @CachePut
     public Personal update(String id, PersonalUpdateDto personalDto) {
         log.info("Actualizando");
-        var personalUpd = this.findById(id);
-        Categoria categoria = null;
-        if (personalDto.seccion() != null && !personalDto.seccion().isEmpty()) {
-            categoria= categoriaService.findByName(personalDto.seccion());
-        } else {
-            categoria = personalUpd.getSeccion();
+        try{
+            var personalUpd = this.findById(id);
+            Categoria categoria = null;
+            if (personalDto.seccion() != null && !personalDto.seccion().isEmpty()) {
+                categoria= categoriaService.findByName(personalDto.seccion());
+            } else {
+                categoria = personalUpd.getSeccion();
+            }
+            return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd, categoria));
+        } catch (CategoriaNotFoundException e){
+            throw new PersonalBadRequest(personalDto.seccion());
         }
-        return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd, categoria));
     }
-
 
     @Override
     @Cacheable
