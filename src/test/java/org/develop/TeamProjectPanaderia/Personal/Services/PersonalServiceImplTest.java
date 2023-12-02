@@ -1,12 +1,14 @@
 package org.develop.TeamProjectPanaderia.Personal.Services;
 
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.personal.exceptions.PersonalBadRequest;
 import org.develop.TeamProjectPanaderia.rest.personal.exceptions.PersonalBadUuid;
 import org.develop.TeamProjectPanaderia.rest.personal.exceptions.PersonalNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.personal.exceptions.PersonalNotSaved;
@@ -347,7 +349,7 @@ public class PersonalServiceImplTest {
         verify(personalRepository, times(1)).findByDniEqualsIgnoreCase(any(String.class));
     }
     @Test
-    public void  save_PersonalNameAlreadyExist(){
+    void  save_PersonalNameAlreadyExist(){
         // Arrange
         UUID uuid = UUID.randomUUID();
         PersonalCreateDto personalCreateDto = new PersonalCreateDto("123456789y","Kevin",categoriaPersonal.getNameCategory(),true);
@@ -374,53 +376,36 @@ public class PersonalServiceImplTest {
     }
 
     @Test
-    void updatePersonal_IdNotExist() {
+    void  save_CategoryNotExist(){
         // Arrange
-        String id = UUID.randomUUID().toString();
-        PersonalUpdateDto personalDto = new PersonalUpdateDto("bun","GERENTE",true);
-
-        when(personalRepository.findById(UUID.fromString(id))).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(PersonalNotFoundException.class, () -> personalService.update(id, personalDto));
-
-        // Verify
-        verify(personalRepository).findById(UUID.fromString(id));
-    }
-/*
-    @Test
-    void updatePersonal_Success() {
-        // Arrange
-        UUID id = UUID.randomUUID();
-        PersonalUpdateDto personalDto = new PersonalUpdateDto("Bin", "PERSONAL", true);
-        Personal existingPersonal = Personal.builder()
-                .id(id)
-                .nombre("Nombre existente")
+        UUID uuid = UUID.randomUUID();
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("123456789y","Kevin",categoriaPersonal.getNameCategory(),true);
+        Personal expectedPersonal = Personal.builder()
+                .id(uuid)
+                .nombre("nuevo_personal")
+                .dni("12345678A")
                 .seccion(categoriaPersonal)
-                .isActive(true)
-                .build();
-        Categoria categoria = new Categoria().builder()
-                .id(1L)
-                .nameCategory("PERSONAL")
                 .build();
 
-        when(personalRepository.findById(id)).thenReturn(Optional.of(existingPersonal));
-        when(categoriaService.findByName(personalDto.seccion())).thenReturn(categoria);
-        when(personalRepository.save(any(Personal.class))).thenReturn(existingPersonal);
+        when(personalRepository.findByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
+        when(categoriaService.findByName(personalCreateDto.seccion())).thenThrow(new CategoriaNotFoundException(personalCreateDto.seccion()));
 
-        // Act
-        Personal actualPersonal = personalService.update(id.toString(), personalDto);
+        // Act Assert
+        PersonalBadRequest exception = assertThrows(
+                PersonalBadRequest.class,
+                () -> personalService.save(personalCreateDto)
+        );
 
         // Assert
-        assertNotNull(actualPersonal);
+        assertEquals("La categoria con nombre " + personalCreateDto.seccion() + " no existe", exception.getMessage());
 
         // Verify
-        verify(personalRepository).findById(id);
-        verify(categoriaService).findByName(personalDto.seccion());
-        verify(personalRepository).save(any(Personal.class));
+        verify(personalRepository, times(1)).findByDniEqualsIgnoreCase(any(String.class));
+        verify(categoriaService, times(1)).findByName(personalCreateDto.seccion());
+
     }
 
- */
+
     @Test
     void savePersonal_WithDuplicatedDni() {
         // Arrange
@@ -435,21 +420,81 @@ public class PersonalServiceImplTest {
         // Verify
         verify(personalRepository).findByDniEqualsIgnoreCase("12345678Z");
     }
-    /*
+
+
+    @Test
+    void updatePersonal_IdNotExist() {
+        // Arrange
+        String id = UUID.randomUUID().toString();
+        PersonalUpdateDto personalDto = new PersonalUpdateDto("bun","GERENTE",true);
+
+        when(personalRepository.findById(UUID.fromString(id))).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(PersonalNotFoundException.class, () -> personalService.update(id, personalDto));
+
+        // Verify
+        verify(personalRepository).findById(UUID.fromString(id));
+    }
+
+    @Test
+    void updatePersonal_Success() {
+        // Arrange
+        UUID id = UUID.randomUUID();
+        PersonalUpdateDto personalDto = new PersonalUpdateDto("Bin", "PERSONAL_TEST", true);
+        Personal existingPersonal = Personal.builder()
+                .id(id)
+                .nombre("Nombre existente")
+                .seccion(categoriaPersonal)
+                .isActive(true)
+                .build();
+
+        when(personalRepository.findById(id)).thenReturn(Optional.of(existingPersonal));
+        when(categoriaService.findByName(personalDto.seccion())).thenReturn(categoria);
+        when(personalMapper.toPersonalUpdate(personalDto,existingPersonal,categoria)).thenReturn(existingPersonal);
+        when(personalRepository.save(existingPersonal)).thenReturn(existingPersonal);
+
+        // Act
+        Personal actualPersonal = personalService.update(id.toString(), personalDto);
+
+        // Assert
+        assertNotNull(actualPersonal);
+
+        // Verify
+        verify(personalRepository).findById(id);
+        verify(personalMapper, times(1)).toPersonalUpdate(personalDto, existingPersonal, categoria);
+        verify(categoriaService).findByName(personalDto.seccion());
+        verify(personalRepository).save(existingPersonal);
+    }
+
+
     @Test
     void updatePersonal_WithAllFieldChanges() {
         // Arrange
         UUID id = UUID.randomUUID();
         PersonalUpdateDto personalDto = new PersonalUpdateDto("PEPE", "SUPERVISOR", false);
         Personal existingPersonal = Personal.builder().id(id).nombre("Manuel").isActive(true).build();
-        Categoria nuevaCategoria = new Categoria().builder().nameCategory("SUPERVISOR").build();
+        Categoria nuevaCategoria = Categoria.builder().nameCategory("SUPERVISOR").build();
 
-            when(personalRepository.findById(id)).thenReturn(Optional.of(existingPersonal));
-            when(categoriaService.findByName("SUPERVISOR")).thenReturn(nuevaCategoria);
-            when(personalRepository.save(any(Personal.class))).thenReturn(existingPersonal);
+        when(personalRepository.findById(id)).thenReturn(Optional.of(existingPersonal));
+        when(categoriaService.findByName("SUPERVISOR")).thenReturn(nuevaCategoria);
+        when(personalMapper.toPersonalUpdate(personalDto,existingPersonal,nuevaCategoria)).thenReturn(existingPersonal);
+        when(personalRepository.save(existingPersonal)).thenReturn(existingPersonal);
+
+        // Act
+        Personal actualPersonal = personalService.update(id.toString(), personalDto);
+
+        // Assert
+        assertNotNull(actualPersonal);
+
+        // Verify
+        verify(personalRepository).findById(id);
+        verify(personalMapper, times(1)).toPersonalUpdate(personalDto, existingPersonal, nuevaCategoria);
+        verify(categoriaService).findByName(personalDto.seccion());
+        verify(personalRepository).save(existingPersonal);
     }
-*/
-/*
+
+
     @Test
     void updatePersonal_WithInvalidCategory() {
         // Arrange
@@ -458,17 +503,18 @@ public class PersonalServiceImplTest {
         Personal existingPersonal = Personal.builder().id(id).build();
 
         when(personalRepository.findById(id)).thenReturn(Optional.of(existingPersonal));
-        when(categoriaService.findByName("CATEGORIA_INVALIDA")).thenReturn(null);
+        when(categoriaService.findByName("CATEGORIA_INVALIDA")).thenThrow(new CategoriaNotFoundException("CATEGORIA_INVALIDA"));
 
         // Act & Assert
-        assertThrows(PersonalNotSaved.class, () -> personalService.update(id.toString(), personalDto));
+        PersonalBadRequest personalBadRequest = assertThrows(PersonalBadRequest.class, () -> personalService.update(id.toString(), personalDto));
+        assertEquals("La categoria con nombre CATEGORIA_INVALIDA no existe", personalBadRequest.getMessage());
 
         // Verify
         verify(personalRepository).findById(id);
         verify(categoriaService).findByName("CATEGORIA_INVALIDA");
     }
 
-     */
+
     @Test
     void findPersonalByDni_Success() {
         // Arrange

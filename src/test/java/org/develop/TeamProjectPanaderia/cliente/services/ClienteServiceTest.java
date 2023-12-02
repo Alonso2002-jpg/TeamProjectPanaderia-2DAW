@@ -11,6 +11,7 @@ import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteBadRequest;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
@@ -302,6 +303,21 @@ public class ClienteServiceTest{
 
         // Verift
         verify(categoriaService, times(1)).findByName(clienteCreateDto.getCategoria());
+        verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase((any(String.class)));
+    }
+
+    @Test
+    void save_dniAlreadyExist(){
+        // Arrange
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(),true);
+
+        when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.of(cliente1));
+
+        // Act
+        var res = assertThrows(ClienteNotSaveException.class, () -> clienteService.save(clienteCreateDto));
+        assertEquals("El dni " + clienteCreateDto.getDni() + " ya existe en la BD", res.getMessage());
+
+        // Verift
         verify(clienteRepository, times(1)).findClienteByDniEqualsIgnoreCase((any(String.class)));
     }
 

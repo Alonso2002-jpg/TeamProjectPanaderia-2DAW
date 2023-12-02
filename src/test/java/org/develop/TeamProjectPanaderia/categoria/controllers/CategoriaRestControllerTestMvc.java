@@ -284,6 +284,25 @@ class CategoriaRestControllerTestMvc {
         verify(categoriaService,times(1)).save(categoria);
     }
 
+
+    @Test
+    void postCategoriaBadRequest() throws Exception {
+        CategoriaCreateDto categoria = new CategoriaCreateDto(null,true);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                        post(initEndPoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(mapper.writeValueAsString(categoria))
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        assertAll(
+                () -> assertEquals(400, response.getStatus()),
+                () -> assertTrue(response.getContentAsString().contains("El nombre de la categoria no puede estar vacio"))
+        );
+    }
+
+
     @Test
     void putCategoria() throws Exception {
         var localEndPoint = initEndPoint + "/1";

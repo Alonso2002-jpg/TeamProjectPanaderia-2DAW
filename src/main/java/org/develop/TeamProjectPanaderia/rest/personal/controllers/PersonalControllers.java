@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.rest.personal.controllers;
 
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
@@ -55,17 +56,17 @@ public class PersonalControllers {
         return ResponseEntity.ok(personalMapper.toResponseDto(personalService.findById(id)));
     }
     @PostMapping
-    public ResponseEntity<PersonalResponseDto>createPersonal(@RequestBody PersonalCreateDto personalCreateDto){
+    public ResponseEntity<PersonalResponseDto>createPersonal(@RequestBody @Valid PersonalCreateDto personalCreateDto){
         log.info("Se crea el Personal: " + personalCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(personalMapper.toResponseDto(personalService.save(personalCreateDto)));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<PersonalResponseDto> updatePersonal(@PathVariable String id, @RequestBody PersonalUpdateDto personalUpdateDto){
+    public ResponseEntity<PersonalResponseDto> updatePersonal(@PathVariable String id, @RequestBody @Valid PersonalUpdateDto personalUpdateDto){
         log.info("Se actualiza el Personal: " + personalUpdateDto);
         return ResponseEntity.ok(personalMapper.toResponseDto(personalService.update(id,personalUpdateDto)));
     }
     @PatchMapping("/{id}")
-    public ResponseEntity<PersonalResponseDto> patchPersonal(@PathVariable String id, @RequestBody PersonalUpdateDto personalUpdateDto){
+    public ResponseEntity<PersonalResponseDto> patchPersonal(@PathVariable String id, @RequestBody @Valid PersonalUpdateDto personalUpdateDto){
         log.info("Se actualiza el Personal: " + personalUpdateDto);
         return ResponseEntity.ok(personalMapper.toResponseDto(personalService.update(id,personalUpdateDto)));
     }
