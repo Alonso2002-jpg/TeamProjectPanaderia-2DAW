@@ -70,3 +70,20 @@ VALUES ('Carlos Martínez', 'carlos@example.com', '45678912D', '666123456', 9, t
 
 INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, is_active)
 VALUES ('Lucía Sánchez', 'lucia@example.com', '56789123E', '677654321',  8, true);
+
+--Password: Admin1
+insert into USERS(name, username, email, password, is_active)
+values ('Admin Admin', 'admin', 'admin@prueba.net',
+        '$2a$10$vPaqZvZkz6jhb7U7k/V/v.5vprfNdOnh4sxi/qpPRkYTzPmFlI9p2', true);
+
+insert into USER_ROLES (user_id, roles)
+values (1, 'USER');
+insert into USER_ROLES (user_id, roles)
+values (1, 'ADMIN');
+
+-- Contraseña: User1
+insert into USERS(name, username, email, password, is_active)
+values ('User User', 'user', 'user@prueba.net',
+        '$2a$12$RUq2ScW1Kiizu5K4gKoK4OTz80.DWaruhdyfi2lZCB.KeuXTBh0S.', true);
+insert into USER_ROLES (user_id, roles)
+values (2, 'USER');
