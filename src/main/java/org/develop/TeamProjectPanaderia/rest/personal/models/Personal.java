@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.rest.personal.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
@@ -32,6 +34,9 @@ public class Personal {
     @NotBlank(message = "El dni no puede estar vacio")
     @Pattern(regexp = "^[0-9]{8}[a-zA-Z]$", message = "El DNI debe tener 8 numeros seguidos de una letra")
     private String dni;
+    @Column(name = "email", nullable = false, unique = true)
+    @Email(message = "El email no es valido")
+    private String email;
     @Builder.Default
     @Column(name = "fecha_alta",  columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDate fechaAlta = LocalDate.now();
@@ -47,6 +52,9 @@ public class Personal {
     @Builder.Default
     private boolean isActive=true;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     @ManyToOne
     @JoinColumn(name = "seccion", nullable = false)
     private Categoria seccion;

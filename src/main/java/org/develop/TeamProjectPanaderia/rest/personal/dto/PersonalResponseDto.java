@@ -1,6 +1,7 @@
 package org.develop.TeamProjectPanaderia.rest.personal.dto;
 
 import lombok.Builder;
+import org.develop.TeamProjectPanaderia.rest.users.dto.UserInfoResponseDto;
 
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ public record PersonalResponseDto(
         String nombre,
         String seccion,
         String fechaAlta,
-        Boolean isActive
+        Boolean isActive,
+        Long user
 ) {
 }
