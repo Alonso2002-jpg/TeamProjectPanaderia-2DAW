@@ -14,12 +14,28 @@ public class CorsConfig {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/rest/**/**")
+                registry.addMapping("/rest/pedidos/**")
                         //.allowedOrigins("http://localhost:8080")
                         .allowedMethods("GET", "POST", "PUT", "DELETE")
                         .maxAge(3600);
-            }
+                registry.addMapping("/rest/productos/**")
+                        //.allowedOrigins("http://localhost:8080")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .maxAge(3600);
+                registry.addMapping("/rest/categorias/**")
+                        //.allowedOrigins("http://localhost:8080")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .maxAge(3600);
+                registry.addMapping("/rest/clientes/**")
+                        //.allowedOrigins("http://localhost:8080")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .maxAge(3600);
+                registry.addMapping("/rest/proveedores/**")
+                        //.allowedOrigins("http://localhost:8080")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .maxAge(3600);
 
+            }
         };
     }
 }
