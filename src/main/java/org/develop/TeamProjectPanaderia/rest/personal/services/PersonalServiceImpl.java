@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.rest.personal.services;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.develop.TeamProjectPanaderia.rest.users.dto.UserRequestDto;
 import org.develop.TeamProjectPanaderia.rest.users.mapper.UserMapper;
 import org.develop.TeamProjectPanaderia.rest.users.model.Role;
@@ -110,23 +111,22 @@ public class PersonalServiceImpl implements PersonalService {
     public Personal save(PersonalCreateDto personalCreateDto) {
         log.info("Guardando Personal");
         try{
-            if (personalRepository.findByDniEqualsIgnoreCase(personalCreateDto.dni()).isPresent()) {
-                throw new PersonalNotSaved(personalCreateDto.dni());
-            }
             Categoria categoria = categoriaService.findByName(personalCreateDto.seccion());
             UUID id = UUID.randomUUID();
-            return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto));
+            User user = userMapper.toUserFromPersonal(personalCreateDto, getPasswordFromPersonal(personalCreateDto));
+            if (personalRepository.findByDniEqualsIgnoreCase(personalCreateDto.dni()).isPresent()) {
+                throw new PersonalNotSaved(personalCreateDto.dni());
+            }else if (userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).isPresent()) {
+                return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto,userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).get()));
+            }
+            if (userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(personalCreateDto.dni(), personalCreateDto.email()).isPresent()){
+                throw new PersonalBadRequest("El Email ya esta vinculado a una cuenta");
+            }
+            userRepository.save(user);
+            return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto,user));
         } catch (CategoriaNotFoundException e){
-            throw new PersonalBadRequest(personalCreateDto.seccion());
+            throw new PersonalBadRequest(e.getMessage());
         }
-        Categoria categoria = categoriaService.findByName(personalCreateDto.seccion());
-        UUID id = UUID.randomUUID();
-        if (userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).isPresent()) {
-            return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto,userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).get()));
-        }
-        User user = userMapper.toUserFromPersonal(personalCreateDto, getPasswordFromPersonal(personalCreateDto));
-        userRepository.save(user);
-        return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto, user));
     }
 
     @Override
@@ -146,7 +146,6 @@ public class PersonalServiceImpl implements PersonalService {
             throw new PersonalBadRequest(personalDto.seccion());
         }
     }
-
     @Override
     @Cacheable
     public Personal findPersonalByDni(String dni) {
@@ -170,6 +169,6 @@ public class PersonalServiceImpl implements PersonalService {
 
     public String getPasswordFromPersonal(PersonalCreateDto personal){
         String[] completeName = personal.nombre().split(" ");
-        return completeName[0].trim().substring(0,1).toLowerCase() + completeName[1].trim() + personal.dni().substring(personal.dni().length()-4);
+        return completeName[0].trim().substring(0,2).toLowerCase() + completeName[1].trim() + personal.dni().substring(personal.dni().length()-4);
     }
 }

@@ -34,6 +34,7 @@ public class PersonalMapper {
                 .isActive(dto.isActive() != null ? dto.isActive() : true)
                 .fechaAlta(LocalDate.now())
                 .fechaBaja(null)
+                .email(dto.email())
                 .user(user)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())

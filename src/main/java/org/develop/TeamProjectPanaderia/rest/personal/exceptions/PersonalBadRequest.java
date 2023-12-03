@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class PersonalBadRequest extends PersonalException {
-    public PersonalBadRequest(String categoria) {
-        super("La categoria con nombre " + categoria + " no existe");
+    public PersonalBadRequest(String message) {
+        super(message);
     }
 }
