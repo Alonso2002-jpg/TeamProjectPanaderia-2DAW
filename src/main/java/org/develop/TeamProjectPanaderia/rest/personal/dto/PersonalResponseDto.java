@@ -19,7 +19,7 @@ public record PersonalResponseDto(
         @Schema(description = "Fecha de alta del trabajador", example = "2023-12-02")
         String fechaAlta,
         @Schema(description = "Si esta activo o no el trabajador",example = "true")
-        Boolean isActive
+        Boolean isActive,
         Long user
 ) {
 }
