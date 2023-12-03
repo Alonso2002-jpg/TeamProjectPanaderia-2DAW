@@ -30,9 +30,9 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class PersonalMapperTest {
     @Mock
-    private final UserMapper userMapper;
+    private UserMapper userMapper;
     @InjectMocks
-    private final PersonalMapper personalMapper;
+    private PersonalMapper personalMapper;
     User user1 = new User(1L, "TEST-1", "56789125E", "prueba1@prueba.com", "prueba123", LocalDateTime.now(), LocalDateTime.now(), true, Set.of(Role.ADMIN, Role.USER));
     private final Categoria categoriaPersonal = new Categoria(1L, "PERSONAL_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Personal personal =
@@ -48,11 +48,6 @@ class PersonalMapperTest {
                     .isActive(true)
                     .user(user1)
                     .build();
-
-    PersonalMapperTest(UserMapper userMapper, PersonalMapper personalMapper) {
-        this.userMapper = userMapper;
-        this.personalMapper = personalMapper;
-    }
 
     @Test
     void personalCreate(){

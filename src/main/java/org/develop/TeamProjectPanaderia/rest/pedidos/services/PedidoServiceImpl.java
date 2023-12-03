@@ -104,7 +104,7 @@ public class PedidoServiceImpl implements PedidoService{
         return null;
     }
 
-        Pedido reserveStockPedidos(Pedido pedido){
+        public Pedido reserveStockPedidos(Pedido pedido){
         log.info("Reservando stock del pedido: {}", pedido);
 
         if (pedido.getLineasPedido() == null || pedido.getLineasPedido().isEmpty()) {
@@ -133,7 +133,7 @@ public class PedidoServiceImpl implements PedidoService{
 
         return pedido;
     }
-    void checkPedido(Pedido pedido){
+    public void checkPedido(Pedido pedido){
         log.info("Comprobando pedido: {}", pedido);
 
         if (pedido.getLineasPedido() == null || pedido.getLineasPedido().isEmpty()) {
@@ -154,7 +154,7 @@ public class PedidoServiceImpl implements PedidoService{
             if (!producto.getIsActivo()) throw new ProductoNotActive("Producto con ID: " + linea.getIdProducto() + " no se encuentra activo");
         });
     }
-    Pedido returnStockPedidos(Pedido pedido){
+    public Pedido returnStockPedidos(Pedido pedido){
         log.info("Devolviendo stock del pedido: {}", pedido);
         if (pedido.getLineasPedido() != null){
             pedido.getLineasPedido().forEach(linea -> {
