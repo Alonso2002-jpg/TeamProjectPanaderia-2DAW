@@ -38,8 +38,6 @@ dependencies {
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 	//Websockets
     implementation("org.springframework.boot:spring-boot-starter-websocket")
-	// Para pasar a XML los responses, negocacion de contenido
-	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 	//Lombok
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
@@ -49,17 +47,21 @@ dependencies {
 	//Gson
 	implementation("com.google.code.gson:gson")
 	//H2
-	runtimeOnly("com.h2database:h2")
+	implementation("com.h2database:h2")
+	    // PostgreSQL - Para producción
+    implementation("org.postgresql:postgresql")
 	//Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-
 	// Swagger
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
-
 	// Test seguridad
 	testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform() // Usamos JUnit 5
+}
+
+tasks.test {
+    systemProperty("spring.profiles.active", project.findProperty("spring.profiles.active") ?: "dev")
 }
