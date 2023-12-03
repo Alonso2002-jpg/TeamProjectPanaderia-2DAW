@@ -43,6 +43,9 @@ dependencies {
 	// Para manejar los JWT tokens
     // JWT (Json Web Token)
     implementation("com.auth0:java-jwt:4.4.0")
+
+	// Test seguridad
+	testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<Test> {

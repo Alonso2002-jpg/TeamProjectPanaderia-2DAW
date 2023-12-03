@@ -8,18 +8,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.WebSockets.dto.NotificacionResponseDto;
 import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
 import org.develop.TeamProjectPanaderia.WebSockets.model.Notificacion;
+import org.develop.TeamProjectPanaderia.rest.categoria.exceptions.CategoriaNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.categoria.services.CategoriaService;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoCreateDto;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadRequest;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadUuid;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotSaved;
 import org.develop.TeamProjectPanaderia.rest.producto.mapper.ProductoMapper;
 import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
+import org.develop.TeamProjectPanaderia.rest.proveedores.exceptions.ProveedorNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
@@ -140,42 +143,57 @@ public class ProductoServiceImpl implements ProductoService{
     @CachePut
     public Producto save(ProductoCreateDto productoCreateDto) {
         log.info("Guardando producto: " + productoCreateDto);
-        if(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre()).isPresent()) {
-            throw new ProductoNotSaved(productoCreateDto.nombre());
+        try{
+            if(productoRepository.findByNombreEqualsIgnoreCase(productoCreateDto.nombre()).isPresent()) {
+                throw new ProductoNotSaved(productoCreateDto.nombre());
+            }
+            Categoria categoria = categoriaService.findByName(productoCreateDto.categoria());
+            Proveedor proveedor = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
+            UUID id = UUID.randomUUID();
+            Producto productoMapped = productoMapper.toProducto(id,productoCreateDto, categoria, proveedor);
+            Producto productoSaved = productoRepository.save(productoMapped);
+            onChange(Notificacion.Tipo.CREATE, productoSaved);
+            return productoSaved;
+        } catch (CategoriaNotFoundException e){
+            throw new ProductoBadRequest("La categoria con nombre " + productoCreateDto.categoria() + " no existe");
+        } catch (ProveedorNotFoundException e){
+            throw new ProductoBadRequest("El proveedor con nif " + productoCreateDto.proveedor() + " no existe");
         }
-        Categoria categoria = categoriaService.findByName(productoCreateDto.categoria());
-        Proveedor proveedores = proveedoresService.findProveedoresByNIF(productoCreateDto.proveedor());
-        UUID id = UUID.randomUUID();
-        Producto productoMapped = productoMapper.toProducto(id,productoCreateDto, categoria, proveedores);
-        Producto productoSaved = productoRepository.save(productoMapped);
-        onChange(Notificacion.Tipo.CREATE, productoSaved);
-        return productoSaved;
     }
 
     @Override
     @CachePut
     public Producto update(String id, ProductoUpdateDto productoUpdateDto) {
        log.info("Actualizando producto por id: " + id);
-       Producto productoActual = this.findById(id);
-       Categoria categoria = null;
-       Proveedor proveedor = null;
-       if(productoUpdateDto.nombre() != null && !productoUpdateDto.nombre().isEmpty() && productoRepository.findByNombreEqualsIgnoreCase(productoUpdateDto.nombre()).isPresent()) {
-            throw new ProductoNotSaved(productoUpdateDto.nombre());
+       try{
+           Producto productoActual = this.findById(id);
+           if(productoUpdateDto.nombre() != null && !productoUpdateDto.nombre().isEmpty()) {
+               Optional <Producto> productoSameName = productoRepository.findByNombreEqualsIgnoreCase(productoUpdateDto.nombre());
+               if(productoSameName.isPresent() && productoSameName.get().getId() != productoActual.getId()) {
+                   throw new ProductoNotSaved(productoUpdateDto.nombre());
+               }
+           }
+           Categoria categoria = null;
+           Proveedor proveedor = null;
+           if(productoUpdateDto.categoria() != null && !productoUpdateDto.categoria().isEmpty()){
+               categoria = categoriaService.findByName(productoUpdateDto.categoria());
+           } else {
+               categoria = productoActual.getCategoria();
+           }
+           if(productoUpdateDto.proveedor() != null && !productoUpdateDto.proveedor().isEmpty()){
+               proveedor = proveedoresService.findProveedoresByNIF(productoUpdateDto.proveedor());
+           } else {
+               proveedor = productoActual.getProveedor();
+           }
+           Producto productMapped = productoMapper.toProducto(productoUpdateDto, productoActual, categoria, proveedor);
+           Producto productUpdated = productoRepository.save(productMapped);
+           onChange(Notificacion.Tipo.UPDATE, productUpdated);
+           return productUpdated;
+       } catch (CategoriaNotFoundException e){
+           throw new ProductoBadRequest("La categoria con nombre " + productoUpdateDto.categoria() + " no existe");
+       } catch (ProveedorNotFoundException e){
+           throw new ProductoBadRequest("El proveedor con nif " + productoUpdateDto.proveedor() + " no existe");
        }
-       if(productoUpdateDto.categoria() != null && !productoUpdateDto.categoria().isEmpty()){
-           categoria = categoriaService.findByName(productoUpdateDto.categoria());
-       } else {
-           categoria = productoActual.getCategoria();
-       }
-       if(productoUpdateDto.proveedor() != null && !productoUpdateDto.proveedor().isEmpty()){
-           proveedor = proveedoresService.findProveedoresByNIF(productoUpdateDto.proveedor());
-       } else {
-           proveedor = productoActual.getProveedor();
-       }
-       Producto productMapped = productoMapper.toProducto(productoUpdateDto, productoActual, categoria, proveedor);
-       Producto productUpdated = productoRepository.save(productMapped);
-       onChange(Notificacion.Tipo.UPDATE, productUpdated);
-       return productUpdated;
     }
 
     @Override

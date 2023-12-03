@@ -9,6 +9,8 @@ import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteService;
+import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
+import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,8 +45,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
+@WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
 public class ClienteRestControllerMvcTest {
-    private final String myEndpoint = "/cliente";
+    private final String myEndpoint = "/v1/cliente";
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     MockMvc mockMvc;
@@ -380,6 +384,40 @@ public class ClienteRestControllerMvcTest {
 
         // Assert
         assertEquals(404, response.getStatus());
+    }
+
+
+    @Test
+    void updatePartialCliente() throws Exception {
+        // Arrange
+        Long id = cliente1.getId();
+        String myLocalEndpoint = myEndpoint + "/" + id;
+        ClienteUpdateDto clienteUpdateDto = ClienteUpdateDto.builder()
+                .nombreCompleto("EvelynObando")
+                .correo("evelynobando@gmail.com")
+                .telefono("722663186")
+                .build();
+
+        when(clienteService.update(id, clienteUpdateDto)).thenReturn(cliente1);
+
+        // Consulto el endpoint
+        MockHttpServletResponse response = mockMvc.perform(
+                        patch(myLocalEndpoint)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonClienteUpdateDto.write(clienteUpdateDto).getJson())
+                                .accept(MediaType.APPLICATION_JSON))
+                .andReturn().getResponse();
+
+        Cliente result = mapper.readValue(response.getContentAsString(), Cliente.class);
+
+        // Assert
+        assertAll(
+                () -> assertEquals(200, response.getStatus()),
+                () -> assertEquals(cliente1, result)
+        );
+
+        // Verify
+        verify(clienteService, times(1)).update(id, clienteUpdateDto);
     }
 
     @Test
