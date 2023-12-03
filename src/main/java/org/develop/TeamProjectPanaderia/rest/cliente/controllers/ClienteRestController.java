@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteResponseDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteService;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
@@ -38,10 +40,12 @@ import java.util.Optional;
 @Tag(name = "Clientes", description = "Endpoint de Clientes de nuestra tienda")
 public class ClienteRestController {
     private final ClienteService clienteService;
+    private final ClienteMapper clienteMapper;
 
     @Autowired
-    public ClienteRestController(ClienteService clienteService) {
+    public ClienteRestController(ClienteService clienteService, ClienteMapper clienteMapper) {
         this.clienteService = clienteService;
+        this.clienteMapper = clienteMapper;
     }
 
     @Operation(summary = "Obtiene todos los clientes", description = "Obtiene una lista de clientes")
@@ -57,7 +61,7 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "200", description = "Página de clientes"),
     })
     @GetMapping
-    public ResponseEntity<PageResponse<Cliente>> getAllCliente(
+    public ResponseEntity<PageResponse<ClienteResponseDto>> getAllCliente(
             @RequestParam(required = false) Optional<String> nombreCompleto,
             @RequestParam(required = false) Optional<String> categoria,
             @RequestParam(defaultValue = "0") int page,
@@ -68,7 +72,7 @@ public class ClienteRestController {
         log.info("Buscando todos los clientes con las siguientes opciones: " + nombreCompleto + " " + categoria);
         Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(page, size, sort);
-        return ResponseEntity.ok(PageResponse.of(clienteService.findAll(nombreCompleto, categoria, pageable), sortBy, direction));
+        return ResponseEntity.ok(PageResponse.of(clienteMapper.toPageClienteResponse(clienteService.findAll(nombreCompleto, categoria, pageable)), sortBy, direction));
     }
 
 
@@ -81,9 +85,9 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClienteById(@PathVariable Long id) {
+    public ResponseEntity<ClienteResponseDto> getClienteById(@PathVariable Long id) {
         log.info("Buscando cliente por id: " + id);
-        return ResponseEntity.ok(clienteService.findById(id));
+        return ResponseEntity.ok(clienteMapper.toClienteResponseDto(clienteService.findById(id)));
     }
 
     @Operation(summary = "Crea un cliente", description = "Crea un cliente")
@@ -93,9 +97,9 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "400", description = "Cliente no válido"),
     })
     @PostMapping
-    public ResponseEntity<Cliente> createCliente(@Valid @RequestBody ClienteCreateDto clienteCreateDto) {
+    public ResponseEntity<ClienteResponseDto> createCliente(@Valid @RequestBody ClienteCreateDto clienteCreateDto) {
         log.info("Creando cliente: " + clienteCreateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.save(clienteCreateDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteMapper.toClienteResponseDto(clienteService.save(clienteCreateDto)));
     }
 
     @Operation(summary = "Actualiza un cliente", description = "Actualiza un cliente")
@@ -109,9 +113,9 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
+    public ResponseEntity<ClienteResponseDto> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando cliente por id: " + id + " con cliente: " + clienteUpdateDto);
-        return ResponseEntity.ok(clienteService.update(id, clienteUpdateDto));
+        return ResponseEntity.ok(clienteMapper.toClienteResponseDto(clienteService.update(id, clienteUpdateDto)));
     }
 
     @Operation(summary = "Actualiza parcialmente un cliente", description = "Actualiza parcialmente un cliente")
@@ -125,9 +129,9 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
     })
     @PatchMapping("/{id}")
-    public ResponseEntity<Cliente> updatePartialmenteCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
+    public ResponseEntity<ClienteResponseDto> updatePartialmenteCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando parcialmente cliente con id: " + id + " con cliente: " + clienteUpdateDto);
-        return ResponseEntity.ok(clienteService.update(id, clienteUpdateDto));
+        return ResponseEntity.ok(clienteMapper.toClienteResponseDto(clienteService.update(id, clienteUpdateDto)));
     }
 
     @Operation(summary = "Borra un cliente", description = "Borra un cliente")
@@ -156,9 +160,9 @@ public class ClienteRestController {
             @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
     })
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Cliente> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file){
+    public ResponseEntity<ClienteResponseDto> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()){
-            return ResponseEntity.ok(clienteService.updateImg(id,file));
+            return ResponseEntity.ok(clienteMapper.toClienteResponseDto(clienteService.updateImg(id,file)));
         }else{
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La Imagen no puede estar vacia");
         }

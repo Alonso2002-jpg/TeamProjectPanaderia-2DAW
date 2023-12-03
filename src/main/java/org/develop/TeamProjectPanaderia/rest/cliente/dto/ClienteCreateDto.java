@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
 
 @Data
@@ -29,6 +30,7 @@ public class ClienteCreateDto  {
     private String telefono;
     @Schema(description = "Imagen del cliente", example = Cliente.IMAGE_DEFAULT)
     private String imagen;
+    private Direccion direccion;
     @NotBlank(message = "La categoria no puede estar vacio")
     @Schema(description = "Categoria del cliente", example = "VIP")
     private String categoria;

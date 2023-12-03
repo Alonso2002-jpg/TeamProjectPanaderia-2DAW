@@ -4,6 +4,7 @@ package org.develop.TeamProjectPanaderia.rest.cliente.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 
 
 import java.time.LocalDateTime;
@@ -31,4 +32,5 @@ public class ClienteResponseDto {
     private String categoria;
     @Schema(description = "Si esta activo o no el cliente", example = "true")
     private Boolean isActive;
+    private Direccion direccion;
 }
