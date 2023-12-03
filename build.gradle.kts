@@ -22,28 +22,36 @@ repositories {
 }
 
 dependencies {
+	//Dependencia JPA
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	//Dependencia de Spring Web
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	//Dependencia de Validacion de datos
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	//Dependencia para Cache de Spring
 	implementation("org.springframework.boot:spring-boot-starter-cache:2.4.0")
+	//Dependencia de Mongo JPA
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+	//Dependencia de Spring Security
     implementation("org.springframework.boot:spring-boot-starter-security")
 	//Nogociacion de Contenido
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 	//Websockets
     implementation("org.springframework.boot:spring-boot-starter-websocket")
-
-	compileOnly("org.projectlombok:lombok")
-	runtimeOnly("com.h2database:h2")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	// Para pasar a XML los responses, negocacion de contenido
 	implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
-
+	//Lombok
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
 	// Para manejar los JWT tokens
     // JWT (Json Web Token)
     implementation("com.auth0:java-jwt:4.4.0")
-
+	//Gson
+	implementation("com.google.code.gson:gson")
+	//H2
+	runtimeOnly("com.h2database:h2")
+	//Test
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	// Test seguridad
 	testImplementation("org.springframework.security:spring-security-test")
 }
