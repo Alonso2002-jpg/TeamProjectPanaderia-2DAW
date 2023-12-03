@@ -1,5 +1,11 @@
 package org.develop.TeamProjectPanaderia.rest.proveedores.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorCreateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorResponseDto;
@@ -7,6 +13,7 @@ import org.develop.TeamProjectPanaderia.rest.proveedores.dto.ProveedorUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.proveedores.mapper.ProveedorMapper;
 import org.develop.TeamProjectPanaderia.rest.proveedores.services.ProveedorService;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,17 +31,32 @@ import java.util.Map;
 @RestController
 @RequestMapping("${api.version}/proveedores")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Proveedores", description = "Endpoint de Proveedores de nuestra panaderia")
 public class ProveedorRestController {
     private final ProveedorMapper proveedorMapper;
     private final ProveedorService proveedorService;
 
+    @Autowired
     public ProveedorRestController(ProveedorMapper proveedorMapper,
                                    ProveedorService proveedorService) {
         this.proveedorService = proveedorService;
         this.proveedorMapper = proveedorMapper;
     }
 
-    // Endpoint para obtener todos los proveedores
+    @Operation(summary = "Obtiene todos los proveedores", description = "Obtiene una lista de proveedores")
+    @Parameters({
+            @Parameter(name = "nif", description = "Nif del proveedor", example = "12345678Z"),
+            @Parameter(name = "name", description = "Nombre del proveedor", example = "Harinas S.L."),
+            @Parameter(name = "isActive", description = "Si esta activo o no el proveedor", example = "true"),
+            @Parameter(name = "tipo", description = "Tipo de proveedor", example = "Distribuidor"),
+            @Parameter(name = "page", description = "Número de página", example = "0"),
+            @Parameter(name = "size", description = "Tamaño de la página", example = "10"),
+            @Parameter(name = "sortBy", description = "Campo de ordenación", example = "id"),
+            @Parameter(name = "direction", description = "Dirección de ordenación", example = "asc")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de proveedores"),
+    })
     @GetMapping
     public ResponseEntity<PageResponse<ProveedorResponseDto>> findAll(@RequestParam(required = false) Optional<String> nif,
                                                                       @RequestParam(required = false) Optional<String> name,
@@ -49,26 +71,54 @@ public class ProveedorRestController {
         return ResponseEntity.ok(PageResponse.of(proveedorMapper.toPageResponse(proveedorService.findAll(nif, name,isActive,tipo,pageable)), sortBy, direction));
     }
 
-    // Endpoint para obtener un proveedor por su ID
+    @Operation(summary = "Obtiene un proveedor por su id", description = "Obtiene un proveedor por su id")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Proveedor"),
+            @ApiResponse(responseCode = "404", description = "Proveedor no encontrado"),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<ProveedorResponseDto> getProveedorById(@PathVariable Long id) {
         var proveedor = proveedorService.getProveedoresById(id);
         return ResponseEntity.ok(proveedorMapper.toResponse(proveedor));
     }
 
-    // Endpoint para crear un nuevo proveedor
+    @Operation(summary = "Crea un proveedor", description = "Crea un proveedor")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Proveedor a crear", required = true)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Proveedor creado"),
+            @ApiResponse(responseCode = "400", description = "Proveedor no válido"),
+    })
     @PostMapping
     public ResponseEntity<ProveedorResponseDto> createProveedor(@Valid @RequestBody ProveedorCreateDto proveedor) {
         return ResponseEntity.status(HttpStatus.CREATED).body(proveedorMapper.toResponse(proveedorService.saveProveedores(proveedor)));
     }
 
-    // Endpoint para actualizar un proveedor existente
+    @Operation(summary = "Actualiza un proveedor", description = "Actualiza un proveedor")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Proveedor a actualizar", required = true)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Proveedor actualizado"),
+            @ApiResponse(responseCode = "400", description = "Proveedor no válido"),
+            @ApiResponse(responseCode = "404", description = "Proveedor no encontrado"),
+    })
     @PutMapping("/{id}")
     public ResponseEntity<ProveedorResponseDto> updateProveedor(@PathVariable Long id, @Valid @RequestBody ProveedorUpdateDto proveedor) {
         return ResponseEntity.ok(proveedorMapper.toResponse(proveedorService.updateProveedor(proveedor,id)));
     }
 
-    // Endpoint para eliminar un proveedor por su ID
+    @Operation(summary = "Borra un proveedor", description = "Borra un proveedor")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Proveedor borrado"),
+            @ApiResponse(responseCode = "404", description = "Proveedor no encontrado"),
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProveedor(@PathVariable Long id) {
         proveedorService.deleteProveedoresById(id);

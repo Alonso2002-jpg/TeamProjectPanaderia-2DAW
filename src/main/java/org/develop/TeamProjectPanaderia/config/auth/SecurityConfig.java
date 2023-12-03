@@ -45,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers("/producto/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/storage/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/" + apiVersion + "/**").permitAll()
                         .anyRequest().authenticated())
 
