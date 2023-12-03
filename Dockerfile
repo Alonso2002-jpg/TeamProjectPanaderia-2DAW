@@ -13,7 +13,9 @@ COPY src src
 # Compila y construye el proyecto, podemos evitar los test evitando con -x test
 # Para fijar un perfil de compilación, se usa la instrucción
 # RUN ./gradlew build -Dspring.profiles.active=dev
-RUN ./gradlew clean build
+RUN pwd
+RUN ls -l
+RUN ./gradlew clean build -x test
 
 # Etapa de ejecución, un docker especifico, que se etiqueta como run
 # Con una imagen de java, solo neceistamos el jre
@@ -26,7 +28,7 @@ WORKDIR /app
 # Copia el jar de la aplicación, ojo que esta en la etapa de compilación, etiquetado como build
 # Cuidado con la ruta definida cuando has copiado las cosas en la etapa de compilación
 # Para copiar un archivo de una etapa a otra, se usa la instrucción COPY --from=etapaOrigen
-COPY --from=build /app/build/libs/*SNAPSHOT.jar /app/funkosApi.jar
+COPY --from=build /app/build/libs/*SNAPSHOT.jar /app/panaderiaApi.jar
 
 # Expone el puerto 3000
 EXPOSE 3000
@@ -36,4 +38,4 @@ EXPOSE 3000
 # ENTRYPOINT ["java","-jar","-Dspring.profiles.active=dev","/app/my-app.jar"]
 # Para lanzarlo con un perfil distinto al fijado por defecto, se usa la instrucción
 # ENTRYPOINT ["java","-jar","/app/my-app.jar"]
-ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app/funkosApi.jar"]
+ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app/panaderiaApi.jar"]
