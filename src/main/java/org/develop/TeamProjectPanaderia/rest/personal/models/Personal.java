@@ -29,7 +29,7 @@ public class Personal {
     @Schema(description = "Identificador unico del trabajador", example = "1a70f426-d51f-4a13-ba39-89203f94ed74")
     private UUID id;
     @Column(name = "nombre", nullable = false)
-    @Length(min = 3, message = "El nombre debe contener al menos 3 letras")
+    @Pattern(regexp = "^[A-Z][a-z]{3,}\s[A-Z][a-z]{3,}(\s[A-Z][a-z]{3,})?$", message = "Nombres y Apellidos deben empezar con Mayuscula y tener mas de 3 caracteres")
     @NotBlank(message = "El nombre no puede estar vacio")
     @Schema(description = "Nombre del trabajador", example = "Joselyn Obando")
     private String nombre;
