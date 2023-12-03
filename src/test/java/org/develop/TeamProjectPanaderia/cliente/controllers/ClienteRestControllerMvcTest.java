@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
+import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteResponseDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundException;
+import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteService;
-import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
-import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,16 +22,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -46,11 +46,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureJsonTesters
 @ExtendWith(MockitoExtension.class)
 @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN", "USER"})
-public class ClienteRestControllerMvcTest {
+class ClienteRestControllerMvcTest {
     private final String myEndpoint = "/v1/cliente";
     private final ObjectMapper mapper = new ObjectMapper();
     @Autowired
     MockMvc mockMvc;
+    @MockBean
+    private final ClienteMapper clienteMapper;
     @MockBean
     private ClienteService clienteService;
     @Autowired
@@ -58,6 +60,7 @@ public class ClienteRestControllerMvcTest {
     @Autowired
     private JacksonTester<ClienteUpdateDto> jsonClienteUpdateDto;
     Categoria categoriaCliente = new Categoria(1L, "CLIENTE_TEST", LocalDate.now(), LocalDate.now(), true);
+    private final Direccion direccion = new Direccion("Calle", "Numero", "Ciudad", "Provincia", "Pais", "12345");
     private final Cliente cliente1 =
             Cliente.builder()
                     .id(1L)
@@ -70,6 +73,7 @@ public class ClienteRestControllerMvcTest {
                     .fechaActualizacion(LocalDateTime.now())
                     .isActive(true)
                     .categoria(categoriaCliente)
+                    .direccion(direccion.toString())
                     .build();
     private final Cliente cliente2 =
             Cliente.builder()
@@ -82,33 +86,60 @@ public class ClienteRestControllerMvcTest {
                     .fechaCreacion(LocalDateTime.now())
                     .fechaActualizacion(LocalDateTime.now())
                     .isActive(true)
+                    .direccion(direccion.toString())
                     .categoria(categoriaCliente)
                     .build();
+    private final ClienteResponseDto clienteResponse1 = ClienteResponseDto.builder()
+            .id(1L)
+            .nombreCompleto("TEST1_LOLA")
+            .dni("03480731A")
+            .telefono("602697979")
+            .imagen("test1.png")
+            .fechaCreacion(LocalDateTime.now())
+            .fechaActualizacion(LocalDateTime.now())
+            .categoria("CLIENTE_TEST")
+            .isActive(true)
+            .direccion(direccion)
+            .build();
+    private final ClienteResponseDto clienteResponse2 = ClienteResponseDto.builder()
+            .id(1L)
+            .nombreCompleto("TEST2_LILA")
+            .dni("03480731B")
+            .telefono("602697971")
+            .imagen("test2.jpg")
+            .fechaCreacion(LocalDateTime.now())
+            .fechaActualizacion(LocalDateTime.now())
+            .categoria("CLIENTE_TEST")
+            .isActive(true)
+            .direccion(direccion)
+            .build();
 
     @Autowired
-    public ClienteRestControllerMvcTest(ClienteService clienteService){
+    public ClienteRestControllerMvcTest(ClienteMapper clienteMapper, ClienteService clienteService){
+        this.clienteMapper = clienteMapper;
         this.clienteService = clienteService;
         mapper.registerModule(new JavaTimeModule());
     }
 
-
     @Test
     void getAllCliente() throws Exception {
-        List<Cliente> listaCliente = List.of(cliente1, cliente2);
+        List <Cliente> listaCliente = List.of(cliente1, cliente2);
+        List <ClienteResponseDto> expectedClients = List.of(clienteResponse1, clienteResponse2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(listaCliente);
+        Page<ClienteResponseDto> responseDto = new PageImpl<>(expectedClients);
 
         // Arrange
         when(clienteService.findAll(Optional.empty(), Optional.empty(),  pageable)).thenReturn(page);
+        when(clienteMapper.toPageClienteResponse(page)).thenReturn(responseDto);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(myEndpoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Cliente> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ClienteResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -123,24 +154,25 @@ public class ClienteRestControllerMvcTest {
 
     @Test
     void getAllCliente_ByNombreCompleto() throws Exception {
-        List<Cliente> listaCliente = List.of(cliente1);
-        String localEndPoint = myEndpoint + "?nombreCompleto=TEST1_LOLA";
-
         Optional<String> nombreCompleto = Optional.of("TEST1_LOLA");
+        String localEndPoint = myEndpoint + "?nombreCompleto=TEST1_LOLA";
+        List<Cliente> listaCliente = List.of(cliente1);
+        List<ClienteResponseDto> expectedClients = List.of(clienteResponse1);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(listaCliente);
+        Page<ClienteResponseDto> pageResponse = new PageImpl<>(expectedClients);
 
         // Arrange
         when(clienteService.findAll(nombreCompleto, Optional.empty(), pageable)).thenReturn(page);
+        when(clienteMapper.toPageClienteResponse(page)).thenReturn(pageResponse);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(localEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Cliente> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ClienteResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -150,29 +182,30 @@ public class ClienteRestControllerMvcTest {
 
         // Verify
         verify(clienteService, times(1)).findAll(nombreCompleto, Optional.empty(), pageable);
-    }
 
+    }
 
     @Test
     void getAllCliente_ByCategoria() throws Exception {
         List<Cliente> listaCliente = List.of(cliente1, cliente2);
+        List<ClienteResponseDto> expectedClients = List.of(clienteResponse1, clienteResponse2);
         String localEndPoint = myEndpoint + "?categoria=CLIENTE_TEST";
-
         Optional<String> categoria = Optional.of("CLIENTE_TEST");
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(listaCliente);
+        Page<ClienteResponseDto> pageResponse = new PageImpl<>(expectedClients);
 
         // Arrange
         when(clienteService.findAll(Optional.empty(), categoria,  pageable)).thenReturn(page);
+        when(clienteMapper.toPageClienteResponse(page)).thenReturn(pageResponse);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(localEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Cliente> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ClienteResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
-
 
         // Assert
         assertAll(
@@ -182,27 +215,30 @@ public class ClienteRestControllerMvcTest {
 
         // Verify
         verify(clienteService, times(1)).findAll(Optional.empty(), categoria, pageable);
+        verify(clienteMapper, times(1)).toPageClienteResponse(page);
     }
 
 
     @Test
     void getAllCliente_ByIsActivo() throws Exception {
-        List<Cliente> listaCliente = List.of(cliente1, cliente2);
-        String localEndPoint = myEndpoint + "?isActivo=true";
-
         Optional<Boolean> isActivo = Optional.of(true);
+        String localEndPoint = myEndpoint + "?isActivo=true";
+        List<Cliente> listaCliente = List.of(cliente1, cliente2);
+        List<ClienteResponseDto> expectedClient = List.of(clienteResponse1, clienteResponse2);
         var pageable = PageRequest.of(0, 10, Sort.by("id").ascending());
         var page = new PageImpl<>(listaCliente);
+        Page<ClienteResponseDto> responseDtos = new PageImpl<>(expectedClient);
 
         // Arrange
         when(clienteService.findAll(Optional.empty(), Optional.empty(),  pageable)).thenReturn(page);
+        when(clienteMapper.toPageClienteResponse(page)).thenReturn(responseDtos);
 
         MockHttpServletResponse response = mockMvc.perform(
                         get(localEndPoint)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        PageResponse<Cliente> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        PageResponse<ClienteResponseDto> res = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
         });
 
 
@@ -214,6 +250,7 @@ public class ClienteRestControllerMvcTest {
 
         // Verify
         verify(clienteService, times(1)).findAll(Optional.empty(), Optional.empty(),  pageable);
+        verify(clienteMapper, times(1)).toPageClienteResponse(page);
     }
 
 
@@ -223,6 +260,7 @@ public class ClienteRestControllerMvcTest {
         String localEndPoint = myEndpoint + "/1";
 
         when(clienteService.findById(1L)).thenReturn(cliente1);
+        when(clienteMapper.toClienteResponseDto(cliente1)).thenReturn(clienteResponse1);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -230,12 +268,12 @@ public class ClienteRestControllerMvcTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Cliente res = mapper.readValue(response.getContentAsString(), Cliente.class);
+        ClienteResponseDto res = mapper.readValue(response.getContentAsString(), ClienteResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(cliente1, res)
+                () -> assertEquals(clienteResponse1, res)
         );
     }
 
@@ -262,10 +300,11 @@ public class ClienteRestControllerMvcTest {
     @Test
     void createCliente() throws Exception{
         // Arrange
-        ClienteCreateDto clienteDto = new ClienteCreateDto("TEST3_MARIA","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
-
+        ClienteCreateDto clienteDto = new ClienteCreateDto("TEST3_MARIA","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",direccion, categoriaCliente.getNameCategory(),true);
 
         when(clienteService.save(clienteDto)).thenReturn(cliente1);
+        when(clienteMapper.toClienteResponseDto(cliente1)).thenReturn(clienteResponse1);
+
 
         MockHttpServletResponse response = mockMvc.perform(
                         post(myEndpoint)
@@ -274,22 +313,23 @@ public class ClienteRestControllerMvcTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Cliente res = mapper.readValue(response.getContentAsString(), Cliente.class);
+        ClienteResponseDto res = mapper.readValue(response.getContentAsString(), ClienteResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(201, response.getStatus()),
-                () -> assertEquals(cliente1, res)
+                () -> assertEquals(clienteResponse1, res)
         );
 
         // Verify
         verify(clienteService, times(1)).save(clienteDto);
+        verify(clienteMapper, times(1)).toClienteResponseDto(cliente1);
     }
 
    @Test
     void createCliente_BadRequest_NombreCompleto() throws Exception {
         // Arrange
-        ClienteCreateDto clienteDto = new ClienteCreateDto(null,"test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",categoriaCliente.getNameCategory(),true);
+        ClienteCreateDto clienteDto = new ClienteCreateDto(null,"test3@gmail.com","03480731A", "602697979" ,  "test3.jpg",direccion, categoriaCliente.getNameCategory(),true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -309,7 +349,7 @@ public class ClienteRestControllerMvcTest {
   @Test
    void createCliente_BadRequest_Categoria() throws Exception {
        // Arrange
-       ClienteCreateDto clienteCreateDto = new ClienteCreateDto("EvelynObando","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg", null, true);
+       ClienteCreateDto clienteCreateDto = new ClienteCreateDto("EvelynObando","test3@gmail.com","03480731A", "602697979" ,  "test3.jpg", direccion, null, true);
 
        MockHttpServletResponse response = mockMvc.perform(
                        post(myEndpoint)
@@ -339,6 +379,7 @@ public class ClienteRestControllerMvcTest {
               .build();
 
       when(clienteService.update(id, clienteUpdateDto)).thenReturn(cliente1);
+      when(clienteMapper.toClienteResponseDto(cliente1)).thenReturn(clienteResponse1);
 
       MockHttpServletResponse response = mockMvc.perform(
                       put(myLocalEndpoint)
@@ -347,16 +388,17 @@ public class ClienteRestControllerMvcTest {
                               .accept(MediaType.APPLICATION_JSON))
               .andReturn().getResponse();
 
-      Cliente result = mapper.readValue(response.getContentAsString(), Cliente.class);
+      ClienteResponseDto result = mapper.readValue(response.getContentAsString(), ClienteResponseDto.class);
 
       // Assert
       assertAll(
               () -> assertEquals(200, response.getStatus()),
-              () -> assertEquals(cliente1, result)
+              () -> assertEquals(clienteResponse1, result)
       );
 
       // Verify
       verify(clienteService, times(1)).update(id, clienteUpdateDto);
+      verify(clienteMapper, times(1)).toClienteResponseDto(cliente1);
   }
 
     @Test
@@ -399,6 +441,7 @@ public class ClienteRestControllerMvcTest {
                 .build();
 
         when(clienteService.update(id, clienteUpdateDto)).thenReturn(cliente1);
+        when(clienteMapper.toClienteResponseDto(cliente1)).thenReturn(clienteResponse1);
 
         // Consulto el endpoint
         MockHttpServletResponse response = mockMvc.perform(
@@ -408,16 +451,17 @@ public class ClienteRestControllerMvcTest {
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
 
-        Cliente result = mapper.readValue(response.getContentAsString(), Cliente.class);
+        ClienteResponseDto result = mapper.readValue(response.getContentAsString(), ClienteResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(cliente1, result)
+                () -> assertEquals(clienteResponse1, result)
         );
 
         // Verify
         verify(clienteService, times(1)).update(id, clienteUpdateDto);
+        verify(clienteMapper, times(1)).toClienteResponseDto(cliente1);
     }
 
     @Test
@@ -481,6 +525,7 @@ public class ClienteRestControllerMvcTest {
         );
 
         when(clienteService.updateImg(id, file)).thenReturn(cliente1);
+        when(clienteMapper.toClienteResponseDto(cliente1)).thenReturn(clienteResponse1);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -493,15 +538,16 @@ public class ClienteRestControllerMvcTest {
         ).andReturn().getResponse();
 
 
-        Cliente result = mapper.readValue(response.getContentAsString(), Cliente.class);
+        ClienteResponseDto result = mapper.readValue(response.getContentAsString(), ClienteResponseDto.class);
 
         // Assert
         assertAll(
                 () -> assertEquals(200, response.getStatus()),
-                () -> assertEquals(cliente1, result)
+                () -> assertEquals(clienteResponse1, result)
         );
 
         // Verify
         verify(clienteService, times(1)).updateImg(id, file);
+        verify(clienteMapper, times(1)).toClienteResponseDto(cliente1);
     }
 }

@@ -125,7 +125,7 @@ public class PersonalServiceImpl implements PersonalService {
             userRepository.save(user);
             return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto,user));
         } catch (CategoriaNotFoundException e){
-            throw new PersonalBadRequest(e.getMessage());
+            throw new PersonalBadRequest("La categoria con nombre " + personalCreateDto.seccion() + " no existe");
         }
     }
 
@@ -143,7 +143,7 @@ public class PersonalServiceImpl implements PersonalService {
             }
             return personalRepository.save(personalMapper.toPersonalUpdate(personalDto, personalUpd, categoria));
         } catch (CategoriaNotFoundException e){
-            throw new PersonalBadRequest(personalDto.seccion());
+            throw new PersonalBadRequest("La categoria con nombre " +  personalDto.seccion() + " no existe");
         }
     }
     @Override

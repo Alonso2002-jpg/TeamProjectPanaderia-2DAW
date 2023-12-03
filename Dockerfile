@@ -13,9 +13,7 @@ COPY src src
 # Compila y construye el proyecto, podemos evitar los test evitando con -x test
 # Para fijar un perfil de compilación, se usa la instrucción
 # RUN ./gradlew build -Dspring.profiles.active=dev
-RUN pwd
-RUN ls -l
-RUN ./gradlew clean build -x test
+RUN ./gradlew build -x test
 
 # Etapa de ejecución, un docker especifico, que se etiqueta como run
 # Con una imagen de java, solo neceistamos el jre
@@ -39,3 +37,4 @@ EXPOSE 3000
 # Para lanzarlo con un perfil distinto al fijado por defecto, se usa la instrucción
 # ENTRYPOINT ["java","-jar","/app/my-app.jar"]
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app/panaderiaApi.jar"]
+
