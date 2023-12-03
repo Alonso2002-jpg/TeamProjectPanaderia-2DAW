@@ -6,21 +6,34 @@ import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.personal.mapper.PersonalMapper;
 import org.develop.TeamProjectPanaderia.rest.personal.models.Personal;
-import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoResponseDto;
-import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
+import org.develop.TeamProjectPanaderia.rest.users.mapper.UserMapper;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 class PersonalMapperTest {
-    private final PersonalMapper personalMapper = new PersonalMapper();
+    @Mock
+    private UserMapper userMapper;
+    @InjectMocks
+    private PersonalMapper personalMapper;
+    User user1 = new User(1L, "TEST-1", "56789125E", "prueba1@prueba.com", "prueba123", LocalDateTime.now(), LocalDateTime.now(), true, Set.of(Role.ADMIN, Role.USER));
     private final Categoria categoriaPersonal = new Categoria(1L, "PERSONAL_TEST", LocalDate.now(), LocalDate.now(), true);
     private final Personal personal =
             Personal.builder()
@@ -33,6 +46,7 @@ class PersonalMapperTest {
                     .fechaCreacion(LocalDateTime.now())
                     .fechaActualizacion(LocalDateTime.now())
                     .isActive(true)
+                    .user(user1)
                     .build();
 
     @Test
@@ -47,7 +61,7 @@ class PersonalMapperTest {
         UUID id = UUID.randomUUID();
 
         // Act
-        Personal nuevoPersonal = personalMapper.toPersonalCreate(id, categoriaPersonal, personalCreateDto);
+        Personal nuevoPersonal = personalMapper.toPersonalCreate(id, categoriaPersonal, personalCreateDto, user1);
 
         // Assert
         assertAll(

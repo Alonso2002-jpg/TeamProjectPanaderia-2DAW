@@ -2,6 +2,7 @@ package org.develop.TeamProjectPanaderia.cliente.repositories;
 
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DataJpaTest
 class ClienteRepositoryTest {
     private final Categoria categoriaCliente = new Categoria(1L, "CLIENTE_TEST", LocalDate.now(), LocalDate.now(), true);
+    private final Direccion direccion = new Direccion("Calle", "Numero", "Ciudad", "Provincia", "Pais", "12345");
     private final Cliente cliente1 = Cliente.builder()
             .id(null)
             .nombreCompleto("Joselyn Obando")
@@ -35,12 +37,12 @@ class ClienteRepositoryTest {
             .fechaActualizacion(LocalDateTime.now())
             .isActive(true)
             .categoria(categoriaCliente)
+            .direccion(direccion.toString())
             .build();
     @Autowired
     private ClienteRepository clienteRepository;
     @Autowired
     private TestEntityManager entityManager;
-
     @BeforeEach
     void setup() {
         // Categoria
@@ -88,6 +90,7 @@ class ClienteRepositoryTest {
                 .dni("21234567A")
                 .telefono("623456789")
                 .imagen("nuevocliente.jpg")
+                .direccion(direccion.toString())
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .categoria(categoriaCliente)
@@ -114,6 +117,7 @@ class ClienteRepositoryTest {
                 .dni("21234567A")
                 .telefono("623456789")
                 .imagen("nuevocliente.jpg")
+                .direccion(direccion.toString())
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .isActive(true)

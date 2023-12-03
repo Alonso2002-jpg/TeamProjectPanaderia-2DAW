@@ -2,13 +2,17 @@ package org.develop.TeamProjectPanaderia.rest.cliente.dto;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @Builder
 public class ClienteResponseDto {

@@ -14,6 +14,7 @@ import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundE
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.rest.cliente.services.ClienteServiceImpl;
 import org.develop.TeamProjectPanaderia.storage.services.StorageService;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.times;
 @ExtendWith(MockitoExtension.class)
 public class ClienteServiceTest{
     private final Categoria categoriaCliente = new Categoria(1L, "CLIENTE_TEST", LocalDate.now(), LocalDate.now(), true);
-
+    private final Direccion direccion = new Direccion("Calle", "Numero", "Ciudad", "Provincia", "Pais", "12345");
     private final Cliente cliente1 =
             Cliente.builder()
                     .id(1L)
@@ -256,7 +257,7 @@ public class ClienteServiceTest{
    void save() throws IOException {
        // Arrange
        Long id = 1L;
-       ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg",categoriaCliente.getNameCategory(),true);
+       ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", direccion, categoriaCliente.getNameCategory(),true);
        Cliente expecCliente = Cliente.builder()
                .id(1L)
                .nombreCompleto("nuevo_cliente")
@@ -292,7 +293,7 @@ public class ClienteServiceTest{
     @Test
     void save_categoryNotExist(){
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(),true);
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", direccion, categoriaCliente.getNameCategory(),true);
 
         when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.empty());
         when(categoriaService.findByName(clienteCreateDto.getCategoria())).thenThrow(new CategoriaNotFoundException(clienteCreateDto.getCategoria()));
@@ -309,7 +310,7 @@ public class ClienteServiceTest{
     @Test
     void save_dniAlreadyExist(){
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(),true);
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", direccion, categoriaCliente.getNameCategory(),true);
 
         when(clienteRepository.findClienteByDniEqualsIgnoreCase(any(String.class))).thenReturn(Optional.of(cliente1));
 
