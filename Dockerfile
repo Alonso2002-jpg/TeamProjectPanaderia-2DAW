@@ -13,8 +13,6 @@ COPY src src
 # Compila y construye el proyecto, podemos evitar los test evitando con -x test
 # Para fijar un perfil de compilación, se usa la instrucción
 # RUN ./gradlew build -Dspring.profiles.active=dev
-RUN pwd
-RUN ls -l
 RUN ./gradlew clean build -x test
 
 # Etapa de ejecución, un docker especifico, que se etiqueta como run

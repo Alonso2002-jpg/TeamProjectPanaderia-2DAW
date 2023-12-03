@@ -59,5 +59,9 @@ dependencies {
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform() // Usamos JUnit 5
+}
+
+tasks.test {
+    systemProperty("spring.profiles.active", project.findProperty("spring.profiles.active") ?: "dev")
 }
