@@ -5,6 +5,10 @@ import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.personal.models.Personal;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
+import org.develop.TeamProjectPanaderia.rest.users.dto.UserInfoResponseDto;
+import org.develop.TeamProjectPanaderia.rest.users.mapper.UserMapper;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +19,13 @@ import java.util.UUID;
 
 @Component
 public class PersonalMapper {
-    public Personal toPersonalCreate(UUID id, Categoria categoria, PersonalCreateDto dto) {
+    private final UserMapper userMapper;
+
+    @Autowired
+    public PersonalMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+    public Personal toPersonalCreate(UUID id, Categoria categoria, PersonalCreateDto dto, User user) {
         return Personal.builder()
                 .id(id)
                 .dni(dto.dni())
@@ -24,6 +34,7 @@ public class PersonalMapper {
                 .isActive(dto.isActive() != null ? dto.isActive() : true)
                 .fechaAlta(LocalDate.now())
                 .fechaBaja(null)
+                .user(user)
                 .fechaCreacion(LocalDateTime.now())
                 .fechaActualizacion(LocalDateTime.now())
                 .build();
@@ -50,7 +61,8 @@ public class PersonalMapper {
                 personal.getNombre(),
                 personal.getSeccion().getNameCategory(),
                 personal.getFechaAlta().toString(),
-                personal.isActive()
+                personal.isActive(),
+                personal.getUser().getId()
         );
     }
 

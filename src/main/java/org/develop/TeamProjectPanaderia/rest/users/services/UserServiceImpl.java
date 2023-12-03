@@ -62,6 +62,11 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsernameIgnoreCase(username);
+    }
+
+    @Override
     public UserResponseDto save(UserRequestDto userRequestDto) {
         log.info("Guardando usuario: " + userRequestDto);
 

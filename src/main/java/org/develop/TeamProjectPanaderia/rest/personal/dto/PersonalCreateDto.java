@@ -1,6 +1,7 @@
 
 package org.develop.TeamProjectPanaderia.rest.personal.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
@@ -17,6 +18,9 @@ public record PersonalCreateDto(
         @NotBlank(message = "El nombre no puede estar vacio")
         @Schema(description = "Nombre del trabajador", example = "Joselyn Obando")
         String nombre,
+        @Email(message = "El email no es valido")
+        @NotBlank(message = "El email no puede estar vacio")
+        String email,
         @NotBlank(message = "La seccion no puede estar vacia")
         @Schema(description = "Seccion del trabajador", example = "Panaderia")
         String seccion,

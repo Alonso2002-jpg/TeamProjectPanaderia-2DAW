@@ -1,5 +1,15 @@
 package org.develop.TeamProjectPanaderia.rest.personal.services;
 
+import org.develop.TeamProjectPanaderia.WebSockets.mapper.NotificacionMapper;
+import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
+import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
+import org.develop.TeamProjectPanaderia.rest.users.dto.UserRequestDto;
+import org.develop.TeamProjectPanaderia.rest.users.mapper.UserMapper;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
+import org.develop.TeamProjectPanaderia.rest.users.repositories.UserRepository;
+import org.develop.TeamProjectPanaderia.storage.services.StorageService;
+import org.springframework.cache.annotation.Cacheable;
 import jakarta.persistence.criteria.Join;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -40,22 +51,18 @@ import java.util.UUID;
 
 public class PersonalServiceImpl implements PersonalService {
     private final PersonalRepository personalRepository;
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final PersonalMapper personalMapper;
-    private final StorageService storageService;
-
-    private final WebSocketConfig webSocketConfig;
-    private WebSocketHandler webSocketService;
     private final CategoriaService categoriaService;
-    private final NotificacionMapper<Personal> productoNotificacionMapper;
 
     @Autowired
-    public PersonalServiceImpl(PersonalRepository personalRepository, PersonalMapper personalMapper, StorageService storageService, WebSocketConfig webSocketConfig, CategoriaService categoriaService, NotificacionMapper<Personal> productoNotificacionMapper) {
+    public PersonalServiceImpl(PersonalRepository personalRepository, UserMapper userMapper,UserRepository userRepository,PersonalMapper personalMapper, CategoriaService categoriaService) {
         this.personalRepository = personalRepository;
         this.personalMapper = personalMapper;
-        this.storageService = storageService;
-        this.webSocketConfig = webSocketConfig;
         this.categoriaService = categoriaService;
-        this.productoNotificacionMapper = productoNotificacionMapper;
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
 
@@ -112,6 +119,14 @@ public class PersonalServiceImpl implements PersonalService {
         } catch (CategoriaNotFoundException e){
             throw new PersonalBadRequest(personalCreateDto.seccion());
         }
+        Categoria categoria = categoriaService.findByName(personalCreateDto.seccion());
+        UUID id = UUID.randomUUID();
+        if (userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).isPresent()) {
+            return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto,userRepository.findByUsernameIgnoreCase(personalCreateDto.dni()).get()));
+        }
+        User user = userMapper.toUserFromPersonal(personalCreateDto, getPasswordFromPersonal(personalCreateDto));
+        userRepository.save(user);
+        return personalRepository.save(personalMapper.toPersonalCreate(id, categoria, personalCreateDto, user));
     }
 
     @Override
@@ -151,7 +166,10 @@ public class PersonalServiceImpl implements PersonalService {
     public List<Personal> findByActiveIs(Boolean isActive) {
         return personalRepository.findByIsActive(isActive);
     }
-    public void setWebSocketService(WebSocketHandler webSocketHandlerMock) {
-        this.webSocketService = webSocketHandlerMock;
+
+
+    public String getPasswordFromPersonal(PersonalCreateDto personal){
+        String[] completeName = personal.nombre().split(" ");
+        return completeName[0].trim().substring(0,1).toLowerCase() + completeName[1].trim() + personal.dni().substring(personal.dni().length()-4);
     }
 }

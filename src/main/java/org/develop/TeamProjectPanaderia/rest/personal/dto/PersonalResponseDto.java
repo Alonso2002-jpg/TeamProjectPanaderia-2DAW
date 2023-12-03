@@ -2,6 +2,7 @@ package org.develop.TeamProjectPanaderia.rest.personal.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import org.develop.TeamProjectPanaderia.rest.users.dto.UserInfoResponseDto;
 
 import java.util.UUID;
 
@@ -19,5 +20,6 @@ public record PersonalResponseDto(
         String fechaAlta,
         @Schema(description = "Si esta activo o no el trabajador",example = "true")
         Boolean isActive
+        Long user
 ) {
 }
