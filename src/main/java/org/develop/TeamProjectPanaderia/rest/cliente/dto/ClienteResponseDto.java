@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.rest.cliente.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 
 
 import java.time.LocalDateTime;
@@ -21,4 +22,5 @@ public class ClienteResponseDto {
     private LocalDateTime fechaActualizacion;
     private String categoria;
     private Boolean isActive;
+    private Direccion direccion;
 }

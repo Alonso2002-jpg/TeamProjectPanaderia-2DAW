@@ -50,7 +50,8 @@ public class Cliente {
     private LocalDateTime fechaActualizacion;
     @Column(columnDefinition = "Boolean default true")
     private Boolean isActive;
-
+    @NotBlank(message = "La categoria no puede estar vacia")
+    private String direccion;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

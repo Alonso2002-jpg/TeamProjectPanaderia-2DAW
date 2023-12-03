@@ -3,6 +3,7 @@ package org.develop.TeamProjectPanaderia.rest.cliente.dto;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
 
 @Builder
@@ -17,5 +18,6 @@ public class ClienteUpdateDto {
     private String telefono;
     private String imagen;
     private String categoria;
+    private Direccion direccion;
     private Boolean isActive;
 }

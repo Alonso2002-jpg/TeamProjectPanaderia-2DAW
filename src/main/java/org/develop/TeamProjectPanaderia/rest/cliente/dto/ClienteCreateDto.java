@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
 
 @Data
@@ -22,6 +23,7 @@ public class ClienteCreateDto  {
     @Pattern(regexp = "^[679][0-9]{8,}$", message = "El teléfono debe comenzar con 9, 6 o 7 y tener  9 números")
     private String telefono;
     private String imagen;
+    private Direccion direccion;
     @NotBlank(message = "La categoria no puede estar vacio")
     private String categoria;
     private Boolean isActive;
