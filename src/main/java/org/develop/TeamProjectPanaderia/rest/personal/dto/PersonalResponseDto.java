@@ -20,6 +20,7 @@ public record PersonalResponseDto(
         String fechaAlta,
         @Schema(description = "Si esta activo o no el trabajador",example = "true")
         Boolean isActive,
+        @Schema(description = "Identificador unico del usuario del personal", example = "1")
         Long user
 ) {
 }

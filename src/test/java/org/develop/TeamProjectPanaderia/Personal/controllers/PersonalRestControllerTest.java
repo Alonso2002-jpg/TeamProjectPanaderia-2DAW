@@ -4,6 +4,11 @@ package org.develop.TeamProjectPanaderia.Personal.controllers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
 import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalResponseDto;
@@ -16,7 +21,10 @@ import org.develop.TeamProjectPanaderia.rest.personal.services.PersonalService;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoResponseDto;
 import org.develop.TeamProjectPanaderia.rest.producto.dto.ProductoUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoBadRequest;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
 import org.develop.TeamProjectPanaderia.utils.pageresponse.PageResponse;
+import org.hibernate.validator.constraints.Length;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +45,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,6 +75,8 @@ class PersonalRestControllerTest {
     private Personal personal2;
     private PersonalResponseDto personalResponseDto1;
     private PersonalResponseDto personalResponseDto2;
+    private User user1;
+    private User user2;
 
     @Autowired
     public PersonalRestControllerTest(PersonalMapper personalMapper, PersonalService personalService){
@@ -76,8 +87,10 @@ class PersonalRestControllerTest {
 
     @BeforeEach
     void setup(){
-        personal1 = new Personal(UUID.randomUUID(),"TEST-1", "56789125E", LocalDate.now(), LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(), true, categoriaPersonal);
-        personal2 = new Personal(UUID.randomUUID(),"TEST-2", "56781236E", LocalDate.now(), LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(), true, categoriaPersonal);
+        user1 = new User(1L, "TEST-1", "56789125E", "prueba1@prueba.com", "prueba123", LocalDateTime.now(), LocalDateTime.now(), true, Set.of(Role.ADMIN, Role.USER));
+        user2 = new User(2L, "TEST-2", "56781236E", "prueba2@prueba.com", "prueba123", LocalDateTime.now(), LocalDateTime.now(), true, Set.of(Role.ADMIN, Role.USER));
+        personal1 = new Personal(UUID.randomUUID(),"TEST-1", "56789125E", "prueba1@prueba.com", LocalDate.now(), LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(), true, user1, categoriaPersonal);
+        personal2 = new Personal(UUID.randomUUID(),"TEST-2", "56781236E", "prueba2@prueba.com", LocalDate.now(), LocalDate.now(), LocalDateTime.now(), LocalDateTime.now(), true, user2, categoriaPersonal);
         personalResponseDto1 = PersonalResponseDto.builder()
                 .id(personal1.getId())
                 .dni(personal1.getDni())
@@ -95,7 +108,6 @@ class PersonalRestControllerTest {
                 .isActive(personal2.isActive())
                 .build();
     }
-
 
     @Test
     void getAllPersonal() throws Exception {
@@ -347,7 +359,7 @@ class PersonalRestControllerTest {
     void createPersonal() throws Exception{
         // Arrange
         UUID uuid = UUID.randomUUID();
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "Nuevo_Personal", categoriaPersonal.getNameCategory(), true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "Nuevo_Personal", "nuevopersonal@gmail.com", categoriaPersonal.getNameCategory(), true);
 
         when(personalService.save(personalCreateDto)).thenReturn(personal1);
         when(personalMapper.toResponseDto(personal1)).thenReturn(personalResponseDto1);
@@ -375,7 +387,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Dni_isNull() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto(null, "Nuevo_Personal", categoriaPersonal.getNameCategory(), true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto(null, "Nuevo_Personal", "nuevopersonal@gmail.com", categoriaPersonal.getNameCategory(), true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -396,7 +408,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Dni_isInvalid() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("123", "Nuevo_Personal", categoriaPersonal.getNameCategory(), true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("123", "Nuevo_Personal", "nuevopersonal@gmail.com", categoriaPersonal.getNameCategory(), true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -417,7 +429,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Name_2LettersOnly() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "ho", categoriaPersonal.getNameCategory(), true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "ho", "nuevopersonal@gmail.com", categoriaPersonal.getNameCategory(), true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -439,7 +451,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Name_isEmpty() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", null, categoriaPersonal.getNameCategory(), true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", null, "nuevopersonal@gmail.com", categoriaPersonal.getNameCategory(), true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -460,7 +472,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Category_isEmpty() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "TEST-1", "", true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "TEST-1", "nuevopersonal@gmail.com", "", true);
 
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -481,7 +493,7 @@ class PersonalRestControllerTest {
     @Test
     void createPersonal_BadRequest_Category_notExist() throws Exception{
         // Arrange
-        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "TEST-1", "Categoria_Falsa", true);
+        PersonalCreateDto personalCreateDto = new PersonalCreateDto("56789125E", "TEST-1", "nuevopersonal@gmail.com","Categoria_Falsa", true);
 
         when(personalService.save(personalCreateDto)).thenThrow(new ProductoBadRequest("Categoria_falsa"));
 

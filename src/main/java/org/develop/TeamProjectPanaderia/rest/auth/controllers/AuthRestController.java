@@ -1,5 +1,6 @@
 package org.develop.TeamProjectPanaderia.rest.auth.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.rest.auth.dto.JwtAuthResponseDto;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("${api.version}/auth")
+@Tag(name = "Autorizacion", description = "Endpoint para la autorizacion de Logeo y registro en nuestra tienda")
 public class AuthRestController {
     private final AuthenticationService authenticationService;
 
