@@ -52,6 +52,10 @@ dependencies {
 	runtimeOnly("com.h2database:h2")
 	//Test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+	// Swagger
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
 	// Test seguridad
 	testImplementation("org.springframework.security:spring-security-test")
 }
