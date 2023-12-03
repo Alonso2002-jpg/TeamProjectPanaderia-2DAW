@@ -13,16 +13,33 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+/**
+ * Manejador de WebSocket para la gestión de conexiones y envío de mensajes.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Slf4j
 public class WebSocketHandler extends TextWebSocketHandler implements SubProtocolCapable, WebSocketSender {
     private final String entity;
     //Sesiones de los clientes conectados, puede ser usado por varios hilos.
     private final Set<WebSocketSession> sessions = new CopyOnWriteArraySet<>();
 
+
+    /**
+     * Constructor de la clase WebSocketHandler.
+     *
+     * @param entity La entidad asociada al WebSocketHandler.
+     */
     public WebSocketHandler(String entity) {
         this.entity = entity;
     }
 
+    /**
+     * Se ejecuta despues de que se establece una conexion WebSocket.
+     *
+     * @param session La sesión WebSocket establecida.
+     * @throws Exception Si ocurre un error durante la conexion.
+     */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("Conexión establecida con el servidor");
@@ -33,12 +50,24 @@ public class WebSocketHandler extends TextWebSocketHandler implements SubProtoco
         session.sendMessage(message);
     }
 
+    /**
+     * Se ejecuta después de que se establece una conexion WebSocket.
+     *
+     * @param session La sesióo WebSocket establecida.
+     * @throws Exception Si ocurre un error durante la conexión.
+     */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         log.info("Conexión cerrada con el servidor: " + status);
         sessions.remove(session);
     }
 
+    /**
+     * Envía un mensaje a todos los clientes conectados.
+     *
+     * @param message El mensaje a enviar.
+     * @throws IOException Si ocurre un error durante el envio del mensaje.
+     */
     @Override
     public void sendMessage(String message) throws IOException {
         log.info("Enviar mensaje de cambios en la entidad: " + entity + " : " + message);
