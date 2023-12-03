@@ -1,5 +1,11 @@
 package org.develop.TeamProjectPanaderia.rest.cliente.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteCreateDto;
@@ -29,8 +35,8 @@ import java.util.Optional;
 @Slf4j
 @RequestMapping("${api.version}/cliente")
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Clientes", description = "Endpoint de Clientes de nuestra tienda")
 public class ClienteRestController {
-
     private final ClienteService clienteService;
 
     @Autowired
@@ -38,6 +44,18 @@ public class ClienteRestController {
         this.clienteService = clienteService;
     }
 
+    @Operation(summary = "Obtiene todos los clientes", description = "Obtiene una lista de clientes")
+    @Parameters({
+            @Parameter(name = "nombreCompleto", description = "Nombre completo del cliente", example = "Kurt Cobain"),
+            @Parameter(name = "categoria", description = "Categoria del cliente", example = "VIP"),
+            @Parameter(name = "page", description = "Número de página", example = "0"),
+            @Parameter(name = "size", description = "Tamaño de la página", example = "10"),
+            @Parameter(name = "sortBy", description = "Campo de ordenación", example = "id"),
+            @Parameter(name = "direction", description = "Dirección de ordenación", example = "asc")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Página de clientes"),
+    })
     @GetMapping
     public ResponseEntity<PageResponse<Cliente>> getAllCliente(
             @RequestParam(required = false) Optional<String> nombreCompleto,
@@ -53,30 +71,73 @@ public class ClienteRestController {
         return ResponseEntity.ok(PageResponse.of(clienteService.findAll(nombreCompleto, categoria, pageable), sortBy, direction));
     }
 
+
+    @Operation(summary = "Obtiene un cliente por su id", description = "Obtiene un cliente por su id")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del cliente", example = "1", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<Cliente> getClienteById(@PathVariable Long id) {
         log.info("Buscando cliente por id: " + id);
         return ResponseEntity.ok(clienteService.findById(id));
     }
 
+    @Operation(summary = "Crea un cliente", description = "Crea un cliente")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Cliente a crear", required = true)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Cliente creado"),
+            @ApiResponse(responseCode = "400", description = "Cliente no válido"),
+    })
     @PostMapping
     public ResponseEntity<Cliente> createCliente(@Valid @RequestBody ClienteCreateDto clienteCreateDto) {
         log.info("Creando cliente: " + clienteCreateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.save(clienteCreateDto));
     }
 
+    @Operation(summary = "Actualiza un cliente", description = "Actualiza un cliente")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del cliente", example = "1", required = true)
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Cliente a actualizar", required = true)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente actualizado"),
+            @ApiResponse(responseCode = "400", description = "Cliente no válido"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+    })
     @PutMapping("/{id}")
     public ResponseEntity<Cliente> updateCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando cliente por id: " + id + " con cliente: " + clienteUpdateDto);
         return ResponseEntity.ok(clienteService.update(id, clienteUpdateDto));
     }
 
+    @Operation(summary = "Actualiza parcialmente un cliente", description = "Actualiza parcialmente un cliente")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del cliente", example = "1", required = true)
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Cliente a actualizar", required = true)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente actualizado"),
+            @ApiResponse(responseCode = "400", description = "Cliente no válido"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+    })
     @PatchMapping("/{id}")
     public ResponseEntity<Cliente> updatePartialmenteCliente(@PathVariable Long id, @Valid @RequestBody ClienteUpdateDto clienteUpdateDto) {
         log.info("Actualizando parcialmente cliente con id: " + id + " con cliente: " + clienteUpdateDto);
         return ResponseEntity.ok(clienteService.update(id, clienteUpdateDto));
     }
 
+    @Operation(summary = "Borra un cliente", description = "Borra un cliente")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del cliente", example = "1", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Cliente borrado"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCliente(@PathVariable Long id) {
         log.info("Borrando cliente por id: " + id);
@@ -84,6 +145,16 @@ public class ClienteRestController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @Operation(summary = "Actualiza la imagen de un cliente", description = "Actualiza la imagen de un cliente")
+    @Parameters({
+            @Parameter(name = "id", description = "Identificador unico del cliente", example = "1", required = true),
+            @Parameter(name = "file", description = "Fichero a subir", required = true)
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Cliente actualizado"),
+            @ApiResponse(responseCode = "400", description = "Cliente no válido"),
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado"),
+    })
     @PatchMapping(value = "/image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Cliente> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file){
         if (!file.isEmpty()){
