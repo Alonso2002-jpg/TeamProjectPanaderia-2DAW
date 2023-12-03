@@ -30,7 +30,7 @@ import java.util.Optional;
 
 @RestController
 @Slf4j
-@RequestMapping("users")
+@RequestMapping("${api.version}/users")
 @PreAuthorize("hasRole('USER')")
 public class UserRestController {
     private final UserService userService;

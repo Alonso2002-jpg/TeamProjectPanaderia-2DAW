@@ -1,14 +1,18 @@
 package org.develop.TeamProjectPanaderia.rest.users.mapper;
 
+import org.develop.TeamProjectPanaderia.rest.personal.dto.PersonalCreateDto;
+import org.develop.TeamProjectPanaderia.rest.personal.models.Personal;
 import org.develop.TeamProjectPanaderia.rest.users.dto.UserInfoResponseDto;
 import org.develop.TeamProjectPanaderia.rest.users.dto.UserRequestDto;
 import org.develop.TeamProjectPanaderia.rest.users.dto.UserResponseDto;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
 import org.develop.TeamProjectPanaderia.rest.users.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class UserMapper {
@@ -40,7 +44,15 @@ public class UserMapper {
                 .isActive(request.getIsActive() == null ? user.getIsActive() : request.getIsActive())
                 .build();
     }
-
+    public User toUserFromPersonal(PersonalCreateDto personal, String password){
+        return User.builder()
+                .name(personal.nombre())
+                .username(personal.dni())
+                .password(passwordEncoder.encode(password))
+                .email(personal.email())
+                .roles(Set.of(Role.USER))
+                .build();
+    }
     public UserResponseDto toUserResponse(User user){
         return UserResponseDto.builder()
                 .id(user.getId())
