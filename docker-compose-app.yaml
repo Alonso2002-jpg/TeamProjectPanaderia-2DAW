@@ -1,0 +1,25 @@
+# Servicios de la aplicación
+services:
+  # Servicio de la API REST
+  # comentar si no se quiere ejecutar en local o IDE
+  panaderia-api-rest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: panaderia-api-rest
+    restart: always
+    env_file: .env
+    ports:
+      - ${API_PORT}:3000
+    volumes:
+      - storage-dir:/app/storage-dir
+    networks:
+      - panaderia-network
+
+# Volume para guardar los datos de la base de datos
+volumes:
+  storage-dir:
+
+networks:
+  panaderia-network:
+    driver: bridge

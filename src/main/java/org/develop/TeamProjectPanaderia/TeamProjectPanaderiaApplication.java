@@ -16,7 +16,7 @@ public class TeamProjectPanaderiaApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("Servidor Corriendo en puerto 8080");
+		System.out.println("Servidor Corriendo en puerto 3000");
 		System.out.println("Bienvenidos a Tostones Panaderia 🥖​🍞​");
 	}
 }
