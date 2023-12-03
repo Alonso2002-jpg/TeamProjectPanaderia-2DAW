@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Data;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
 
 @Builder
@@ -22,6 +23,7 @@ public class ClienteUpdateDto {
     private String imagen;
     @Schema(description = "Categoria del cliente", example = "VIP")
     private String categoria;
+    private Direccion direccion;
     @Schema(description = "Si esta activo o no el cliente", example = "true")
     private Boolean isActive;
 }

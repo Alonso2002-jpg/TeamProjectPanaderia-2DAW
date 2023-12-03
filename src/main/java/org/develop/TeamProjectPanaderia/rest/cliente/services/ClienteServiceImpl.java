@@ -3,6 +3,8 @@ package org.develop.TeamProjectPanaderia.rest.cliente.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import jakarta.persistence.criteria.Join;
 import lombok.extern.slf4j.Slf4j;
 import org.develop.TeamProjectPanaderia.WebSockets.dto.NotificacionResponseDto;
@@ -18,6 +20,7 @@ import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotFoundE
 import org.develop.TeamProjectPanaderia.rest.cliente.exceptions.ClienteNotSaveException;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.develop.TeamProjectPanaderia.rest.cliente.repositories.ClienteRepository;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketConfig;
 import org.develop.TeamProjectPanaderia.config.websockets.WebSocketHandler;
@@ -130,6 +133,16 @@ public class ClienteServiceImpl implements ClienteService{
         } catch (CategoriaNotFoundException e){
             throw new ClienteBadRequest(clienteUpdateDto.getCategoria());
         }
+    }
+    @Override
+    @CachePut
+    public Cliente updateDireccion(Long id, Direccion direccion){
+        log.info("Actualizando direccion de cliente por id: " + id);
+        Cliente clienteActual = this.findById(id);
+        clienteActual.setDireccion(clienteMapper.toJson(direccion));
+        Cliente clienteUpdated = clienteRepository.save(clienteActual);
+        onChange(Notificacion.Tipo.UPDATE, clienteUpdated);
+        return clienteUpdated;
     }
 
     @Override

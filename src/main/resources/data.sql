@@ -98,18 +98,18 @@ INSERT INTO Personal (id, dni, nombre,email,user_id, seccion, active)
 VALUES (UUID(),'56789123E', 'Carlos Martínez','carlos@pepitos.org',7, 7, true);
 
 --INSERTS CLIENTES
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
-VALUES ('Laura González', 'laura@example.com', '12345678A', '612345678',9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id,direccion, is_active)
+VALUES ('Laura González', 'laura@example.com', '12345678A', '612345678',9,'{"calle":"Calle A","numero":"123","ciudad":"Ciudad X","provincia":"Provincia Y","pais":"Pais Z","codPostal":"12345"}', true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
-VALUES ('Pablo Pérez', 'pablo@example.com', '23456789B', '655432167', 9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, direccion,is_active)
+VALUES ('Pablo Pérez', 'pablo@example.com', '23456789B', '655432167', 9, '{"calle":"Avenida B","numero":"456","ciudad":"Ciudad Y","provincia":"Provincia X","pais":"Pais Z","codPostal":"54321"}',true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, is_active)
-VALUES ('María Rodríguez', 'maria@example.com', '34567891C', '699876543', 8, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id, direccion,is_active)
+VALUES ('María Rodríguez', 'maria@example.com', '34567891C', '699876543', 8, '{"calle":"Calle Principal","numero":"789","ciudad":"Ciudad Z","provincia":"Provincia Z","pais":"Pais X","codPostal":"67890"}',true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, is_active)
-VALUES ('Carlos Martínez', 'carlos@example.com', '45678912D', '666123456', 9, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, direccion,is_active)
+VALUES ('Carlos Martínez', 'carlos@example.com', '45678912D', '666123456', 9, '{"calle":"Calle Central","numero":"234","ciudad":"Ciudad X","provincia":"Provincia Y","pais":"Pais Z","codPostal":"34567"}',true);
 
-INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, is_active)
-VALUES ('Lucía Sánchez', 'lucia@example.com', '56789123E', '677654321',  8, true);
+INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono, categoria_id, direccion,is_active)
+VALUES ('Lucía Sánchez', 'lucia@example.com', '56789123E', '677654321',  8, '{"calle":"Avenida Principal","numero":"567","ciudad":"Ciudad Z","provincia":"Provincia X","pais":"Pais Y","codPostal":"45678"}',true);
 

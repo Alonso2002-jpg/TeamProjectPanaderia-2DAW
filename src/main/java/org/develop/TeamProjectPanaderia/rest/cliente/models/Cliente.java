@@ -60,6 +60,8 @@ public class Cliente {
     @Column(columnDefinition = "Boolean default true")
     @Schema(description = "Si esta activo o no el cliente", example = "true")
     private Boolean isActive;
+    @NotBlank(message = "La categoria no puede estar vacia")
+    private String direccion;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
