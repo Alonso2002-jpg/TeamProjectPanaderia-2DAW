@@ -76,7 +76,7 @@ Configuraciones y manejadores para establecer comunicaciones en tiempo real entr
 - **Gestión de Productos**: Permite a los usuarios crear, actualizar, eliminar y consultar información detallada de los productos disponibles, incluyendo precios y disponibilidad con los stock .
 - **Manejo de Personal**: Administra los datos del personal, sus roles, asegurando que la asignación de tareas sea óptima y eficiente.
 - **Relación con Proveedores**: Facilita la comunicación y gestión de pedidos con proveedores, optimizando el proceso de compra y mantenimiento de inventario.
-- **Seguimiento en Tiempo Real**: A través de WebSockets, ofrece a los usuarios la capacidad de recibir actualizaciones en tiempo real sobre el estado de los pedidos y las transacciones.
+- **Seguimiento en Tiempo Real**: A través de WebSockets, ofrece a los usuarios la capacidad de recibir actualizaciones en tiempo real sobre el estado de los pedidos y las transacciones. 
 
 ### Tecnologías Utilizadas
 Este proyecto ha sido construido utilizando un stack tecnológico moderno y eficiente, que garantiza rendimiento, seguridad y escalabilidad:
@@ -166,7 +166,7 @@ La Panadería API proporciona una serie de endpoints RESTful para la gestión de
 }
 
 ```
-### post de un producto
+### post de un producto 
 
 
 
@@ -249,7 +249,7 @@ El uso de UUID en nuestra API representa una elección estratégica para asegura
     "sortBy": "id",
     "direction": "asc"
   }
-
+  
 
 ## Uso de UUID para Identificadores de Personal
 
@@ -332,7 +332,7 @@ La API de proveedores permite gestionar la información de los proveedores de la
 
 La API de categoría facilita la gestión de categorías de productos y servicios en la panadería, permitiendo crear, leer, actualizar y eliminar categorías.
 
-#### tabla de gestion del controlador
+#### tabla de gestion del controlador 
 
 | Endpoint                                    | URL                                | HTTP Verbo | AUTH                          | Descripción                              | HTTP Status Code | Otras Salidas                                          |
 |---------------------------------------------|------------------------------------|------------|-------------------------------|------------------------------------------|------------------|---------------------------------------------------------|
@@ -498,7 +498,7 @@ La sección de pedidos de la API proporciona funcionalidades para gestionar los 
 
 Para garantizar la calidad y el correcto funcionamiento de nuestra API, hemos implementado una serie de pruebas utilizando JUnit y Mockito. Estas herramientas nos permiten realizar pruebas unitarias y de integración de manera eficiente y efectiva.
 
-## Dependencias Usadas en el proyecto
+## Dependencias Usadas en el proyecto 
 
 Nuestro proyecto utiliza una serie de dependencias para facilitar diversas funcionalidades, desde la persistencia de datos hasta la comunicación en tiempo real. A continuación, se detallan las principales dependencias utilizadas:
 
