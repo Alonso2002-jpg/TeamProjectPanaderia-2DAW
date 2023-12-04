@@ -6,7 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
-
+/**
+ * {@code ClienteUpdateDto} es un objeto de transferencia de datos (DTO) que representa la información
+ * utilizada para actualizar un cliente existente en la tienda.
+ *
+ * @Builder Anotación de Lombok que proporciona un patrón de creación de objetos fluido y legible.
+ * @Data Anotación de Lombok que genera automáticamente los métodos 'toString', 'equals', 'hashCode',
+ * y los métodos getter y setter para todos los campos de la clase.
+ */
 @Builder
 @Data
 public class ClienteUpdateDto {

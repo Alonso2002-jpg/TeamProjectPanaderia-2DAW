@@ -14,7 +14,15 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
+/**
+ * La clase {@code Producto} representa un producto en la base de datos.
+ * Cada producto tiene un identificador único, nombre, stock, fecha de creación,
+ * fecha de actualización, imagen, precio, estado de activación, categoría y proveedor asociados.
+ * La clase utiliza anotaciones de Lombok para generar automáticamente
+ * métodos como getters, setters, constructores y JPA para mapear la clase a una tabla en la base de datos.
+ *
+ * @version 1.0
+ */
 @Data
 @Builder
 @NoArgsConstructor

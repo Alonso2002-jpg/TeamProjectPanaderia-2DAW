@@ -9,7 +9,15 @@ import lombok.Data;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.hibernate.validator.constraints.Length;
-
+/**
+ * {@code ClienteCreateDto} es un objeto de transferencia de datos (DTO) que representa la información
+ * necesaria para crear un nuevo cliente en la tienda.
+ *
+ * @Data Anotación de Lombok que genera automáticamente los métodos 'toString', 'equals', 'hashCode',
+ * y los métodos getter y setter para todos los campos de la clase.
+ * @AllArgsConstructor Anotación de Lombok que genera automáticamente un constructor que acepta todos
+ * los campos de la clase como parámetros.
+ */
 @Data
 @AllArgsConstructor
 public class ClienteCreateDto  {

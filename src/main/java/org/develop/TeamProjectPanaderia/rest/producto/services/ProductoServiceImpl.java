@@ -41,6 +41,11 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementación del servicio {@code ProductoService} que proporciona operaciones relacionadas con productos.
+ *
+ * @version 1.0
+ */
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "productos")
@@ -75,6 +80,18 @@ public class ProductoServiceImpl implements ProductoService{
         this.productoNotificacionMapper = productoNotificacionMapper;
     }
 
+    /**
+     * Recupera una página de productos según los criterios de búsqueda proporcionados.
+     *
+     * @param nombre    Nombre del producto (opcional).
+     * @param stockMin  Cantidad mínima del producto (opcional).
+     * @param precioMax Precio máximo del producto (opcional).
+     * @param isActivo  Indica si el producto está activo (opcional).
+     * @param categoria Nombre de la categoría del producto (opcional).
+     * @param proveedor NIF del proveedor del producto (opcional).
+     * @param pageable  Información de paginación y ordenación.
+     * @return Una página de productos que cumplen con los criterios de búsqueda.
+     */
     @Override
     public Page<Producto> findAll(Optional<String> nombre, Optional<Integer> stockMin, Optional<Double> precioMax, Optional<Boolean> isActivo, Optional<String> categoria, Optional<String> proveedor, Pageable pageable) {
         // Criteerio de búsqueda por nombre
@@ -120,6 +137,14 @@ public class ProductoServiceImpl implements ProductoService{
         return productoRepository.findAll(criterio, pageable);
     }
 
+    /**
+     * Recupera un producto por su identificador único.
+     *
+     * @param id Identificador único del producto.
+     * @return El producto con el identificador dado.
+     * @throws ProductoNotFound Si no se encuentra un producto con el identificador proporcionado.
+     * @throws ProductoBadUuid  Si el identificador proporcionado no es un UUID válido.
+     */
     @Override
     @Cacheable
     public Producto findById(String id) {
@@ -132,6 +157,13 @@ public class ProductoServiceImpl implements ProductoService{
         }
     }
 
+    /**
+     * Recupera un producto por su nombre, ignorando mayúsculas y minúsculas.
+     *
+     * @param name Nombre del producto.
+     * @return El producto con el nombre dado.
+     * @throws ProductoNotFound Si no se encuentra un producto con el nombre proporcionado.
+     */
     @Override
     @Cacheable
     public Producto findByName(String name) {
@@ -139,6 +171,16 @@ public class ProductoServiceImpl implements ProductoService{
         return productoRepository.findByNombreEqualsIgnoreCase(name).orElseThrow(() -> new ProductoNotFound(name));
     }
 
+    /**
+     * Guarda un nuevo producto en la base de datos.
+     *
+     * @param productoCreateDto Datos del producto a crear.
+     * @return El producto creado.
+     * @throws ProductoNotSaved     Si ya existe un producto con el mismo nombre en la base de datos.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     * @throws ProveedorNotFoundException  Si el proveedor especificado no existe.
+     * @throws ProductoBadRequest   Si la categoría o el proveedor no son válidos.
+     */
     @Override
     @CachePut
     public Producto save(ProductoCreateDto productoCreateDto) {
@@ -161,6 +203,18 @@ public class ProductoServiceImpl implements ProductoService{
         }
     }
 
+    /**
+     * Actualiza un producto existente en la base de datos.
+     *
+     * @param id                Identificador único del producto a actualizar.
+     * @param productoUpdateDto Datos actualizados del producto.
+     * @return El producto actualizado.
+     * @throws ProductoNotFound          Si no se encuentra un producto con el identificador proporcionado.
+     * @throws ProductoNotSaved          Si ya existe un producto con el mismo nombre en la base de datos.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     * @throws ProveedorNotFoundException  Si el proveedor especificado no existe.
+     * @throws ProductoBadRequest        Si la categoría o el proveedor no son válidos.
+     */
     @Override
     @CachePut
     public Producto update(String id, ProductoUpdateDto productoUpdateDto) {
@@ -196,6 +250,14 @@ public class ProductoServiceImpl implements ProductoService{
        }
     }
 
+    /**
+     * Actualiza la imagen de un producto en la base de datos.
+     *
+     * @param id   Identificador único del producto.
+     * @param file Archivo de imagen a cargar.
+     * @return El producto con la imagen actualizada.
+     * @throws ProductoNotFound Si no se encuentra un producto con el identificador proporcionado.
+     */
     @Override
     @CachePut
     public Producto updateImg(String id, MultipartFile file){
@@ -212,6 +274,12 @@ public class ProductoServiceImpl implements ProductoService{
         return productUpdated;
     }
 
+    /**
+     * Elimina un producto por su identificador único.
+     *
+     * @param id Identificador único del producto a eliminar.
+     * @throws ProductoNotFound Si no se encuentra un producto con el identificador proporcionado.
+     */
     @Override
     @CacheEvict
     public void deleteById(String id) {
@@ -225,6 +293,13 @@ public class ProductoServiceImpl implements ProductoService{
         onChange(Notificacion.Tipo.DELETE, productoActual);
     }
 
+
+    /**
+     * Realiza acciones específicas cuando cambia un producto, como enviar notificaciones WebSocket.
+     *
+     * @param tipo Tipo de notificación.
+     * @param data Datos relacionados con el producto que cambió.
+     */
     public void onChange(Notificacion.Tipo tipo, Producto data) {
         log.debug("Servicio de Productos onChange con tipo: " + tipo + " y datos: " + data);
 
@@ -258,6 +333,11 @@ public class ProductoServiceImpl implements ProductoService{
         }
     }
 
+    /**
+     * Establece el servicio WebSocket para pruebas unitarias.
+     *
+     * @param webSocketHandlerMock Implementación mock del servicio WebSocketHandler.
+     */
     public void setWebSocketService(WebSocketHandler webSocketHandlerMock) {
         this.webSocketService = webSocketHandlerMock;
     }

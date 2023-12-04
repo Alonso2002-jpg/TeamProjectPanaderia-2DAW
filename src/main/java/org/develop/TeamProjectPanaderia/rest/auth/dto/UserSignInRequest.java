@@ -6,6 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Clase que representa un objeto de transferencia de datos (DTO) para la solicitud de inicio de sesion de usuario.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Data
 @Builder
 @AllArgsConstructor

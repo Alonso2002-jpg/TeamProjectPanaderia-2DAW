@@ -28,6 +28,9 @@ import org.springframework.data.domain.Sort;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador REST para manejar operaciones relacionadas con proveedores.
+ */
 @RestController
 @RequestMapping("${api.version}/proveedores")
 @PreAuthorize("hasRole('ADMIN')")
@@ -36,6 +39,12 @@ public class ProveedorRestController {
     private final ProveedorMapper proveedorMapper;
     private final ProveedorService proveedorService;
 
+    /**
+     * Constructor que inyecta dependencias necesarias para el controlador de proveedores.
+     *
+     * @param proveedorMapper Mapper para convertir entre DTO y entidad para proveedores.
+     * @param proveedorService Servicio para realizar operaciones relacionadas con proveedores.
+     */
     @Autowired
     public ProveedorRestController(ProveedorMapper proveedorMapper,
                                    ProveedorService proveedorService) {
@@ -43,6 +52,19 @@ public class ProveedorRestController {
         this.proveedorMapper = proveedorMapper;
     }
 
+    /**
+     * Obtiene todos los proveedores paginados y filtrados según los parámetros proporcionados.
+     *
+     * @param nif Nif del proveedor a filtrar.
+     * @param name Nombre del proveedor a filtrar.
+     * @param isActive Estado de activación del proveedor a filtrar.
+     * @param tipo Tipo de proveedor a filtrar.
+     * @param page Número de página.
+     * @param size Tamaño de la página.
+     * @param sortBy Campo de ordenación.
+     * @param direction Dirección de ordenación.
+     * @return Respuesta con la página de proveedores.
+     */
     @Operation(summary = "Obtiene todos los proveedores", description = "Obtiene una lista de proveedores")
     @Parameters({
             @Parameter(name = "nif", description = "Nif del proveedor", example = "12345678Z"),
@@ -71,6 +93,12 @@ public class ProveedorRestController {
         return ResponseEntity.ok(PageResponse.of(proveedorMapper.toPageResponse(proveedorService.findAll(nif, name,isActive,tipo,pageable)), sortBy, direction));
     }
 
+    /**
+     * Obtiene un proveedor por su identificador único.
+     *
+     * @param id Identificador único del proveedor.
+     * @return Respuesta con el proveedor encontrado.
+     */
     @Operation(summary = "Obtiene un proveedor por su id", description = "Obtiene un proveedor por su id")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
@@ -85,6 +113,12 @@ public class ProveedorRestController {
         return ResponseEntity.ok(proveedorMapper.toResponse(proveedor));
     }
 
+    /**
+     * Crea un nuevo proveedor.
+     *
+     * @param proveedor DTO con la información del proveedor a crear.
+     * @return Respuesta con el proveedor creado.
+     */
     @Operation(summary = "Crea un proveedor", description = "Crea un proveedor")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Proveedor a crear", required = true)
     @ApiResponses(value = {
@@ -96,6 +130,13 @@ public class ProveedorRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(proveedorMapper.toResponse(proveedorService.saveProveedores(proveedor)));
     }
 
+    /**
+     * Actualiza la información de un proveedor existente.
+     *
+     * @param id Identificador único del proveedor a actualizar.
+     * @param proveedor DTO con la información actualizada del proveedor.
+     * @return Respuesta con el proveedor actualizado.
+     */
     @Operation(summary = "Actualiza un proveedor", description = "Actualiza un proveedor")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
@@ -111,6 +152,12 @@ public class ProveedorRestController {
         return ResponseEntity.ok(proveedorMapper.toResponse(proveedorService.updateProveedor(proveedor,id)));
     }
 
+    /**
+     * Borra un proveedor por su identificador único.
+     *
+     * @param id Identificador único del proveedor a borrar.
+     * @return Respuesta con el resultado de la operación.
+     */
     @Operation(summary = "Borra un proveedor", description = "Borra un proveedor")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del proveedor", example = "1", required = true)
@@ -125,7 +172,12 @@ public class ProveedorRestController {
         return ResponseEntity.noContent().build();
     }
 
-    //Para mostrar los errores.
+    /**
+     * Maneja las excepciones de validación y devuelve un mapa de errores.
+     *
+     * @param ex Excepción de validación.
+     * @return Mapa de errores con los campos y mensajes asociados.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(
