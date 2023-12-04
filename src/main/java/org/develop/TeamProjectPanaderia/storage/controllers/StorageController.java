@@ -13,12 +13,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
+/**
+ * Controlador REST para la gestion de almacenamiento de ficheros.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @RestController
 @Slf4j
 @RequestMapping("/storage")
 public class StorageController {
     private final StorageService storageService;
 
+    /**
+     * Constructor del controlador StorageController.
+     *
+     * @param storageService El servicio de almacenamiento a inyectar.
+     */
     @Autowired
     public StorageController(StorageService storageService) {
         this.storageService = storageService;

@@ -21,17 +21,33 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Servicio de almacenamiento basado en sistema de archivos.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Service
 @Slf4j
 public class FileSystemStorageService implements StorageService{
     private final Path rootLocation;
+    private final List<String> allowedExtensions = List.of("png", "jpg", "jpeg", "gif");
 
+
+    /**
+     * Constructor del servicio FileSystemStorageService.
+     *
+     * @param rootLocation La ubicacion raiz del almacenamiento.
+     */
     public FileSystemStorageService(@Value("${upload.root-location}") String rootLocation){
 
         this.rootLocation = Paths.get(rootLocation);
     }
+    /**
+     * Inicializa el almacenamiento creando el directorio raiz si no existe.
+     */
     @Override
     public void init() {
         log.info("Inicializando almacenamiento");
@@ -42,10 +58,20 @@ public class FileSystemStorageService implements StorageService{
         }
     }
 
+    /**
+     * Almacena un archivo en el sistema de archivos.
+     *
+     * @param file El archivo a almacenar.
+     * @return El nombre del archivo almacenado.
+     */
     @Override
     public String store(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
         String extension = StringUtils.getFilenameExtension(filename);
+        allowedExtensions.stream()
+                .filter(ex -> extension.contains(ex))
+                .findAny()
+                .orElseThrow(()-> new StorageBadRequestException("Extension no permitida"));
         String justFilename = filename.replace("." + extension, "");
         String storedFilename = System.currentTimeMillis() + "_" + justFilename + "." + extension;
 
@@ -72,6 +98,12 @@ public class FileSystemStorageService implements StorageService{
         }
     }
 
+
+    /**
+     * Carga todos los archivos almacenados en el sistema de archivos.
+     *
+     * @return Una secuencia de rutas de archivos almacenados.
+     */
     @Override
     public Stream<Path> loadAll() {
         log.info("Cargando todos los ficheros almacenados");
@@ -84,12 +116,24 @@ public class FileSystemStorageService implements StorageService{
         }
     }
 
+    /**
+     * Carga un archivo específico del sistema de archivos.
+     *
+     * @param filename El nombre del archivo a cargar.
+     * @return La ruta del archivo cargado.
+     */
     @Override
     public Path load(String filename) {
         log.info("Cargando fichero " + filename);
         return rootLocation.resolve(filename);
     }
 
+    /**
+     * Carga un archivo como recurso desde el sistema de archivos.
+     *
+     * @param filename El nombre del archivo a cargar como recurso.
+     * @return El recurso del archivo cargado.
+     */
     @Override
     public Resource loadAsResource(String filename) {
         log.info("Cargando fichero " + filename);
@@ -106,6 +150,11 @@ public class FileSystemStorageService implements StorageService{
         }
     }
 
+    /**
+     * Elimina un archivo especifico del sistema de archivos.
+     *
+     * @param filename El nombre del archivo a eliminar.
+     */
     @Override
     public void delete(String filename) {
         String justFilename = StringUtils.getFilename(filename);
@@ -118,12 +167,21 @@ public class FileSystemStorageService implements StorageService{
         }
     }
 
+    /**
+     * Elimina todos los archivos almacenados en el sistema de archivos.
+     */
     @Override
     public void deleteAll() {
         log.info("Eliminando todos los ficheros almacenados");
         FileSystemUtils.deleteRecursively(rootLocation.toFile());
     }
 
+    /**
+     * Obtiene la URL de un archivo especifico del sistema de archivos.
+     *
+     * @param filename El nombre del archivo del cual obtener la URL.
+     * @return La URL del archivo.
+     */
     @Override
     public String getUrl(String filename) {
         log.info("Obteniendo URL del fichero " + filename);

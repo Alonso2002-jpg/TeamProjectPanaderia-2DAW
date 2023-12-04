@@ -6,6 +6,7 @@ import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteResponseDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.dto.ClienteUpdateDto;
 import org.develop.TeamProjectPanaderia.rest.cliente.mapper.ClienteMapper;
 import org.develop.TeamProjectPanaderia.rest.cliente.models.Cliente;
+import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClienteMapperTest {
     private final ClienteMapper clienteMapper = new ClienteMapper();
     private final Categoria categoriaCliente = new Categoria(1L, "CLIENTE_TEST", LocalDate.now(), LocalDate.now(),true);
+    private final Direccion direccion = new Direccion("Calle", "Numero", "Ciudad", "Provincia", "Pais", "12345");
     private final Cliente cliente1 =
             Cliente.builder()
                     .id(1L)
@@ -29,7 +31,7 @@ public class ClienteMapperTest {
     @Test
     void testToCliente_create() {
         // Arrange
-        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", categoriaCliente.getNameCategory(), true);
+        ClienteCreateDto clienteCreateDto = new ClienteCreateDto("nuevo_cliente","nuevo_cliente@gmail.com","03480731C", "602697985" ,"test3.jpg", direccion, categoriaCliente.getNameCategory(), true);
 
 
         // Act
