@@ -9,7 +9,7 @@ public enum Role {
      * Rol básico para usuarios normales.
      */
     USER,
-    SELLER
+    SELLER,
     /**
      * Rol para administradores con privilegios adicionales.
      */
