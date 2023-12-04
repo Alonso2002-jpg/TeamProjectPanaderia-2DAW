@@ -73,7 +73,7 @@ Configuraciones y manejadores para establecer comunicaciones en tiempo real entr
 - **Gestión de Productos**: Permite a los usuarios crear, actualizar, eliminar y consultar información detallada de los productos disponibles, incluyendo precios y disponibilidad con los stock .
 - **Manejo de Personal**: Administra los datos del personal, sus roles, asegurando que la asignación de tareas sea óptima y eficiente.
 - **Relación con Proveedores**: Facilita la comunicación y gestión de pedidos con proveedores, optimizando el proceso de compra y mantenimiento de inventario.
-- **Seguimiento en Tiempo Real**: A través de WebSockets, ofrece a los usuarios la capacidad de recibir actualizaciones en tiempo real sobre el estado de los pedidos y las transacciones.
+- **Seguimiento en Tiempo Real**: A través de WebSockets, ofrece a los usuarios la capacidad de recibir actualizaciones en tiempo real sobre el estado de los pedidos y las transacciones. 
 
 ### Tecnologías Utilizadas
 Este proyecto ha sido construido utilizando un stack tecnológico moderno y eficiente, que garantiza rendimiento, seguridad y escalabilidad:
@@ -125,16 +125,16 @@ La Panadería API proporciona una serie de endpoints RESTful para la gestión de
 - **GET** `/producto`
 - **Descripción**: Retorna una lista paginada de todos los productos, con opciones de filtrado por nombre, stock mínimo, precio máximo, estado activo, categoría y proveedor.
 - **Parámetros**:
-    - `nombre` (string, opcional): Filtro por nombre del producto.
-    - `stockMin` (integer, opcional): Filtro por stock mínimo.
-    - `precioMax` (double, opcional): Filtro por precio máximo.
-    - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del producto.
-    - `categoria` (string, opcional): Filtro por categoría del producto.
-    - `proveedor` (string, opcional): Filtro por proveedor del producto.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombre` (string, opcional): Filtro por nombre del producto.
+  - `stockMin` (integer, opcional): Filtro por stock mínimo.
+  - `precioMax` (double, opcional): Filtro por precio máximo.
+  - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del producto.
+  - `categoria` (string, opcional): Filtro por categoría del producto.
+  - `proveedor` (string, opcional): Filtro por proveedor del producto.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 
 **Response:**
@@ -163,7 +163,7 @@ La Panadería API proporciona una serie de endpoints RESTful para la gestión de
 }
 
 ```
-### post de un producto
+### post de un producto 
 
 
 
@@ -213,14 +213,14 @@ El uso de UUID en nuestra API representa una elección estratégica para asegura
 - **GET** `/personal`
 - **Descripción**: Retorna una lista paginada de todo el personal, con opciones de filtrado por nombre, DNI, categoría y estado activo.
 - **Parámetros**:
-    - `nombre` (string, opcional): Filtro por nombre del empleado.
-    - `dni` (string, opcional): Filtro por DNI del empleado.
-    - `categoria` (string, opcional): Filtro por categoría del empleado.
-    - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del empleado.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombre` (string, opcional): Filtro por nombre del empleado.
+  - `dni` (string, opcional): Filtro por DNI del empleado.
+  - `categoria` (string, opcional): Filtro por categoría del empleado.
+  - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del empleado.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -246,7 +246,7 @@ El uso de UUID en nuestra API representa una elección estratégica para asegura
     "sortBy": "id",
     "direction": "asc"
   }
-
+  
 
 ## Uso de UUID para Identificadores de Personal
 
@@ -284,14 +284,14 @@ La API de proveedores permite gestionar la información de los proveedores de la
 - **GET** `/proveedores`
 - **Descripción**: Retorna una lista paginada de todos los proveedores, con opciones de filtrado por NIF, nombre, estado activo y tipo.
 - **Parámetros**:
-    - `nif` (string, opcional): Filtro por NIF del proveedor.
-    - `name` (string, opcional): Filtro por nombre del proveedor.
-    - `isActive` (boolean, opcional): Filtro por estado activo/inactivo del proveedor.
-    - `tipo` (string, opcional): Filtro por tipo de proveedor.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nif` (string, opcional): Filtro por NIF del proveedor.
+  - `name` (string, opcional): Filtro por nombre del proveedor.
+  - `isActive` (boolean, opcional): Filtro por estado activo/inactivo del proveedor.
+  - `tipo` (string, opcional): Filtro por tipo de proveedor.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -329,7 +329,7 @@ La API de proveedores permite gestionar la información de los proveedores de la
 
 La API de categoría facilita la gestión de categorías de productos y servicios en la panadería, permitiendo crear, leer, actualizar y eliminar categorías.
 
-#### tabla de gestion del controlador
+#### tabla de gestion del controlador 
 
 | Endpoint                                    | URL                                | HTTP Verbo | AUTH                          | Descripción                              | HTTP Status Code | Otras Salidas                                          |
 |---------------------------------------------|------------------------------------|------------|-------------------------------|------------------------------------------|------------------|---------------------------------------------------------|
@@ -345,12 +345,12 @@ La API de categoría facilita la gestión de categorías de productos y servicio
 - **GET** `/categoria`
 - **Descripción**: Retorna una lista paginada de todas las categorías, con opciones de filtrado por nombre y estado activo.
 - **Parámetros**:
-    - `isActive` (boolean, opcional): Filtro por estado activo/inactivo de la categoría.
-    - `name` (string, opcional): Filtro por nombre de la categoría.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `isActive` (boolean, opcional): Filtro por estado activo/inactivo de la categoría.
+  - `name` (string, opcional): Filtro por nombre de la categoría.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -397,12 +397,12 @@ La API de clientes permite gestionar la información de los clientes de la panad
 - **GET** `/cliente`
 - **Descripción**: Retorna una lista paginada de todos los clientes, con opciones de filtrado por nombre completo y categoría.
 - **Parámetros**:
-    - `nombreCompleto` (string, opcional): Filtro por nombre completo del cliente.
-    - `categoria` (string, opcional): Filtro por categoría del cliente.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombreCompleto` (string, opcional): Filtro por nombre completo del cliente.
+  - `categoria` (string, opcional): Filtro por categoría del cliente.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -443,7 +443,7 @@ La API de clientes permite gestionar la información de los clientes de la panad
 
 Para garantizar la calidad y el correcto funcionamiento de nuestra API, hemos implementado una serie de pruebas utilizando JUnit y Mockito. Estas herramientas nos permiten realizar pruebas unitarias y de integración de manera eficiente y efectiva.
 
-## Dependencias Usadas en el proyecto
+## Dependencias Usadas en el proyecto 
 
 Nuestro proyecto utiliza una serie de dependencias para facilitar diversas funcionalidades, desde la persistencia de datos hasta la comunicación en tiempo real. A continuación, se detallan las principales dependencias utilizadas:
 
