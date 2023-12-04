@@ -37,3 +37,4 @@ EXPOSE 3000
 # Para lanzarlo con un perfil distinto al fijado por defecto, se usa la instrucción
 # ENTRYPOINT ["java","-jar","/app/my-app.jar"]
 ENTRYPOINT ["java","-jar","-Dspring.profiles.active=prod","/app/panaderiaApi.jar"]
+
