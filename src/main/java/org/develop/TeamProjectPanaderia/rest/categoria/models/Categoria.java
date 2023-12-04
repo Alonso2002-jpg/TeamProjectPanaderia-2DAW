@@ -33,7 +33,7 @@ public class Categoria {
     @Schema(description = "Fecha de creacion del registro de la categoria", example = "2023-12-02")
     private LocalDate createdAt = LocalDate.now();
     @Builder.Default
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Schema(description = "Fecha de actualizacion del registro de la categoria", example = "2023-12-02")
     private LocalDate updatedAt = LocalDate.now();
     @Builder.Default
