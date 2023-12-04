@@ -7,7 +7,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-
+/**
+ * Clase que representa un objeto de transferencia de datos (DTO) para la solicitud de registro de usuario.
+ *
+ * <p>
+ * Esta clase utiliza las anotaciones de Lombok para generar automaticamente constructores, metodos getter/setter,
+ * y otros metodos útiles. Se utiliza para encapsular la informacion necesaria para registrar un nuevo usuario,
+ * incluyendo nombre, nombre de usuario, correo electronico y contrasenas.
+ * </p>
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Data
 @Builder
 @NoArgsConstructor

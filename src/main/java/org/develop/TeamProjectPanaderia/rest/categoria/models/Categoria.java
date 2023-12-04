@@ -9,7 +9,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-
+/**
+ * Clase que representa la entidad Categoria en el sistema.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,7 +33,7 @@ public class Categoria {
     @Schema(description = "Fecha de creacion del registro de la categoria", example = "2023-12-02")
     private LocalDate createdAt = LocalDate.now();
     @Builder.Default
-    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @Schema(description = "Fecha de actualizacion del registro de la categoria", example = "2023-12-02")
     private LocalDate updatedAt = LocalDate.now();
     @Builder.Default

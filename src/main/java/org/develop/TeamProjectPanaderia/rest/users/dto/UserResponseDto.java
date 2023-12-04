@@ -8,6 +8,10 @@ import org.develop.TeamProjectPanaderia.rest.users.model.Role;
 
 import java.util.Set;
 
+/**
+ * DTO (Data Transfer Object) que representa la información de respuesta para un usuario.
+ * Utiliza Lombok para la generación automática de constructores, getters, setters y otros métodos.
+ */
 @Builder
 @Data
 @NoArgsConstructor

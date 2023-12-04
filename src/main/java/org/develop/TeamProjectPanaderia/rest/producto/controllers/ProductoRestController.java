@@ -30,6 +30,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
+/**
+ * Controlador REST que gestiona las operaciones relacionadas con los productos de la panadería.
+ */
 @RestController
 @Slf4j
 @RequestMapping("${api.version}/producto")
@@ -37,12 +40,34 @@ import java.util.*;
 public class ProductoRestController {
     private final ProductoService productoService;
     private final ProductoMapper productoMapper;
+
+    /**
+     * Constructor de la clase ProductoRestController.
+     *
+     * @param productoService Servicio de productos.
+     * @param productoMapper Mapper para mapear entre DTOs y entidades de productos.
+     */
     @Autowired
     public ProductoRestController(ProductoService productoService, ProductoMapper productoMapper) {
         this.productoService = productoService;
         this.productoMapper = productoMapper;
     }
 
+    /**
+     * Obtiene todos los productos según los filtros especificados.
+     *
+     * @param nombre     Filtro opcional por nombre del producto.
+     * @param stockMin   Filtro opcional por cantidad mínima del producto.
+     * @param precioMax  Filtro opcional por precio máximo del producto.
+     * @param isActivo   Filtro opcional por estado de actividad del producto.
+     * @param categoria  Filtro opcional por nombre de categoría del producto.
+     * @param proveedor  Filtro opcional por NIF del proveedor del producto.
+     * @param page       Número de página para la paginación.
+     * @param size       Tamaño de la página para la paginación.
+     * @param sortBy     Campo de ordenación.
+     * @param direction  Dirección de ordenación (ascendente o descendente).
+     * @return Respuesta con la página de productos que cumplen con los criterios de búsqueda.
+     */
     @Operation(summary = "Obtiene todos los productos", description = "Obtiene una lista de productos")
     @Parameters({
             @Parameter(name = "nombre", description = "Nombre del producto", example = "Pan dulce"),
@@ -78,6 +103,12 @@ public class ProductoRestController {
         return ResponseEntity.ok(PageResponse.of(productoMapper.toPageResponse(productoService.findAll(nombre, stockMin, precioMax, isActivo, categoria, proveedor, pageable)), sortBy, direction));
     }
 
+    /**
+     * Obtiene un producto por su ID.
+     *
+     * @param id Identificador único del producto.
+     * @return Respuesta con el producto correspondiente al ID proporcionado.
+     */
     @Operation(summary = "Obtiene un producto por su id", description = "Obtiene un producto por su id")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74", required = true)
@@ -93,6 +124,12 @@ public class ProductoRestController {
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.findById(id)));
     }
 
+    /**
+     * Crea un nuevo producto.
+     *
+     * @param productoCreateDto DTO que contiene la información del nuevo producto a crear.
+     * @return Respuesta con el DTO del producto recién creado.
+     */
     @Operation(summary = "Crea un producto", description = "Crea un producto")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Producto a crear", required = true)
     @ApiResponses(value = {
@@ -106,6 +143,13 @@ public class ProductoRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productoMapper.toProductoResponseDto(productoService.save(productoCreateDto)));
     }
 
+    /**
+     * Actualiza un producto por su ID.
+     *
+     * @param id                Identificador único del producto a actualizar.
+     * @param productoUpdateDto DTO que contiene la información actualizada del producto.
+     * @return Respuesta con el DTO del producto actualizado.
+     */
     @Operation(summary = "Actualiza un producto", description = "Actualiza un producto")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74", required = true)
@@ -123,6 +167,13 @@ public class ProductoRestController {
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
+    /**
+     * Actualiza parcialmente un producto por su ID.
+     *
+     * @param id                Identificador único del producto a actualizar parcialmente.
+     * @param productoUpdateDto DTO que contiene la información parcialmente actualizada del producto.
+     * @return Respuesta con el DTO del producto actualizado parcialmente.
+     */
     @Operation(summary = "Actualiza parcialmente un producto", description = "Actualiza parcialmente un producto")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74", required = true)
@@ -140,6 +191,12 @@ public class ProductoRestController {
         return ResponseEntity.ok(productoMapper.toProductoResponseDto(productoService.update(id, productoUpdateDto)));
     }
 
+    /**
+     * Borra un producto por su ID.
+     *
+     * @param id Identificador único del producto a borrar.
+     * @return Respuesta indicando el éxito del borrado.
+     */
     @Operation(summary = "Borra un producto", description = "Borra un producto")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74", required = true)
@@ -157,6 +214,13 @@ public class ProductoRestController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    /**
+     * Actualiza la imagen de un producto por su ID.
+     *
+     * @param id   Identificador único del producto al que se le actualizará la imagen.
+     * @param file Fichero de imagen a subir.
+     * @return Respuesta con el DTO del producto con la imagen actualizada.
+     */
     @Operation(summary = "Actualiza la imagen de un producto", description = "Actualiza la imagen de un producto")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74", required = true),
@@ -178,6 +242,12 @@ public class ProductoRestController {
         }
     }
 
+    /**
+     * Maneja excepciones de validación y retorna un mapa de errores.
+     *
+     * @param ex Excepción de validación.
+     * @return Mapa de errores.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(

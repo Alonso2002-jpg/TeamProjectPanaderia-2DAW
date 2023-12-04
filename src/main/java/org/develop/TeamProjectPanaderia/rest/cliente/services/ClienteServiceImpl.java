@@ -40,7 +40,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Implementación del servicio de Cliente.
+ */
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "clientes")
@@ -55,6 +57,17 @@ public class ClienteServiceImpl implements ClienteService{
     private final NotificacionMapper<Cliente> clienteNotificacionMapper;
     private WebSocketHandler webSocketService;
 
+    /**
+     * Constructor de la clase ClienteServiceImpl.
+     *
+     * @param clienteRepository        Repositorio de clientes.
+     * @param categoriaService         Servicio de categoría.
+     * @param clienteMapper            Mapper para la conversión entre entidades y DTOs de clientes.
+     * @param storageService           Servicio de almacenamiento.
+     * @param webSocketConfig          Configuración del WebSocket.
+     * @param mapper                   Objeto ObjectMapper para la conversión de objetos a JSON.
+     * @param clienteNotificacionMapper Mapper para la conversión de clientes a notificaciones.
+     */
     @Autowired
     public ClienteServiceImpl(ClienteRepository clienteRepository, CategoriaService categoriaService, ClienteMapper clienteMapper, StorageService storageService, WebSocketConfig webSocketConfig, ObjectMapper mapper, NotificacionMapper<Cliente> clienteNotificacionMapper) {
         this.clienteRepository = clienteRepository;
@@ -68,7 +81,14 @@ public class ClienteServiceImpl implements ClienteService{
         this.clienteNotificacionMapper = clienteNotificacionMapper;
     }
 
-
+    /**
+     * Obtiene una página de clientes según los criterios proporcionados.
+     *
+     * @param nombreCompleto Nombre completo del cliente (opcional).
+     * @param categoria      Categoría del cliente (opcional).
+     * @param pageable       Objeto Pageable para la paginación y ordenación de resultados.
+     * @return Una página de clientes que cumple con los criterios especificados.
+     */
     @Override
     public Page<Cliente> findAll(Optional<String> nombreCompleto, Optional<String> categoria, Pageable pageable){
 
@@ -90,6 +110,13 @@ public class ClienteServiceImpl implements ClienteService{
          return clienteRepository.findAll(criterio, pageable);
     }
 
+    /**
+     * Busca un cliente por su identificador único (ID).
+     *
+     * @param id El ID del cliente a buscar.
+     * @return El cliente encontrado.
+     * @throws ClienteNotFoundException Si no se encuentra el cliente con el ID especificado.
+     */
     @Override
     @Cacheable
     public Cliente findById(Long id) {
@@ -97,6 +124,14 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteRepository.findById(id).orElseThrow(() -> new ClienteNotFoundException(id));
     }
 
+    /**
+     * Guarda un nuevo cliente utilizando la información proporcionada en el objeto ClienteCreateDto.
+     *
+     * @param clienteCreateDto Objeto DTO con la información del cliente a guardar.
+     * @return El cliente guardado.
+     * @throws ClienteNotSaveException Si ya existe un cliente con el mismo DNI.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     */
     @Override
     @CachePut
     public Cliente save(ClienteCreateDto clienteCreateDto) {
@@ -114,6 +149,15 @@ public class ClienteServiceImpl implements ClienteService{
         }
     }
 
+    /**
+     * Actualiza la información de un cliente existente utilizando el objeto ClienteUpdateDto.
+     *
+     * @param id                El identificador único del cliente a actualizar.
+     * @param clienteUpdateDto Objeto DTO con la información actualizada del cliente.
+     * @return El cliente actualizado.
+     * @throws ClienteNotFoundException Si no se encuentra el cliente con el ID especificado.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     */
     @Override
     @CachePut
     public Cliente update(Long id, ClienteUpdateDto clienteUpdateDto) {
@@ -134,6 +178,15 @@ public class ClienteServiceImpl implements ClienteService{
             throw new ClienteBadRequest(clienteUpdateDto.getCategoria());
         }
     }
+
+    /**
+     * Actualiza la dirección de un cliente existente utilizando el objeto Direccion.
+     *
+     * @param id       El identificador único del cliente a actualizar.
+     * @param direccion Objeto Direccion con la nueva información de la dirección.
+     * @return El cliente actualizado.
+     * @throws ClienteNotFoundException Si no se encuentra el cliente con el ID especificado.
+     */
     @Override
     @CachePut
     public Cliente updateDireccion(Long id, Direccion direccion){
@@ -145,6 +198,13 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteUpdated;
     }
 
+    /**
+     * Obtiene la categoría actualizada para un cliente, tomando en cuenta el valor en el ClienteUpdateDto
+     * y utilizando la categoría actual si no se proporciona un valor.
+     *
+     * @return La categoría actualizada para el cliente.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     */
     @Override
     @CachePut
     public Cliente updateImg(Long id, MultipartFile file){
@@ -161,6 +221,13 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteUpdated;
     }
 
+    /**
+     * Busca y devuelve un cliente por su número de DNI.
+     *
+     * @param dni Número de DNI del cliente a buscar.
+     * @return El cliente encontrado.
+     * @throws ClienteNotFoundException Si no se encuentra un cliente con el DNI especificado.
+     */
     @Override
     @Cacheable
     public Cliente findByDni(String dni) {
@@ -168,6 +235,12 @@ public class ClienteServiceImpl implements ClienteService{
         return clienteRepository.findClienteByDniEqualsIgnoreCase(dni).orElseThrow(() -> new ClienteNotFoundException(dni));
     }
 
+    /**
+     * Elimina un cliente por su identificador único.
+     *
+     * @param id Identificador único del cliente a eliminar.
+     * @throws ClienteNotFoundException Si no se encuentra el cliente con el ID especificado.
+     */
     @Override
     @CacheEvict
     public void deleteById(Long id) {
@@ -181,7 +254,12 @@ public class ClienteServiceImpl implements ClienteService{
         onChange(Notificacion.Tipo.DELETE, clienteActual);
     }
 
-
+    /**
+     * Método invocado para notificar cambios en los clientes a través de WebSocket.
+     *
+     * @param tipo Tipo de cambio (CREATE, UPDATE, DELETE).
+     * @param data Datos relacionados al cambio (cliente).
+     */
     void onChange(Notificacion.Tipo tipo, Cliente data) {
         log.debug("Servicio de Clientes onChange con tipo: " + tipo + " y datos: " + data);
 
@@ -215,10 +293,21 @@ public class ClienteServiceImpl implements ClienteService{
         }
     }
 
+    /**
+     * Establece el servicio WebSocket. Útil para pruebas unitarias.
+     *
+     * @param webSocketHandlerMock Mock del servicio WebSocket.
+     */
     public void setWebSocketService(WebSocketHandler webSocketHandlerMock) {
         this.webSocketService = webSocketHandlerMock;
     }
 
+    /**
+     * Busca y devuelve una lista de clientes activos o inactivos según el parámetro.
+     *
+     * @param isActive Indica si se buscan clientes activos (true) o inactivos (false).
+     * @return Lista de clientes según el estado de activación especificado.
+     */
     @Override
     public List<Cliente> findByActiveIs(Boolean isActive) {
         return clienteRepository.findByIsActive(isActive);

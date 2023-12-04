@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import org.aspectj.bridge.IMessage;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * DTO (Data Transfer Object) que representa la información necesaria para crear un nuevo producto.
+ */
 public record ProductoCreateDto (
         @Length(min = 3, message = "El nombre debe contener al menos 3 letras")
         @NotBlank(message = "El nombre no puede estar vacio")
