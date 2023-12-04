@@ -2,6 +2,7 @@ package org.develop.TeamProjectPanaderia.rest.pedidos.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.develop.TeamProjectPanaderia.rest.pedidos.exceptions.PedidoBadRequest;
 import org.develop.TeamProjectPanaderia.rest.pedidos.exceptions.PedidoEmpty;
 import org.develop.TeamProjectPanaderia.rest.pedidos.exceptions.PedidoNotFound;
 import org.develop.TeamProjectPanaderia.rest.pedidos.model.LineaPedido;
@@ -12,6 +13,9 @@ import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotActi
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFound;
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotStock;
 import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
+import org.develop.TeamProjectPanaderia.rest.users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,11 +33,13 @@ import java.time.LocalDateTime;
 public class PedidoServiceImpl implements PedidoService{
     private final PedidoRepository pedidoRepository;
     private final ProductoRepository productoRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProductoRepository productoRepository) {
+    public PedidoServiceImpl(PedidoRepository pedidoRepository, ProductoRepository productoRepository, UserRepository userRepository) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
+        this.userRepository = userRepository;
     }
     @Override
     public Page<Pedido> findAll(Pageable pageable) {
@@ -58,7 +64,11 @@ public class PedidoServiceImpl implements PedidoService{
     @CachePut(key = "#pedido.id")
     public Pedido save(Pedido pedido) {
         log.info("Guardando pedido {}", pedido);
-
+        User user = userRepository.findById(pedido.getIdUsuario()).orElseThrow(() -> new PedidoBadRequest("El usuario con ID :" + pedido.getIdUsuario() + " no existe"));
+        if (!user.getRoles().stream().anyMatch(rl -> rl.equals(Role.SELLER) || rl.equals(Role.ADMIN))) {
+            throw new PedidoBadRequest("El usuario con ID :" + pedido.getIdUsuario() + " no puede realizar ventas");
+        }
+        log.info("Id del cliente: {}", pedido.getIdCliente());
         checkPedido(pedido);
 
         var pedSave = reserveStockPedidos(pedido);

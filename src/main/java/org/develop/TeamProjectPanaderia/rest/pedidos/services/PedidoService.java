@@ -2,6 +2,7 @@ package org.develop.TeamProjectPanaderia.rest.pedidos.services;
 
 import org.bson.types.ObjectId;
 import org.develop.TeamProjectPanaderia.rest.pedidos.model.Pedido;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
