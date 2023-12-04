@@ -1,5 +1,5 @@
 -- Crear secuencia para categorias
-CREATE SEQUENCE categorias_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 13 CACHE 1;
+CREATE SEQUENCE categorias_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 -- Crear tabla para categorias
 CREATE TABLE categorias (
@@ -12,26 +12,25 @@ CREATE TABLE categorias (
 );
 
 -- Crear secuencia para proveedores
-CREATE SEQUENCE proveedores_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 5 CACHE 1;
+CREATE SEQUENCE proveedores_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 -- Crear tabla para proveedores
 CREATE TABLE proveedores (
     id bigint DEFAULT nextval('proveedores_id_seq') NOT NULL,
     nif character varying(255),
-    tipo integer,
+    tipo bigint,
     numero character varying(255),
     name character varying(255),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT proveedores_pkey PRIMARY KEY (id)
+    CONSTRAINT proveedores_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_tipo FOREIGN KEY (tipo) REFERENCES categorias (id) NOT DEFERRABLE
 );
 
--- Crear secuencia para productos
-CREATE SEQUENCE productos_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 5 CACHE 1;
 
 -- Crear tabla para productos
 CREATE TABLE productos (
-    id bigint DEFAULT nextval('productos_id_seq') NOT NULL,
+    id uuid NOT NULL,
     nombre character varying(255),
     stock integer,
     precio double precision,
@@ -46,7 +45,7 @@ CREATE TABLE productos (
 );
 
 -- Crear secuencia para usuarios
-CREATE SEQUENCE usuarios_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 8 CACHE 1;
+CREATE SEQUENCE usuarios_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 -- Crear tabla para usuarios
 CREATE TABLE users (
@@ -69,12 +68,10 @@ CREATE TABLE user_roles (
     roles character varying(255)
 );
 
--- Crear secuencia para personal
-CREATE SEQUENCE personal_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 6 CACHE 1;
 
 -- Crear tabla para personal
 CREATE TABLE personal (
-    id bigint DEFAULT nextval('personal_id_seq') NOT NULL,
+    id uuid NOT NULL,
     dni character varying(255),
     nombre character varying(255),
     email character varying(255),
@@ -89,7 +86,7 @@ CREATE TABLE personal (
 );
 
 -- Crear secuencia para clientes
-CREATE SEQUENCE clientes_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 5 CACHE 1;
+CREATE SEQUENCE clientes_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
 
 -- Crear tabla para clientes
 CREATE TABLE clientes (
@@ -97,7 +94,8 @@ CREATE TABLE clientes (
     nombre_completo character varying(255),
     correo character varying(255),
     dni character varying(255),
-    telefono character varying(255),
+    telefono text ,
+    imagen text DEFAULT 'https://www.realmadrid.com/img/vertical_380px/cristiano_550x650_20180917025046.jpg',
     categoria_id bigint,
     direccion jsonb,
     is_active boolean DEFAULT TRUE,
@@ -137,16 +135,16 @@ INSERT INTO Proveedores (nif, tipo, numero, name)--4
 VALUES ('34567891D', 10, '654321789', 'Proveedores Utensilios');
 --INSERTS PRODUCTOS
 INSERT INTO Productos (id,nombre, stock, precio, is_activo, categoria_id, proveedor_id)
-VALUES (UUID(),'Pan de Leche', 100, 2.5, true, 1, 1);
+VALUES ('fc334e19-c0f6-46a0-910c-4a1e9a82230e','Pan de Leche', 100, 2.5, true, 1, 1);
 
 INSERT INTO Productos (id,nombre, stock, precio, is_activo, categoria_id, proveedor_id)
-VALUES (UUID(),'Galletas de Chocolate', 150, 3.0, true, 1, 2);
+VALUES ('8cf17c52-52f4-4b1b-a7c8-eb9b073b3f9c','Galletas de Chocolate', 150, 3.0, true, 1, 2);
 
 INSERT INTO Productos (id,nombre, stock, precio, is_activo, categoria_id, proveedor_id)
-VALUES (UUID(),'Agua Mineral', 200, 1.0, true, 2, 3);
+VALUES ('50a3e2cb-eb04-4c63-a7db-1b7e398f5ab1','Agua Mineral', 200, 1.0, true, 2, 3);
 
 INSERT INTO Productos (id,nombre, stock, precio, is_activo, categoria_id, proveedor_id)
-VALUES (UUID(),'Taza de Café', 50, 5.0, true, 3, 4);
+VALUES ('dd3e3c46-6a86-4c08-90a9-04026960e962','Taza de Café', 50, 5.0, true, 3, 4);
 --USERS
 --Password: Admin1
 insert into USERS(name, username, email, password, is_active)
@@ -195,19 +193,19 @@ insert into USER_ROLES (user_id, roles)
 values (7, 'USER');
 --INSERTS PERSONAL
 INSERT INTO Personal (id,dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'12345678A', 'Juan Pérez','juan@pepitos.org', 3,4, true);
+VALUES ('b0f8931b-94b8-49e3-a4b0-64d19486a6f5','12345678A', 'Juan Pérez','juan@pepitos.org', 3,4, true);
 
 INSERT INTO Personal (id,dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'23456789B', 'María López','maria@pepitos.org',4, 5, true);
+VALUES ('edc1c52b-7856-4f20-a23e-42f6154a6938','23456789B', 'María López','maria@pepitos.org',4, 5, true);
 
 INSERT INTO Personal (id, dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'34567891C', 'Pedro Rodríguez','pedro@pepitos.org',5, 5, true);
+VALUES ('a7c5a309-8247-4a0f-a97e-d8051f21f768','34567891C', 'Pedro Rodríguez','pedro@pepitos.org',5, 5, true);
 
 INSERT INTO Personal (id, dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'45678912D', 'Laura García','laura@pepitos.org', 6,6, true);
+VALUES ('cef32a51-0a56-4e5c-b5a1-95d9eaa4a456','45678912D', 'Laura García','laura@pepitos.org', 6,6, true);
 
 INSERT INTO Personal (id, dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'56789123E', 'Carlos Martínez','carlos@pepitos.org',7, 7, true);
+VALUES ('76a63d82-5063-4c3f-8c47-62db5757b915','56789123E', 'Carlos Martínez','carlos@pepitos.org',7, 7, true);
 --INSERTS CLIENTES
 INSERT INTO CLIENTES (nombre_completo, correo, dni, telefono,categoria_id,direccion, is_active)
 VALUES ('Laura González', 'laura@example.com', '12345678A', '612345678',9,'{"calle":"Calle A","numero":"123","ciudad":"Ciudad X","provincia":"Provincia Y","pais":"Pais Z","codPostal":"12345"}', true);
