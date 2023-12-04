@@ -15,7 +15,16 @@ import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * {@code Cliente} es una entidad que representa a un cliente en la tienda.
+ *
+ * @Data Genera automáticamente los métodos getter, setter, toString, equals y hashCode para la clase.
+ * @Builder Patrón de diseño que permite construir objetos Cliente de manera más concisa y legible.
+ * @AllArgsConstructor Genera automáticamente un constructor que incluye todos los campos de la clase como parámetros.
+ * @NoArgsConstructor Genera automáticamente un constructor sin parámetros.
+ * @Entity Indica que esta clase es una entidad JPA y se mapeará a una tabla en la base de datos.
+ * @Table Especifica el nombre de la tabla en la base de datos que se utilizará para almacenar los datos de la entidad.
+ */
 @Data
 @Builder
 @AllArgsConstructor

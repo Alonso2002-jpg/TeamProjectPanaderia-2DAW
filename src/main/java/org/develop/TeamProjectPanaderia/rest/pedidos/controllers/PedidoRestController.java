@@ -26,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador REST para gestionar pedidos en una panadería.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/${api.version}/pedidos")
@@ -34,11 +37,25 @@ import java.util.Map;
 public class PedidoRestController {
     private final PedidoService pedidoService;
 
+    /**
+     * Constructor del controlador.
+     *
+     * @param pedidoService Servicio de pedidos.
+     */
     @Autowired
     public PedidoRestController(PedidoService pedidoService) {
         this.pedidoService = pedidoService;
     }
 
+    /**
+     * Obtiene todos los pedidos paginados y ordenados según los parámetros proporcionados.
+     *
+     * @param page       Número de página.
+     * @param size       Tamaño de la página.
+     * @param sortBy     Campo de ordenación.
+     * @param direction  Dirección de ordenación.
+     * @return ResponseEntity con la página de pedidos.
+     */
     @Operation(summary = "Obtiene todos los pedidos", description = "Obtiene una lista de pedidos")
     @Parameters({
             @Parameter(name = "page", description = "Número de página", example = "0"),
@@ -60,6 +77,12 @@ public class PedidoRestController {
         return ResponseEntity.ok(PageResponse.of(pedidoService.findAll(pageable), sortBy, direction));
     }
 
+    /**
+     * Obtiene un pedido por su identificador único.
+     *
+     * @param id Identificador único del pedido.
+     * @return ResponseEntity con el pedido encontrado.
+     */
     @Operation(summary = "Obtiene un pedido por su id", description = "Obtiene un pedido por su id")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del pedido", example = "6568d6b3faf1c03ca80a6818", required = true)
@@ -73,7 +96,16 @@ public class PedidoRestController {
         return ResponseEntity.ok(pedidoService.findById(id));
     }
 
-
+    /**
+     * Obtiene los pedidos de un usuario por su identificador.
+     *
+     * @param id        Identificador único del usuario.
+     * @param page      Número de página.
+     * @param size      Tamaño de la página.
+     * @param sortBy    Campo de ordenación.
+     * @param direction Dirección de ordenación.
+     * @return ResponseEntity con la página de pedidos del usuario.
+     */
     @Operation(summary = "Obtiene los pedidos de un usuario por su id", description = "Obtiene los pedidos de un usuario por su id")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del usuario", example = "1", required = true),
@@ -98,6 +130,12 @@ public class PedidoRestController {
     return ResponseEntity.ok(PageResponse.of(pedidoService.findByIdUsuario(id, pageable), sortBy, direction));
     }
 
+    /**
+     * Crea un nuevo pedido.
+     *
+     * @param pedido Pedido a crear.
+     * @return ResponseEntity con el pedido creado.
+     */
     @Operation(summary = "Crea un pedido", description = "Crea un pedido")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Pedido a crear", required = true)
     @ApiResponses(value = {
@@ -109,6 +147,13 @@ public class PedidoRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.save(pedido));
     }
 
+    /**
+     * Actualiza un pedido existente por su identificador único.
+     *
+     * @param id     Identificador único del pedido.
+     * @param pedido Pedido a actualizar.
+     * @return ResponseEntity con el pedido actualizado.
+     */
     @Operation(summary = "Actualiza un pedido", description = "Actualiza un pedido")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del pedido", example = "6568d6b3faf1c03ca80a6818", required = true)
@@ -124,6 +169,12 @@ public class PedidoRestController {
         return ResponseEntity.ok(pedidoService.update(id, pedido));
     }
 
+    /**
+     * Borra un pedido por su identificador único.
+     *
+     * @param id Identificador único del pedido.
+     * @return ResponseEntity con información sobre la operación de borrado.
+     */
     @Operation(summary = "Borra un pedido", description = "Borra un pedido")
     @Parameters({
             @Parameter(name = "id", description = "Identificador unico del pedido", example = "6568d6b3faf1c03ca80a6818", required = true)
@@ -138,6 +189,12 @@ public class PedidoRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Maneja las excepciones de validación del modelo.
+     *
+     * @param ex Excepción de validación del modelo.
+     * @return Mapa de errores de validación.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(

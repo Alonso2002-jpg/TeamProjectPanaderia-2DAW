@@ -17,6 +17,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+/**
+ * Implementación de la interfaz {@code ProveedorService} que gestiona las operaciones relacionadas con los proveedores.
+ */
 @Service
 public class ProveedorServiceImpl implements ProveedorService {
 
@@ -24,6 +28,13 @@ public class ProveedorServiceImpl implements ProveedorService {
     private final CategoriaService categoriaService;
     private final ProveedorMapper proveedorMapper;
 
+    /**
+     * Constructor de la clase ProveedorServiceImpl.
+     *
+     * @param proveedoresRepository Repositorio de proveedores.
+     * @param categoriaService      Servicio de categorías.
+     * @param proveedorMapper       Mapper para mapear entre DTOs y entidades de proveedores.
+     */
     public ProveedorServiceImpl(ProveedorRepository proveedoresRepository,
                                 CategoriaService categoriaService,
                                 ProveedorMapper proveedorMapper) {
@@ -32,6 +43,14 @@ public class ProveedorServiceImpl implements ProveedorService {
         this.categoriaService = categoriaService;
     }
 
+    /**
+     * Guarda un nuevo proveedor en la base de datos.
+     *
+     * @param proveedor DTO que contiene la información del proveedor a ser guardado.
+     * @return El proveedor guardado.
+     * @throws ProveedorNotSaveException Si ya existe un proveedor con el mismo NIF.
+     * @throws CategoriaNotFoundException Si la categoría asociada al proveedor no existe.
+     */
     @Override
     public Proveedor saveProveedores(ProveedorCreateDto proveedor) {
         if (proveedoresRepository.findByNif(proveedor.getNif()).isPresent()){
@@ -47,6 +66,16 @@ public class ProveedorServiceImpl implements ProveedorService {
         }
     }
 
+    /**
+     * Actualiza un proveedor existente en la base de datos.
+     *
+     * @param proveedorUpdateDto DTO que contiene la información actualizada del proveedor.
+     * @param id                 Identificador único del proveedor a ser actualizado.
+     * @return El proveedor actualizado.
+     * @throws ProveedorNotFoundException Si no se encuentra el proveedor con el ID especificado.
+     * @throws ProveedorInvalidNif        Si el NIF proporcionado ya está asociado a otro proveedor.
+     * @throws CategoriaNotFoundException Si la categoría especificada no existe.
+     */
     @Override
     public Proveedor updateProveedor(ProveedorUpdateDto proveedorUpdateDto, Long id) {
         Proveedor proveedor = getProveedoresById(id);
@@ -69,11 +98,26 @@ public class ProveedorServiceImpl implements ProveedorService {
         }
     }
 
+
+    /**
+     * Obtiene un proveedor por su ID.
+     *
+     * @param id Identificador único del proveedor.
+     * @return El proveedor con el ID especificado.
+     * @throws ProveedorNotFoundException Si no se encuentra el proveedor con el ID especificado.
+     */
     @Override
     public Proveedor getProveedoresById(Long id) {
         return proveedoresRepository.findById(id).orElseThrow(() -> new ProveedorNotFoundException(""+id));
     }
 
+    /**
+     * Elimina un proveedor por su ID, si no tiene productos asociados.
+     *
+     * @param id Identificador único del proveedor a ser eliminado.
+     * @throws ProveedorNotFoundException    Si no se encuentra el proveedor con el ID especificado.
+     * @throws ProveedorNotDeletedException  Si no se puede borrar el proveedor debido a productos asociados.
+     */
     @Override
     @Transactional
     public void deleteProveedoresById(Long id) {
@@ -85,11 +129,28 @@ public class ProveedorServiceImpl implements ProveedorService {
         }
     }
 
+    /**
+     * Busca un proveedor por su NIF.
+     *
+     * @param nif NIF del proveedor a buscar.
+     * @return El proveedor con el NIF especificado.
+     * @throws ProveedorNotFoundException Si no se encuentra el proveedor con el NIF especificado.
+     */
     @Override
     public Proveedor findProveedoresByNIF(String nif) {
         return proveedoresRepository.findByNif(nif).orElseThrow(() -> new ProveedorNotFoundException(nif));
     }
 
+    /**
+     * Obtiene una página de proveedores según los parámetros proporcionados.
+     *
+     * @param nif      Filtro opcional por NIF del proveedor.
+     * @param name     Filtro opcional por nombre del proveedor.
+     * @param isActive Filtro opcional por estado de actividad del proveedor.
+     * @param tipo     Filtro opcional por tipo de proveedor.
+     * @param pageable Objeto Pageable que representa la paginación y ordenación de los resultados.
+     * @return Página de proveedores que cumplen con los criterios de búsqueda.
+     */
     @Override
     public Page<Proveedor> findAll(Optional<String> nif, Optional<String> name, Optional<Boolean> isActive, Optional<String> tipo, Pageable pageable) {
         Specification<Proveedor> findNif = (root, query, criteriaBuilder) ->

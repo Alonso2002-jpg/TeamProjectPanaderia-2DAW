@@ -46,6 +46,9 @@ import java.util.Set;
 import java.util.UUID;
 
 
+/**
+ * Implementación del servicio para gestionar entidades de Personal.
+ */
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "personal")
@@ -57,6 +60,15 @@ public class PersonalServiceImpl implements PersonalService {
     private final PersonalMapper personalMapper;
     private final CategoriaService categoriaService;
 
+    /**
+     * Constructor que inyecta dependencias necesarias para el servicio.
+     *
+     * @param personalRepository Repositorio para operaciones de base de datos relacionadas con Personal.
+     * @param userMapper          Mapper para convertir entidades de User.
+     * @param userRepository      Repositorio para operaciones de base de datos relacionadas con User.
+     * @param personalMapper      Mapper para convertir entidades de Personal.
+     * @param categoriaService    Servicio para operaciones relacionadas con Categoría.
+     */
     @Autowired
     public PersonalServiceImpl(PersonalRepository personalRepository, UserMapper userMapper,UserRepository userRepository,PersonalMapper personalMapper, CategoriaService categoriaService) {
         this.personalRepository = personalRepository;
@@ -66,7 +78,16 @@ public class PersonalServiceImpl implements PersonalService {
         this.userMapper = userMapper;
     }
 
-
+    /**
+     * Obtiene una página de trabajadores filtrados por nombre, DNI, sección, estado de activación y paginación.
+     *
+     * @param nombre   Nombre del trabajador (opcional).
+     * @param dni      Número de DNI del trabajador (opcional).
+     * @param seccion  Sección del trabajador (opcional).
+     * @param isActivo Estado de activación del trabajador (opcional).
+     * @param pageable Objeto que encapsula información de paginación.
+     * @return Una página de trabajadores que cumplen con los criterios de búsqueda y paginación.
+     */
     public Page<Personal> findAll(Optional<String> nombre, Optional<String> dni, Optional<String> seccion, Optional<Boolean> isActivo, Pageable pageable) {
         Specification<Personal> specNombrePersonal = (root, query, criteriaBuilder) ->
                 nombre.map(n -> criteriaBuilder.like(criteriaBuilder.lower(root.get("nombre")), "%" + n.toLowerCase() + "%"))
@@ -93,6 +114,14 @@ public class PersonalServiceImpl implements PersonalService {
         return personalRepository.findAll(criterio, pageable);
     }
 
+    /**
+     * Obtiene un trabajador por su identificador único.
+     *
+     * @param id Identificador único del trabajador.
+     * @return Una instancia de {@code Personal} que representa al trabajador con el identificador dado.
+     * @throws PersonalNotFoundException Si no se encuentra un trabajador con el ID especificado.
+     * @throws PersonalBadUuid           Si el ID proporcionado no es un UUID válido.
+     */
     @Override
     @Cacheable
     public Personal findById(String id) {
@@ -106,6 +135,15 @@ public class PersonalServiceImpl implements PersonalService {
         }
     }
 
+    /**
+     * Guarda un nuevo trabajador en la base de datos.
+     *
+     * @param personalCreateDto DTO con la información del trabajador a crear.
+     * @return La entidad {@code Personal} creada.
+     * @throws PersonalNotSaved       Si ya existe un trabajador con el mismo DNI en la base de datos.
+     * @throws PersonalBadRequest      Si la categoría especificada en el DTO no existe.
+     * @throws CategoriaNotFoundException Si la categoría especificada en el DTO no existe.
+     */
     @Override
     @CachePut
     public Personal save(PersonalCreateDto personalCreateDto) {
@@ -129,6 +167,15 @@ public class PersonalServiceImpl implements PersonalService {
         }
     }
 
+    /**
+     * Actualiza la información de un trabajador existente en la base de datos.
+     *
+     * @param id         Identificador único del trabajador a actualizar.
+     * @param personalDto DTO con la información actualizada del trabajador.
+     * @return La entidad {@code Personal} actualizada.
+     * @throws PersonalBadRequest      Si la categoría especificada en el DTO no existe.
+     * @throws CategoriaNotFoundException Si la categoría especificada en el DTO no existe.
+     */
     @Override
     @CachePut
     public Personal update(String id, PersonalUpdateDto personalDto) {
@@ -146,6 +193,14 @@ public class PersonalServiceImpl implements PersonalService {
             throw new PersonalBadRequest("La categoria con nombre " +  personalDto.seccion() + " no existe");
         }
     }
+
+    /**
+     * Busca un trabajador por su número de DNI.
+     *
+     * @param dni Número de DNI del trabajador a buscar.
+     * @return La entidad {@code Personal} encontrada.
+     * @throws PersonalNotFoundException Si no se encuentra un trabajador con el DNI especificado.
+     */
     @Override
     @Cacheable
     public Personal findPersonalByDni(String dni) {
@@ -153,6 +208,11 @@ public class PersonalServiceImpl implements PersonalService {
         return personalRepository.findByDniEqualsIgnoreCase(dni).orElseThrow(() -> new PersonalNotFoundException(dni));
     }
 
+    /**
+     * Elimina un trabajador de la base de datos por su identificador único.
+     *
+     * @param id Identificador único del trabajador a eliminar.
+     */
     @Override
     @CacheEvict
     public void deleteById(String id) {
@@ -161,12 +221,23 @@ public class PersonalServiceImpl implements PersonalService {
         personalRepository.delete(personal);
     }
 
+    /**
+     * Obtiene una lista de trabajadores filtrados por estado de activación.
+     *
+     * @param isActive Estado de activación a filtrar.
+     * @return Lista de trabajadores que cumplen con el criterio de activación.
+     */
     @Override
     public List<Personal> findByActiveIs(Boolean isActive) {
         return personalRepository.findByIsActive(isActive);
     }
 
-
+    /**
+     * Genera una contraseña a partir de la información proporcionada en el DTO de creación de trabajador.
+     *
+     * @param personal DTO de creación de trabajador.
+     * @return La contraseña generada.
+     */
     public String getPasswordFromPersonal(PersonalCreateDto personal){
         String[] completeName = personal.nombre().split(" ");
         return completeName[0].trim().substring(0,2).toLowerCase() + completeName[1].trim() + personal.dni().substring(personal.dni().length()-4);

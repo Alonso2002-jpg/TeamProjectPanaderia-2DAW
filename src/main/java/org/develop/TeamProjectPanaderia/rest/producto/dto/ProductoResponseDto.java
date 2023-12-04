@@ -7,6 +7,9 @@ import org.develop.TeamProjectPanaderia.rest.proveedores.models.Proveedor;
 
 import java.util.UUID;
 
+/**
+ * DTO (Data Transfer Object) que representa la información de respuesta de un producto.
+ */
 public record ProductoResponseDto(
         @Schema(description = "Identificador unico del producto", example = "1a70f426-d51f-4a13-ba39-89203f94ed74")
         UUID id,

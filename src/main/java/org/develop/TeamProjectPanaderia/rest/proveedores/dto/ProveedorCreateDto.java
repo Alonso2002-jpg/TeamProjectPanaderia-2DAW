@@ -6,6 +6,14 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Clase que representa los datos de creación de un proveedor.
+ * Esta clase se utiliza como DTO (Data Transfer Object) para recibir información al crear un proveedor en la aplicación.
+ *
+ * Se han aplicado anotaciones de Lombok para generar automáticamente métodos como toString, equals, hashCode, y constructores.
+ * Además, se han utilizado anotaciones de validación para garantizar que los datos cumplan con ciertos requisitos.
+ *
+ */
 @Builder
 @Data
 @AllArgsConstructor

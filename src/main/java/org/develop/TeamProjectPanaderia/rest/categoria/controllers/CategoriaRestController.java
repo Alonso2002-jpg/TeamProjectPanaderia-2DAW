@@ -28,7 +28,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+/**
+ * Controlador REST que gestiona las operaciones relacionadas con las categorias en la tienda.
+ * Requiere el rol de usuario para acceder a las operaciones.
+ */
 @RestController
 @RequestMapping("${api.version}/categoria")
 @PreAuthorize("hasRole('USER')")
@@ -37,12 +40,29 @@ public class CategoriaRestController {
     private final CategoriaService categoriaService;
     private final CategoriaMapper categoriaMapper;
 
+    /**
+     * Constructor del controlador CategoriaRestController.
+     *
+     * @param categoriaService Servicio de categoria a inyectar.
+     * @param categoriaMapper Mapper de categoria a inyectar.
+     */
     @Autowired
     public CategoriaRestController(CategoriaService categoriaService, CategoriaMapper categoriaMapper) {
         this.categoriaService = categoriaService;
         this.categoriaMapper = categoriaMapper;
     }
 
+    /**
+     * Obtiene todas las categorias paginadas y opcionalmente filtradas.
+     *
+     * @param isActive   Indica si la categoria esta activa o no.
+     * @param name       Nombre de la categoria.
+     * @param page       Número de pagina.
+     * @param size       Tamaño de la pagina.
+     * @param sortBy     Campo de ordenacion.
+     * @param direction  Dirección de ordenacion.
+     * @return Respuesta HTTP que contiene la pagina de categorias.
+     */
     @Operation(summary = "Obtiene todas las categorias", description = "Obtiene una lista de categorias")
     @Parameters({
             @Parameter(name = "isActive", description = "Si esta activo o no la categoria", example = "true"),
@@ -75,18 +95,39 @@ public class CategoriaRestController {
             @ApiResponse(responseCode = "200", description = "Categoria"),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada"),
     })
+
+    /**
+     * Obtiene una categoria por su identificador.
+     *
+     * @param id Identificador de la categoria.
+     * @return Respuesta HTTP que contiene la categoria.
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CategoriaResponseDto> findById(@PathVariable Long id){
         var categoria = this.categoriaService.findById(id);
         return ResponseEntity.ok(categoriaMapper.toResponse(categoria));
     }
 
+    /**
+     * Crea una nueva categoria.
+     *
+     * @param categoria Categoria a crear.
+     * @return Respuesta HTTP que contiene la categoria creada.
+     */
     @Operation(summary = "Crea una categoria", description = "Crea una categoria")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Categoria a crear", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Categoria creada"),
             @ApiResponse(responseCode = "400", description = "Categoria no válida"),
     })
+
+    /**
+     * Actualiza una categoria existente.
+     *
+     * @param id       Identificador único de la categoria a actualizar.
+     * @param categoria Categoria actualizada.
+     * @return Respuesta HTTP que contiene la categoria actualizada.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDto> postCategoria(@Valid @RequestBody CategoriaCreateDto categoria){
@@ -103,6 +144,13 @@ public class CategoriaRestController {
             @ApiResponse(responseCode = "400", description = "Categoria no válida"),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada"),
     })
+    /**
+     * Actualiza una categora existente.
+     *
+     * @param id       Identificador unico de la categoria a actualizar.
+     * @param categoria Categoria actualizada.
+     * @return Respuesta HTTP que contiene la categoria actualizada.
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoriaResponseDto> putCategoria(@PathVariable Long id, @Valid @RequestBody CategoriaUpdateDto categoria){
@@ -117,6 +165,13 @@ public class CategoriaRestController {
             @ApiResponse(responseCode = "204", description = "Categoria borrada"),
             @ApiResponse(responseCode = "404", description = "Categoria no encontrada"),
     })
+
+    /**
+     * Borra una categoria por su identificador.
+     *
+     * @param id Identificador único de la categoria a borrar.
+     * @return Respuesta HTTP que indica el exito de la operacion.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteById(@PathVariable Long id){
@@ -124,6 +179,12 @@ public class CategoriaRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Maneja las excepciones de validacion en las operaciones del controlador.
+     *
+     * @param ex Excepcion de validacion.
+     * @return Mapa de errores de validacion.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(

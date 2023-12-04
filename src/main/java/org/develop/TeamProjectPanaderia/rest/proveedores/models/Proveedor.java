@@ -12,6 +12,12 @@ import org.develop.TeamProjectPanaderia.rest.categoria.models.Categoria;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDate;
+
+/**
+ * Clase que representa a un proveedor en el sistema.
+ * Contiene información como el identificador único, NIF, tipo, número de teléfono, nombre,
+ * estado de activación, fecha de creación y fecha de actualización del registro del proveedor.
+ */
 @Data
 @Builder
 @NoArgsConstructor

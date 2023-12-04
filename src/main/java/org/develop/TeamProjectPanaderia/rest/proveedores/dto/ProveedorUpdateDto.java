@@ -5,7 +5,19 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
-
+/**
+ * Clase que representa un DTO (Data Transfer Object) para la actualización de proveedores.
+ * Se utiliza para recibir datos de actualización de un proveedor desde el cliente hasta el controlador.
+ *
+ * Se han aplicado anotaciones de Lombok para generar automáticamente métodos como toString, equals, hashCode, y constructores.
+ * Además, se han utilizado anotaciones de Swagger para proporcionar información adicional sobre cada campo en la documentación de la API.
+ *
+ * @see lombok.Builder Se utiliza para generar un constructor de tipo "builder" para la clase.
+ * @see lombok.Data Se utiliza para generar automáticamente los métodos toString, equals, hashCode, y constructores.
+ * @see lombok.AllArgsConstructor Se utiliza para generar un constructor que acepta todos los campos como parámetros.
+ * @see lombok.NoArgsConstructor Se utiliza para generar un constructor sin argumentos.
+ * @see io.swagger.v3.oas.annotations.media.Schema Se utiliza para proporcionar información adicional sobre cada campo, como descripción y ejemplo, en la documentación de la API.
+ */
 @Builder
 @Data
 @AllArgsConstructor

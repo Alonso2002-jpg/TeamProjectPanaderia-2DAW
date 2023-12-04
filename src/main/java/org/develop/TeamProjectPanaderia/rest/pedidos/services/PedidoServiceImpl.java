@@ -27,6 +27,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Implementación del servicio para gestionar pedidos.
+ *
+ * Este servicio proporciona métodos para crear, actualizar, eliminar y obtener información
+ * relacionada con pedidos, incluyendo la lógica para reservar y devolver stock.
+ *
+ * @author  Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ * @version 1.0
+ */
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "pedidos")
@@ -35,18 +44,37 @@ public class PedidoServiceImpl implements PedidoService{
     private final ProductoRepository productoRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Constructor de la clase que inyecta las dependencias necesarias.
+     *
+     * @param pedidoRepository    Repositorio de pedidos.
+     * @param productoRepository  Repositorio de productos.
+     */
     @Autowired
     public PedidoServiceImpl(PedidoRepository pedidoRepository, ProductoRepository productoRepository, UserRepository userRepository) {
         this.pedidoRepository = pedidoRepository;
         this.productoRepository = productoRepository;
         this.userRepository = userRepository;
     }
+
+    /**
+     * Obtiene una página de todos los pedidos.
+     *
+     * @param pageable Configuración de paginación.
+     * @return Página de pedidos.
+     */
     @Override
     public Page<Pedido> findAll(Pageable pageable) {
         log.info("Buscando todos los pedidos");
         return pedidoRepository.findAll(pageable);
     }
 
+    /**
+     * Obtiene un pedido por su identificador único.
+     *
+     * @param id Identificador único del pedido.
+     * @return Pedido encontrado.
+     */
     @Override
     @Cacheable(key = "#id")
     public Pedido findById(ObjectId id) {
@@ -54,12 +82,25 @@ public class PedidoServiceImpl implements PedidoService{
         return pedidoRepository.findById(id).orElseThrow(() -> new PedidoNotFound("id "+ id.toHexString()));
     }
 
+    /**
+     * Obtiene una página de pedidos para un usuario específico.
+     *
+     * @param idUsuario Identificador del usuario.
+     * @param pageable  Configuración de paginación.
+     * @return Página de pedidos para el usuario especificado.
+     */
     @Override
     public Page<Pedido> findByIdUsuario(Long idUsuario, Pageable pageable) {
         log.info(("Obteniendo pedidos de usuario con ID: " + idUsuario));
         return pedidoRepository.findByIdUsuario(idUsuario, pageable);
     }
 
+    /**
+     * Guarda un nuevo pedido.
+     *
+     * @param pedido Pedido a ser guardado.
+     * @return Pedido guardado.
+     */
     @Override
     @CachePut(key = "#pedido.id")
     public Pedido save(Pedido pedido) {
@@ -78,6 +119,14 @@ public class PedidoServiceImpl implements PedidoService{
 
         return pedidoRepository.save(pedSave);
     }
+
+    /**
+     * Actualiza un pedido existente.
+     *
+     * @param id     Identificador único del pedido a ser actualizado.
+     * @param pedido Pedido con los cambios.
+     * @return Pedido actualizado.
+     */
     @Override
     @CachePut(key = "#pedido.id")
     public Pedido update(ObjectId id, Pedido pedido) {
@@ -97,6 +146,12 @@ public class PedidoServiceImpl implements PedidoService{
         return pedidoRepository.save(pedUpd);
     }
 
+    /**
+     * Elimina un pedido por su ID, devuelve el stock y actualiza la caché.
+     *
+     * @param id ID del pedido a eliminar
+     * @throws PedidoNotFound si el pedido no se encuentra
+     */
     @Override
     @CacheEvict(key = "#id")
     public void deleteById(ObjectId id) {
@@ -109,11 +164,24 @@ public class PedidoServiceImpl implements PedidoService{
         pedidoRepository.deleteById(id);
     }
 
+    /**
+     * Verifica si existe un producto por su ID.
+     *
+     * @param id ID del producto a verificar
+     * @return true si el producto existe, false de lo contrario
+     */
     @Override
     public Boolean findByIdProducto(Long id) {
         return null;
     }
 
+    /**
+     * Reserva el stock de productos para un pedido.
+     *
+     * @param pedido Pedido para el cual se reserva el stock
+     * @return Pedido con el stock reservado
+     * @throws PedidoEmpty si el pedido no tiene líneas de pedido
+     */
         public Pedido reserveStockPedidos(Pedido pedido){
         log.info("Reservando stock del pedido: {}", pedido);
 
@@ -143,6 +211,16 @@ public class PedidoServiceImpl implements PedidoService{
 
         return pedido;
     }
+
+    /**
+     * Verifica la validez de un pedido.
+     *
+     * @param pedido Pedido a verificar
+     * @throws PedidoEmpty si el pedido no tiene líneas de pedido
+     * @throws ProductoNotStock si un producto no tiene suficiente stock
+     * @throws ProductoBadPrice si el precio de un producto es incorrecto
+     * @throws ProductoNotActive si un producto no está activo
+     */
     public void checkPedido(Pedido pedido){
         log.info("Comprobando pedido: {}", pedido);
 
@@ -164,6 +242,13 @@ public class PedidoServiceImpl implements PedidoService{
             if (!producto.getIsActivo()) throw new ProductoNotActive("Producto con ID: " + linea.getIdProducto() + " no se encuentra activo");
         });
     }
+
+    /**
+     * Devuelve el stock de productos para un pedido.
+     *
+     * @param pedido Pedido para el cual se devuelve el stock
+     * @return Pedido con el stock devuelto
+     */
     public Pedido returnStockPedidos(Pedido pedido){
         log.info("Devolviendo stock del pedido: {}", pedido);
         if (pedido.getLineasPedido() != null){

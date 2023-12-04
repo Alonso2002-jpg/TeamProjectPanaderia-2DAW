@@ -9,7 +9,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-
+/**
+ * Clase que representa la entidad Categoria en el sistema.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Data
 @Builder
 @NoArgsConstructor

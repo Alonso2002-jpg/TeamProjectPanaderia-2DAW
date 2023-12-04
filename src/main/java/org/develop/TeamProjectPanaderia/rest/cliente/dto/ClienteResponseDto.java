@@ -10,7 +10,17 @@ import org.develop.TeamProjectPanaderia.rest.cliente.models.Direccion;
 
 
 import java.time.LocalDateTime;
-
+/**
+ * {@code ClienteResponseDto} es un objeto de transferencia de datos (DTO) que representa la información
+ * que se devuelve al obtener detalles de un cliente en la tienda.
+ *
+ * @AllArgsConstructor Anotación de Lombok que genera automáticamente un constructor que acepta todos
+ * los campos de la clase como parámetros.
+ * @NoArgsConstructor Anotación de Lombok que genera automáticamente un constructor sin argumentos.
+ * @Data Anotación de Lombok que genera automáticamente los métodos 'toString', 'equals', 'hashCode',
+ * y los métodos getter y setter para todos los campos de la clase.
+ * @Builder Anotación de Lombok que proporciona un patrón de creación de objetos fluido y legible.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
