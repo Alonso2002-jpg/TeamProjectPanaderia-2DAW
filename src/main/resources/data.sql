@@ -75,7 +75,11 @@ values (3, 'USER');
 insert into USER_ROLES (user_id, roles)
 values (4, 'USER');
 insert into USER_ROLES (user_id, roles)
+values (4, 'SELLER');
+insert into USER_ROLES (user_id, roles)
 values (5, 'USER');
+insert into USER_ROLES (user_id, roles)
+values (5, 'SELLER');
 insert into USER_ROLES (user_id, roles)
 values (6, 'USER');
 insert into USER_ROLES (user_id, roles)
@@ -86,7 +90,7 @@ INSERT INTO Personal (id,dni, nombre,email,user_id, seccion, active)
 VALUES (UUID(),'12345678A', 'Juan Pérez','juan@pepitos.org', 3,4, true);
 
 INSERT INTO Personal (id,dni, nombre,email,user_id, seccion, active)
-VALUES (UUID(),'23456789B', 'María López','maria@pepitos.org',4, 4, true);
+VALUES (UUID(),'23456789B', 'María López','maria@pepitos.org',4, 5, true);
 
 INSERT INTO Personal (id, dni, nombre,email,user_id, seccion, active)
 VALUES (UUID(),'34567891C', 'Pedro Rodríguez','pedro@pepitos.org',5, 5, true);

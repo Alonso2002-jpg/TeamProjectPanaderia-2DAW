@@ -172,7 +172,7 @@ public class UserRestController {
      * @return ResponseEntity con el pedido solicitado.
      */
     @GetMapping("/me/pedidos")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<PageResponse<Pedido>> mePedidos(@AuthenticationPrincipal User user,
                                                           @RequestParam(defaultValue = "0") int page,
                                                           @RequestParam(defaultValue = "10") int size,
@@ -192,7 +192,7 @@ public class UserRestController {
      * @return ResponseEntity con el pedido solicitado.
      */
     @GetMapping("/me/pedidos/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> mePedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id) {
         log.info("Obteniendo pedido con id: " + id);
         return ResponseEntity.ok(pedidoService.findById(id));
@@ -206,7 +206,7 @@ public class UserRestController {
      * @return ResponseEntity con el pedido creado.
      */
     @PostMapping("/me/pedidos")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> postPedido(@AuthenticationPrincipal User user, @Valid @RequestBody Pedido pedido) {
         log.info("Creando pedido: " + pedido);
         pedido.setIdUsuario(user.getId());
@@ -222,7 +222,7 @@ public class UserRestController {
      * @return ResponseEntity con el pedido actualizado.
      */
     @PutMapping("/me/pedidos/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> putPedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id, @Valid @RequestBody Pedido pedido) {
         log.info("Actualizando pedido con id: " + id);
         pedido.setIdUsuario(user.getId());
@@ -237,7 +237,7 @@ public class UserRestController {
      * @return ResponseEntity indicando el éxito de la operación.
      */
     @DeleteMapping("/me/pedidos/{id}")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<String> deletePedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id) {
         log.info("Eliminando pedido con id: " + id);
         pedidoService.deleteById(id);
