@@ -31,6 +31,9 @@
 
 - [Dependencias](#dependencias-usadas-en-el-proyecto)
 
+- [Usuarios](#usuarios)
+
+- [Pedidos](#pedidos)
 
 # La API se organiza en módulos clave para promover una arquitectura limpia y una separación clara de responsabilidades
 
@@ -125,16 +128,16 @@ La Panadería API proporciona una serie de endpoints RESTful para la gestión de
 - **GET** `/producto`
 - **Descripción**: Retorna una lista paginada de todos los productos, con opciones de filtrado por nombre, stock mínimo, precio máximo, estado activo, categoría y proveedor.
 - **Parámetros**:
-    - `nombre` (string, opcional): Filtro por nombre del producto.
-    - `stockMin` (integer, opcional): Filtro por stock mínimo.
-    - `precioMax` (double, opcional): Filtro por precio máximo.
-    - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del producto.
-    - `categoria` (string, opcional): Filtro por categoría del producto.
-    - `proveedor` (string, opcional): Filtro por proveedor del producto.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombre` (string, opcional): Filtro por nombre del producto.
+  - `stockMin` (integer, opcional): Filtro por stock mínimo.
+  - `precioMax` (double, opcional): Filtro por precio máximo.
+  - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del producto.
+  - `categoria` (string, opcional): Filtro por categoría del producto.
+  - `proveedor` (string, opcional): Filtro por proveedor del producto.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 
 **Response:**
@@ -213,14 +216,14 @@ El uso de UUID en nuestra API representa una elección estratégica para asegura
 - **GET** `/personal`
 - **Descripción**: Retorna una lista paginada de todo el personal, con opciones de filtrado por nombre, DNI, categoría y estado activo.
 - **Parámetros**:
-    - `nombre` (string, opcional): Filtro por nombre del empleado.
-    - `dni` (string, opcional): Filtro por DNI del empleado.
-    - `categoria` (string, opcional): Filtro por categoría del empleado.
-    - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del empleado.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombre` (string, opcional): Filtro por nombre del empleado.
+  - `dni` (string, opcional): Filtro por DNI del empleado.
+  - `categoria` (string, opcional): Filtro por categoría del empleado.
+  - `isActivo` (boolean, opcional): Filtro por estado activo/inactivo del empleado.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -284,14 +287,14 @@ La API de proveedores permite gestionar la información de los proveedores de la
 - **GET** `/proveedores`
 - **Descripción**: Retorna una lista paginada de todos los proveedores, con opciones de filtrado por NIF, nombre, estado activo y tipo.
 - **Parámetros**:
-    - `nif` (string, opcional): Filtro por NIF del proveedor.
-    - `name` (string, opcional): Filtro por nombre del proveedor.
-    - `isActive` (boolean, opcional): Filtro por estado activo/inactivo del proveedor.
-    - `tipo` (string, opcional): Filtro por tipo de proveedor.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nif` (string, opcional): Filtro por NIF del proveedor.
+  - `name` (string, opcional): Filtro por nombre del proveedor.
+  - `isActive` (boolean, opcional): Filtro por estado activo/inactivo del proveedor.
+  - `tipo` (string, opcional): Filtro por tipo de proveedor.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -345,12 +348,12 @@ La API de categoría facilita la gestión de categorías de productos y servicio
 - **GET** `/categoria`
 - **Descripción**: Retorna una lista paginada de todas las categorías, con opciones de filtrado por nombre y estado activo.
 - **Parámetros**:
-    - `isActive` (boolean, opcional): Filtro por estado activo/inactivo de la categoría.
-    - `name` (string, opcional): Filtro por nombre de la categoría.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `isActive` (boolean, opcional): Filtro por estado activo/inactivo de la categoría.
+  - `name` (string, opcional): Filtro por nombre de la categoría.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -397,12 +400,12 @@ La API de clientes permite gestionar la información de los clientes de la panad
 - **GET** `/cliente`
 - **Descripción**: Retorna una lista paginada de todos los clientes, con opciones de filtrado por nombre completo y categoría.
 - **Parámetros**:
-    - `nombreCompleto` (string, opcional): Filtro por nombre completo del cliente.
-    - `categoria` (string, opcional): Filtro por categoría del cliente.
-    - `page` (integer, opcional): Número de página para la paginación.
-    - `size` (integer, opcional): Tamaño de página para la paginación.
-    - `sortBy` (string, opcional): Campo por el cual ordenar.
-    - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
+  - `nombreCompleto` (string, opcional): Filtro por nombre completo del cliente.
+  - `categoria` (string, opcional): Filtro por categoría del cliente.
+  - `page` (integer, opcional): Número de página para la paginación.
+  - `size` (integer, opcional): Tamaño de página para la paginación.
+  - `sortBy` (string, opcional): Campo por el cual ordenar.
+  - `direction` (string, opcional): Dirección de la ordenación (ascendente/descendente).
 - **Respuesta de éxito**: `200 OK`
 - **Ejemplo de respuesta**:
   ```json
@@ -438,6 +441,58 @@ La API de clientes permite gestionar la información de los clientes de la panad
     "sortBy": "id",
     "direction": "asc"
   }
+
+### Usuarios
+
+La sección de usuarios de la API ofrece funcionalidades para la gestión de los usuarios de la Panadería, incluyendo operaciones para crear, leer, actualizar y eliminar registros de usuarios, así como la gestión de pedidos por parte de los usuarios.
+
+#### Endpoints de Gestión de Usuarios
+
+| Endpoint                                     | URL                                  | HTTP Verbo | AUTH                            | Descripción                                    | HTTP Status Code | Otras Salidas                                        |
+|----------------------------------------------|--------------------------------------|------------|---------------------------------|------------------------------------------------|------------------|------------------------------------------------------|
+| Obtiene todos los usuarios                   | `GET /api/version/users`             | GET        | Admin                           | Lista todos los usuarios con filtrado opcional | 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found       |
+| Obtiene un usuario por su ID                 | `GET /api/version/users/{id}`        | GET        | Admin                           | Detalles de un usuario específico              | 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found       |
+| Crea un nuevo usuario                        | `POST /api/version/users`            | POST       | Admin                           | Registra un nuevo usuario                      | 201 Created      | 400 Bad Request, 401 Unauthorized, 403 Forbidden     |
+| Actualiza un usuario                         | `PUT /api/version/users/{id}`        | PUT        | Admin                           | Actualiza un usuario existente                 | 200 OK           | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found |
+| Elimina un usuario                           | `DELETE /api/version/users/{id}`     | DELETE     | Admin                           | Elimina un usuario existente                   | 204 No Content   | 401 Unauthorized, 403 Forbidden, 404 Not Found       |
+
+#### Endpoints de Gestión de Perfil y Pedidos de Usuario
+
+| Endpoint                                      | URL                                      | HTTP Verbo | AUTH                            | Descripción                                    | HTTP Status Code | Otras Salidas                                        |
+|-----------------------------------------------|------------------------------------------|------------|---------------------------------|------------------------------------------------|------------------|------------------------------------------------------|
+| Obtiene perfil del usuario autenticado        | `GET /api/version/users/me/profile`      | GET        | User                            | Detalles del perfil del usuario autenticado    | 200 OK           | 401 Unauthorized, 403 Forbidden                       |
+| Actualiza perfil del usuario autenticado      | `PUT /api/version/users/me/profile`      | PUT        | User                            | Actualiza el perfil del usuario autenticado    | 200 OK           | 400 Bad Request, 401 Unauthorized, 403 Forbidden      |
+| Elimina perfil del usuario autenticado        | `DELETE /api/version/users/me/profile`   | DELETE     | User                            | Elimina el perfil del usuario autenticado      | 204 No Content   | 401 Unauthorized, 403 Forbidden                       |
+| Obtiene pedidos del usuario autenticado       | `GET /api/version/users/me/pedidos`      | GET        | User                            | Lista pedidos del usuario autenticado          | 200 OK           | 401 Unauthorized, 403 Forbidden                       |
+| Obtiene un pedido del usuario por ID          | `GET /api/version/users/me/pedidos/{id}` | GET        | User                            | Detalles de un pedido específico               | 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found       |
+| Crea un pedido para el usuario autenticado    | `POST /api/version/users/me/pedidos`     | POST       | User                            | Crea un nuevo pedido para el usuario           | 201 Created      | 400 Bad Request, 401 Unauthorized, 403 Forbidden     |
+| Actualiza un pedido del usuario               | `PUT /api/version/users/me/pedidos/{id}` | PUT        | User                            | Actualiza un pedido existente del usuario      | 200 OK           | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found |
+| Elimina un pedido del usuario                 | `DELETE /api/version/users/me/pedidos/{id}` | DELETE | User                            | Elimina un pedido existente del usuario        | 204 No Content   | 401 Unauthorized, 403 Forbidden, 404 Not Found       |
+
+### Pedidos
+
+La sección de pedidos de la API proporciona funcionalidades para gestionar los pedidos de la Panadería, permitiendo operaciones como la creación, consulta, actualización y eliminación de pedidos.
+
+#### Endpoints de Gestión de Pedidos
+
+| Endpoint                                    | URL                                    | HTTP Verbo | AUTH                            | Descripción                                        | HTTP Status Code | Otras Salidas                                          |
+|---------------------------------------------|----------------------------------------|------------|---------------------------------|----------------------------------------------------|------------------|--------------------------------------------------------|
+| Obtiene todos los pedidos                   | `GET /api/version/pedidos`             | GET        | Admin                           | Lista todos los pedidos con paginación y ordenación| 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found         |
+| Obtiene un pedido por su ID                 | `GET /api/version/pedidos/{id}`        | GET        | Admin                           | Detalles de un pedido específico por su ID         | 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found         |
+| Crea un nuevo pedido                        | `POST /api/version/pedidos`            | POST       | Admin                           | Registra un nuevo pedido                           | 201 Created      | 400 Bad Request, 401 Unauthorized, 403 Forbidden       |
+| Actualiza un pedido                         | `PUT /api/version/pedidos/{id}`        | PUT        | Admin                           | Actualiza un pedido existente                      | 200 OK           | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found |
+| Elimina un pedido                           | `DELETE /api/version/pedidos/{id}`     | DELETE     | Admin                           | Elimina un pedido existente                        | 204 No Content   | 401 Unauthorized, 403 Forbidden, 404 Not Found         |
+
+#### Endpoints de Gestión de Pedidos por Usuario
+
+| Endpoint                                    | URL                                        | HTTP Verbo | AUTH                            | Descripción                                        | HTTP Status Code | Otras Salidas                                          |
+|---------------------------------------------|--------------------------------------------|------------|---------------------------------|----------------------------------------------------|------------------|--------------------------------------------------------|
+| Obtiene pedidos de un usuario específico    | `GET /api/version/pedidos/user/{id}`       | GET        | Admin/User                      | Lista los pedidos de un usuario específico         | 200 OK           | 401 Unauthorized, 403 Forbidden, 404 Not Found         |
+| Crea un pedido para un usuario              | `POST /api/version/pedidos/user/{id}`      | POST       | Admin/User                      | Crea un pedido para un usuario específico          | 201 Created      | 400 Bad Request, 401 Unauthorized, 403 Forbidden       |
+| Actualiza un pedido de un usuario           | `PUT /api/version/pedidos/user/{id}/{idPedido}` | PUT    | Admin/User                      | Actualiza un pedido de un usuario específico       | 200 OK           | 400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found |
+| Elimina un pedido de un usuario             | `DELETE /api/version/pedidos/user/{id}/{idPedido}` | DELETE | Admin/User                      | Elimina un pedido de un usuario específico         | 204 No Content   | 401 Unauthorized, 403 Forbidden, 404 Not Found         |
+
+
 
 ## Pruebas Tecnologias usadas
 
