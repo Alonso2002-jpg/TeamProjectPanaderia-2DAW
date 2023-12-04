@@ -18,6 +18,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Clase que representa un pedido en un sistema de pedidos.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,11 +53,21 @@ public class Pedido {
     @Builder.Default
     private Boolean deleted = false;
 
+    /**
+     * Obtiene la representación hexadecimal del identificador del pedido.
+     *
+     * @return Representación hexadecimal del identificador del pedido.
+     */
     @JsonProperty("id")
     public String get_Id(){
         return id.toHexString();
     }
 
+    /**
+     * Establece las líneas de pedido del pedido y actualiza los totales en consecuencia.
+     *
+     * @param lineasPed Lista de líneas de pedido.
+     */
     public void setLineasPedido(List<LineaPedido> lineasPed){
         this.lineasPedido = lineasPed;
         this.totalItems = lineasPed != null ? lineasPedido.size() : 0;

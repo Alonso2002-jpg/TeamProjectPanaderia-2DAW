@@ -37,7 +37,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+/**
+ * Implementación de la interfaz {@link CategoriaService} que gestiona las operaciones relacionadas con la entidad {@link Categoria}.
+ */
 @Service
 @Slf4j
 @CacheConfig(cacheNames = "categorias")
@@ -65,7 +67,14 @@ public class CategoriaServiceImpl implements CategoriaService{
         this.objMapper = objMapper;
         this.notificacionMapper = notificacionMapper;
     }
-
+    /**
+     * Obtiene todas las categorías que cumplen con los criterios dados.
+     *
+     * @param isActive Indica si la categoría está activa o no (opcional).
+     * @param name     Nombre de la categoría (opcional).
+     * @param pageable Paginación para la lista de categorías.
+     * @return Página de categorías que cumplen con los criterios dados.
+     */
     @Override
     public Page<Categoria> findAll(Optional<Boolean> isActive, Optional<String> name, Pageable pageable) {
         Specification<Categoria> findIsActive = (root, query, criteriaBuilder) ->
@@ -79,13 +88,25 @@ public class CategoriaServiceImpl implements CategoriaService{
 
         return categoriaRepository.findAll(criterio, pageable);
     }
-
+    /**
+     * Obtiene una categoría por su identificador único.
+     *
+     * @param id Identificador único de la categoría.
+     * @return La categoría encontrada.
+     * @throws CategoriaNotFoundException Si la categoría no se encuentra.
+     */
     @Override
     @Cacheable
     public Categoria findById(Long id) {
         return categoriaRepository.findById(id).orElseThrow(() -> new CategoriaNotFoundException("id " + id));
     }
-
+    /**
+     * Guarda una nueva categoría en la base de datos.
+     *
+     * @param categoria La categoría a guardar.
+     * @return La categoría guardada.
+     * @throws CategoriaNotSaveException Si la categoría ya existe.
+     */
     @Override
     @CachePut
     public Categoria save(CategoriaCreateDto categoria) {
@@ -97,6 +118,15 @@ public class CategoriaServiceImpl implements CategoriaService{
         return categoriaRepository.save(category);
     }
 
+    /**
+     * Actualiza una categoría existente en la base de datos.
+     *
+     * @param id        Identificador único de la categoría a actualizar.
+     * @param categoria La información actualizada de la categoría.
+     * @return La categoría actualizada.
+     * @throws CategoriaNotSaveException   Si ya existe otra categoría con el mismo nombre.
+     * @throws CategoriaNotFoundException Si la categoría no se encuentra.
+     */
     @Override
     @CachePut
     public Categoria update(Long id, CategoriaUpdateDto categoria) {
@@ -108,17 +138,34 @@ public class CategoriaServiceImpl implements CategoriaService{
         onChange(Notificacion.Tipo.UPDATE, category);
         return categoriaRepository.save(category);
     }
-
+    /**
+     * Encuentra una categoría por su nombre.
+     *
+     * @param name Nombre de la categoría a buscar.
+     * @return La categoría encontrada.
+     * @throws CategoriaNotFoundException Si la categoría no se encuentra.
+     */
     @Override
     public Categoria findByName(String name) {
         return categoriaRepository.findByNameCategoryIgnoreCase(name).orElseThrow(() -> new CategoriaNotFoundException("name " + name));
     }
-
+    /**
+     * Encuentra todas las categorías que estén activas o inactivas según el parámetro proporcionado.
+     *
+     * @param isActive Indica si las categorías a buscar deben estar activas o inactivas.
+     * @return Lista de categorías que cumplen con el criterio proporcionado.
+     */
     @Override
     public List<Categoria> findByActiveIs(boolean isActive) {
         return categoriaRepository.findByIsActive(isActive);
     }
 
+    /**
+     * Verifica si una categoría está asociada a algún elemento (Proveedor, Producto, Cliente o Personal).
+     *
+     * @param id Identificador único de la categoría a verificar.
+     * @throws CategoriaNotDeleteException Si la categoría está asociada a algún elemento y no se puede eliminar.
+     */
     @Override
     public void categoryExistsSomewhere(Long id) {
         if (categoriaRepository.existsProveedorByID(id)){
@@ -131,7 +178,13 @@ public class CategoriaServiceImpl implements CategoriaService{
             throw new CategoriaNotDeleteException("Categoria cant be deleted because it has Personals");
         }
     }
-
+    /**
+     * Elimina una categoría por su identificador único.
+     *
+     * @param id Identificador único de la categoría a eliminar.
+     * @throws CategoriaNotFoundException Si la categoría no se encuentra.
+     * @throws CategoriaNotDeleteException Si la categoría está asociada a algún elemento y no se puede eliminar.
+     */
     @Override
     @CacheEvict
     public void deleteById(Long id) {
@@ -141,11 +194,19 @@ public class CategoriaServiceImpl implements CategoriaService{
         categoriaRepository.deleteById(id);
     }
 
+    /**
+     * Elimina todas las categorías de la base de datos.
+     */
     @Override
     public void deleteAll() {
         categoriaRepository.deleteAll();
     }
-
+    /**
+     * Envía una notificación de cambio a través de WebSocket.
+     *
+     * @param tipo Tipo de cambio (CREATE, UPDATE, DELETE).
+     * @param data Datos de la categoría afectada.
+     */
     public void onChange(Notificacion.Tipo tipo, Categoria data){
         log.debug("Servicio de productos onChange con tipo: " + tipo + " y datos: " + data);
 

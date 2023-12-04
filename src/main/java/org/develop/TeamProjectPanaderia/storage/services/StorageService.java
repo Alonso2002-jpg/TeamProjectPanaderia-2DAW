@@ -5,9 +5,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
-
+/**
+ * Interfaz que define las operaciones basicas de un servicio de almacenamiento.
+ *
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 public interface StorageService {
-          // Inicia sl sistema de ficheros
+    /**
+     * Inicializa el sistema de almacenamiento.
+     */
     void init();
 
     /**

@@ -8,6 +8,17 @@ import lombok.Builder;
 
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * Clase de transferencia de datos (DTO) utilizada para crear un nuevo trabajador (Personal).
+ *
+ * @param dni       DNI del trabajador.
+ * @param nombre    Nombre del trabajador.
+ * @param email     Correo electrónico del trabajador.
+ * @param seccion   Sección a la que pertenece el trabajador.
+ * @param isActive  Indica si el trabajador está activo o no.
+ * @Builder         Anotación de Lombok que facilita la creación de constructores y builders.
+ *                   Se utiliza para mejorar la legibilidad y concisión del código.
+ */
 @Builder
 public record PersonalCreateDto(
         @NotBlank(message = "El dni no puede estar vacio")

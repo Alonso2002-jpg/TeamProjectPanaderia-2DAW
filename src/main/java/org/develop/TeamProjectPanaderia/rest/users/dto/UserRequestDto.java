@@ -11,7 +11,10 @@ import org.develop.TeamProjectPanaderia.rest.users.model.Role;
 import org.hibernate.validator.constraints.Length;
 
 import java.util.Set;
-
+/**
+ * DTO (Data Transfer Object) que representa la información de solicitud para la creación de un nuevo usuario.
+ * Utiliza Lombok para la generación automática de constructores, getters, setters y otros métodos.
+ */
 @Builder
 @Data
 @NoArgsConstructor

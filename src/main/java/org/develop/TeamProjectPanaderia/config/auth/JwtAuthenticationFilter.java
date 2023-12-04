@@ -18,19 +18,37 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
+/**
+ * Este filtro se encarga de la autenticacion mediante JWT.
+ * @author Joselyn Obando, Miguel Zanotto, Alonso Cruz, Kevin Bermudez, Laura Garrido.
+ */
 @Component
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final AuthUserService authUserService;
 
+    /**
+     * Constructor de la clase JwtAuthenticationFilter.
+     *
+     * @param jwtService      Servicio para la manipulacion de JWT.
+     * @param authUserService Servicio para la obtencion de detalles del usuario.
+     */
     @Autowired
     public JwtAuthenticationFilter(JwtService jwtService, AuthUserService authUserService) {
         this.jwtService = jwtService;
         this.authUserService = authUserService;
     }
 
+    /**
+     * Metodo para realizar la autenticacion basada en JWT.
+     *
+     * @param request     Objeto HttpServletRequest.
+     * @param response    Objeto HttpServletResponse.
+     * @param filterChain Cadena de filtros a aplicar.
+     * @throws ServletException Si hay un error en el servlet.
+     * @throws IOException      Si hay un error de entrada/salida.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("Starting JWT authentication filter...");

@@ -17,6 +17,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Clase que representa a un trabajador en la aplicación.
+ *
+ * @Data Anotación de Lombok que genera automáticamente métodos toString, equals, hashCode, getters y setters.
+ * @AllArgsConstructor Constructor que incluye todos los campos de la clase como parámetros.
+ * @NoArgsConstructor Constructor sin argumentos.
+ * @Entity Anotación de JPA que indica que esta clase es una entidad persistente.
+ * @Builder Patrón de diseño Builder para facilitar la creación de instancias de la clase.
+ * @Table Anotación que especifica el nombre de la tabla en la base de datos para esta entidad.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

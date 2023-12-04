@@ -3,7 +3,16 @@ package org.develop.TeamProjectPanaderia.rest.cliente.models;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.Length;
-
+/**
+ * El registro (record) Direccion representa la dirección de un cliente.
+ *
+ * @param calle      La calle de la dirección.
+ * @param numero     El número de la dirección.
+ * @param ciudad     La ciudad de la dirección.
+ * @param provincia  La provincia de la dirección.
+ * @param pais       El país de la dirección.
+ * @param codPostal  El código postal de la dirección.
+ */
 public record Direccion(
         @Length(min = 3, message = "La calle debe tener al menos 3 caracteres")
         @NotBlank(message = "La calle no puede estar vacia")

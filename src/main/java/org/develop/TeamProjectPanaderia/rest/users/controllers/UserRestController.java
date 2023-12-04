@@ -44,6 +44,18 @@ public class UserRestController {
         this.pedidoService = pedidoService;
     }
 
+    /**
+     * Obtiene todos los usuarios paginados y opcionalmente filtrados por nombre de usuario, correo electrónico o estado de activación.
+     *
+     * @param username  Nombre de usuario para filtrar.
+     * @param email     Correo electrónico para filtrar.
+     * @param isActive  Estado de activación para filtrar.
+     * @param page      Número de página.
+     * @param size      Tamaño de la página.
+     * @param sortBy    Campo por el cual ordenar los resultados.
+     * @param direction Dirección de ordenamiento (ASC o DESC).
+     * @return Lista paginada de usuarios.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PageResponse<UserResponseDto>> findAll(@RequestParam(required = false) Optional<String> username,
@@ -60,6 +72,12 @@ public class UserRestController {
         return ResponseEntity.ok(PageResponse.of(pageResult, sortBy, direction));
     }
 
+    /**
+     * Obtiene un usuario por su identificador único.
+     *
+     * @param id Identificador único del usuario.
+     * @return Información detallada del usuario.
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserInfoResponseDto> getById(@PathVariable("id") Long id) {
@@ -67,6 +85,12 @@ public class UserRestController {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    /**
+     * Crea un nuevo usuario.
+     *
+     * @param user Datos del usuario a crear.
+     * @return Datos del usuario creado.
+     */
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> postUser(@RequestBody @Valid UserRequestDto user) {
@@ -74,6 +98,13 @@ public class UserRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
     }
 
+    /**
+     * Actualiza un usuario existente por su identificador único.
+     *
+     * @param id   Identificador único del usuario a actualizar.
+     * @param user Datos actualizados del usuario.
+     * @return Datos del usuario actualizado.
+     */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponseDto> putUser(@PathVariable("id") Long id, @RequestBody UserRequestDto user) {
@@ -81,6 +112,12 @@ public class UserRestController {
         return ResponseEntity.ok(userService.update(id, user));
     }
 
+    /**
+     * Elimina un usuario por su identificador único.
+     *
+     * @param id Identificador único del usuario a eliminar.
+     * @return Respuesta sin contenido.
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable("id") Long id) {
@@ -89,6 +126,12 @@ public class UserRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Obtiene el perfil del usuario autenticado.
+     *
+     * @param user Usuario autenticado.
+     * @return Información detallada del usuario autenticado.
+     */
     @GetMapping("/me/profile")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserInfoResponseDto> meProfile(@AuthenticationPrincipal User user) {
@@ -96,6 +139,13 @@ public class UserRestController {
         return ResponseEntity.ok(userService.findById(user.getId()));
     }
 
+    /**
+     * Actualiza el perfil del usuario autenticado.
+     *
+     * @param user            Usuario autenticado.
+     * @param userRequestDto  Datos actualizados del usuario.
+     * @return Datos del usuario actualizado.
+     */
     @PutMapping("/me/profile")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserResponseDto> meProfileUpdate(@AuthenticationPrincipal User user, @RequestBody UserRequestDto userRequestDto) {
@@ -103,6 +153,12 @@ public class UserRestController {
         return ResponseEntity.ok(userService.update(user.getId(), userRequestDto));
     }
 
+    /**
+     * Elimina el perfil del usuario autenticado.
+     *
+     * @param user Usuario autenticado.
+     * @return Respuesta sin contenido.
+     */
     @DeleteMapping("/me/profile")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<String> meProfileDelete(@AuthenticationPrincipal User user) {
@@ -111,6 +167,12 @@ public class UserRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Obtiene un pedido específico del usuario actual por ID.
+     *
+     * @param user  El usuario autenticado.
+     * @return ResponseEntity con el pedido solicitado.
+     */
     @GetMapping("/me/pedidos")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<PageResponse<Pedido>> mePedidos(@AuthenticationPrincipal User user,
@@ -124,6 +186,13 @@ public class UserRestController {
         return ResponseEntity.ok(PageResponse.of(pedidoService.findByIdUsuario(user.getId(), pageable), sortBy, direction));
     }
 
+    /**
+     * Obtiene un pedido específico del usuario actual por ID.
+     *
+     * @param user  El usuario autenticado.
+     * @param id    El ID del pedido.
+     * @return ResponseEntity con el pedido solicitado.
+     */
     @GetMapping("/me/pedidos/{id}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> mePedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id) {
@@ -131,6 +200,13 @@ public class UserRestController {
         return ResponseEntity.ok(pedidoService.findById(id));
     }
 
+    /**
+     * Crea un nuevo pedido para el usuario actual.
+     *
+     * @param user    El usuario autenticado.
+     * @param pedido  El pedido a ser creado.
+     * @return ResponseEntity con el pedido creado.
+     */
     @PostMapping("/me/pedidos")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> postPedido(@AuthenticationPrincipal User user, @Valid @RequestBody Pedido pedido) {
@@ -139,6 +215,14 @@ public class UserRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.save(pedido));
     }
 
+    /**
+     * Actualiza un pedido existente del usuario actual por ID.
+     *
+     * @param user    El usuario autenticado.
+     * @param id      El ID del pedido a actualizar.
+     * @param pedido  El pedido con los nuevos datos.
+     * @return ResponseEntity con el pedido actualizado.
+     */
     @PutMapping("/me/pedidos/{id}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<Pedido> putPedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id, @Valid @RequestBody Pedido pedido) {
@@ -147,6 +231,13 @@ public class UserRestController {
         return ResponseEntity.ok(pedidoService.update(id, pedido));
     }
 
+    /**
+     * Elimina un pedido del usuario actual por ID.
+     *
+     * @param user  El usuario autenticado.
+     * @param id    El ID del pedido a eliminar.
+     * @return ResponseEntity indicando el éxito de la operación.
+     */
     @DeleteMapping("/me/pedidos/{id}")
     @PreAuthorize("hasAnyRole('SELLER', 'ADMIN')")
     public ResponseEntity<String> deletePedido(@AuthenticationPrincipal User user, @PathVariable("id") ObjectId id) {
@@ -155,6 +246,12 @@ public class UserRestController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Maneja las excepciones de validación lanzadas durante la creación o actualización de pedidos.
+     *
+     * @param ex  La excepción de validación.
+     * @return Mapa que contiene los errores de validación.
+     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(

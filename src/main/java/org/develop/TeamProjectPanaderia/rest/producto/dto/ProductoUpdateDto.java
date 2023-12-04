@@ -3,7 +3,9 @@ package org.develop.TeamProjectPanaderia.rest.producto.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import org.hibernate.validator.constraints.Length;
-
+/**
+ * Representa los datos para actualizar un producto.
+ */
 public record ProductoUpdateDto (
      @Length(min = 3, message = "El nombre debe contener al menos 3 letras")
      @Schema(description = "Nombre del producto", example = "Pan de Barra")
