@@ -53,9 +53,9 @@ class SwaggerConfig {
                                 )
                                 .contact(
                                         new Contact()
-                                                .name("Miguel Angel Zanotot Rojas")
-                                                .email("miguelangel.zanotto@alumno.iesluisvives.org")
-                                                .url("https://github.com/MiguelZanottto")
+                                                .name("Capitalistas Salvajes, Panaderia Pepitos")
+                                                .email("givemeyourmoney@gmail.com")
+                                                .url("https://github.com/Alonso2002-jpg/TeamProjectPanaderia-2DAW")
                                 )
 
                 )
@@ -84,7 +84,7 @@ class SwaggerConfig {
     GroupedOpenApi httpApi() {
         return GroupedOpenApi.builder()
                 .group("https")
-                .pathsToMatch("/" + apiVersion + "/producto/**", "/" + apiVersion + "/categoria/**", "/" + apiVersion + "/auth/**", "/" + apiVersion + "/personal/**", "/" + apiVersion + "/proveedores/**", "/" + apiVersion + "/pedidos/**", "/" + apiVersion + "/cliente/**")
+                .pathsToMatch("/" + apiVersion + "/producto/**", "/" + apiVersion + "/categoria/**", "/" + apiVersion + "/auth/**", "/" + apiVersion + "/personal/**", "/" + apiVersion + "/proveedores/**", "/" + apiVersion + "/pedidos/**", "/" + apiVersion + "/cliente/**",  "/" + apiVersion + "/users/**")
                 .displayName("Panaderia Pepitos Swagger")
                 .build();
     }

@@ -1,5 +1,6 @@
 package org.develop.TeamProjectPanaderia.rest.users.controllers;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
@@ -32,6 +33,7 @@ import java.util.Optional;
 @Slf4j
 @RequestMapping("${api.version}/users")
 @PreAuthorize("hasRole('USER')")
+@Tag(name = "Users", description = "Endpoint para gestionar los usuarios de la Panaderia Pepitos")
 public class UserRestController {
     private final UserService userService;
     private final PedidoService pedidoService;
