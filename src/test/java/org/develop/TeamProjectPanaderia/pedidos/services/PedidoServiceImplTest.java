@@ -15,6 +15,9 @@ import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotFoun
 import org.develop.TeamProjectPanaderia.rest.producto.exceptions.ProductoNotStock;
 import org.develop.TeamProjectPanaderia.rest.producto.models.Producto;
 import org.develop.TeamProjectPanaderia.rest.producto.repositories.ProductoRepository;
+import org.develop.TeamProjectPanaderia.rest.users.model.Role;
+import org.develop.TeamProjectPanaderia.rest.users.model.User;
+import org.develop.TeamProjectPanaderia.rest.users.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,13 +27,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -41,10 +42,20 @@ class PedidoServiceImplTest {
     PedidoRepository pedidoRepository;
     @Mock
     ProductoRepository productoRepository;
+    @Mock
+    UserRepository userRepository;
     @InjectMocks
     PedidoServiceImpl pedidoService;
     private final Direccion direccion = new Direccion("Calle", "Numero", "Ciudad", "Provincia", "Pais", "12345");
     Categoria categoriaCliente = new Categoria(1L, "CLIENTE_TEST", LocalDate.now(), LocalDate.now(), true);
+    private final User user = User.builder()
+            .id(50L)
+            .name("test perez")
+            .password("password_test")
+            .username("username_test")
+            .email("test@test.com")
+            .roles(Set.of(Role.ADMIN))
+            .build();
     private final Cliente cliente1 =
             Cliente.builder()
                     .id(1L)
@@ -137,7 +148,9 @@ class PedidoServiceImplTest {
         pedido.setLineasPedido(List.of(lineaPedido));
         Pedido pedidoToSave = new Pedido();
         pedidoToSave.setLineasPedido(List.of(lineaPedido));
+        pedido.setIdUsuario(50L);
 
+        when(userRepository.findById(50L)).thenReturn(Optional.of(user));
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoToSave);
         when(productoRepository.findById(any(UUID.class))).thenReturn(Optional.of(producto));
 
@@ -157,7 +170,8 @@ class PedidoServiceImplTest {
     @Test
     void save_PedidoWithNotItems() {
         Pedido pedido = new Pedido();
-
+        pedido.setIdUsuario(50L);
+        when(userRepository.findById(50L)).thenReturn(Optional.of(user));
         assertThrows(PedidoEmpty.class, () -> pedidoService.save(pedido));
 
         verify(pedidoRepository, never()).save(any(Pedido.class));
