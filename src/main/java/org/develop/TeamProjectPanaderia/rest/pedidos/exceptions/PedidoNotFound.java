@@ -1,8 +1,12 @@
 package org.develop.TeamProjectPanaderia.rest.pedidos.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
 /**
  * Excepción lanzada cuando no se encuentra un pedido con la información proporcionada.
  */
+@ResponseStatus(HttpStatus.NOT_FOUND)
 public class PedidoNotFound extends PedidoException {
 
     /**
